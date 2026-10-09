@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bb2e0bb66da5ce4ca32c68b33a1e518, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.GameConfig
+  buildings:
+  - {fileID: 11400000, guid: 4682268c44da2484d9fcdd05ac393052, type: 2}
+  - {fileID: 11400000, guid: ad40c368d52cb594089c4ede17aaa09c, type: 2}
+  - {fileID: 11400000, guid: 71ed07f698598ce42b5b14ed06ca851b, type: 2}
+  - {fileID: 11400000, guid: d2b458ceace01d640a280f028cdd8a4b, type: 2}
+  - {fileID: 11400000, guid: 3b01098368843fa40b68b939f5bac4f5, type: 2}
+  - {fileID: 11400000, guid: e0996f0d672c74c4fbf9880465118a88, type: 2}
+  - {fileID: 11400000, guid: 5a4c88419425ea044a3509320650f5b0, type: 2}
+  - {fileID: 11400000, guid: 20095a98a7101fc4890dfce6c656c1c6, type: 2}
+  - {fileID: 11400000, guid: ac5cbf3d61646a64e8010323727b7d88, type: 2}
+  - {fileID: 11400000, guid: e25a8e6e2add2f345b4b8d0914971b0d, type: 2}
+  - {fileID: 11400000, guid: 5edb0bf0fd1c1d243994891471a3297e, type: 2}
+  - {fileID: 11400000, guid: 0d1183bc6c3329c40ac36886db9504c9, type: 2}
+  upgrades:
+  - {fileID: 11400000, guid: 84138769150a9ea4a9a8b9793b098b93, type: 2}
+  - {fileID: 11400000, guid: 9915a2153d7b0cd4e8ad7b4303e6925a, type: 2}
+  - {fileID: 11400000, guid: f0353ac439b335849bf9d68c38d8f806, type: 2}
+  - {fileID: 11400000, guid: 0b0e2638cb4bc90448c6408fc90302dc, type: 2}
+  - {fileID: 11400000, guid: 8ffa8e4da68c4714cb17936569cf8061, type: 2}
+  - {fileID: 11400000, guid: 9d6d734229370714b88c652896305f63, type: 2}
+  - {fileID: 11400000, guid: 36d8f3c94855afc46878b95c0bbdcefd, type: 2}
+  - {fileID: 11400000, guid: 7f5200c1fee2ecb41b2461d34530eb62, type: 2}
+  - {fileID: 11400000, guid: 524b242ce8766ac4086c43d348287315, type: 2}
+  - {fileID: 11400000, guid: fbbb250011f37ee40a67fc09e44ccaa1, type: 2}
+  - {fileID: 11400000, guid: d3d0a0bc3c133f145902b81247c26e33, type: 2}
+  - {fileID: 11400000, guid: 23b1380e2bd279747bb845cf72418836, type: 2}
+  - {fileID: 11400000, guid: fc9ae36ece1ffb049ae1ca25586b907f, type: 2}
+  - {fileID: 11400000, guid: 295d4139d725f2549909eaf87045e5ce, type: 2}
+  - {fileID: 11400000, guid: 78e737cbe89608c4e9c0303ba74b763c, type: 2}
+  - {fileID: 11400000, guid: 63c9230cb694b8f4eb75b1f1e7577124, type: 2}
+  - {fileID: 11400000, guid: a461c826deed78a47893ff60a161893f, type: 2}
+  - {fileID: 11400000, guid: fed678ef0bacfa64abc84bc086877386, type: 2}
+  - {fileID: 11400000, guid: 916d7055b704bf640ba4187660264b33, type: 2}
+  - {fileID: 11400000, guid: 887ffaf459b3f484bace8e2f30d19553, type: 2}
+  - {fileID: 11400000, guid: c75154c8096c5284fbad0dceb1272c17, type: 2}
+  - {fileID: 11400000, guid: 2e95b3c70f9184a44b3ac6e82429416d, type: 2}
+  - {fileID: 11400000, guid: 4d487f6aa235c354791fabfa0679694e, type: 2}
+  - {fileID: 11400000, guid: 6cf45b39a95275245955b5c3698a4a74, type: 2}
+  - {fileID: 11400000, guid: 991a82c6b0c6bf14e8ba48617882d8f1, type: 2}
+  costGrowth: 1.15
+  revealCostRatio: 0.5
+  goldenSpawnInterval: {x: 60, y: 150}
+  goldenLifetime: 13
+  frenzyDuration: 77
+  frenzyMultiplier: 7
+  luckyBankRatio: 0.15
+  luckyMaxCpsSeconds: 900
+  saveKey: CookieClicker.Save
+  autosaveInterval: 30
