@@ -20,11 +20,12 @@ namespace CookieClicker.EditorTools
     /// 결과물은 일반 씬/프리팹이라 이후에는 Hierarchy와 Inspector에서 직접 편집하면 된다.
     /// (게임 실행 중에 오브젝트를 만드는 방식이 아니므로 플레이하지 않아도 모든 오브젝트가 보인다)
     /// </summary>
-    public static class CookieSceneBuilder
+    public static partial class CookieSceneBuilder
     {
         private const string ScenePath = "Assets/CookieClicker/Scenes/CookieClicker.unity";
         private const string PrefabFolder = "Assets/CookieClicker/Prefabs";
         private const string ModelPath = "Assets/CookieClicker/Models/Nakgopsae.glb";
+        internal const string FontPath = "Assets/CookieClicker/Fonts/Cafe24Ohsquare.ttf";
         private const string ClickTargetName = "StewPot";
         private const string ModelPivotName = "ModelPivot";
         // 전골냄비는 윗면(+Y)이 위를 보고 있어서, 정면 카메라에서 국물이 보이도록 앞으로 기울인다.
@@ -56,7 +57,12 @@ namespace CookieClicker.EditorTools
                 return;
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
-            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            font = AssetDatabase.LoadAssetAtPath<Font>(FontPath);
+            if (font == null)
+            {
+                Debug.LogWarning($"[CookieSceneBuilder] {FontPath}이 없어 기본 폰트를 사용합니다.");
+                font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            }
             EditorFolders.Ensure(PrefabFolder);
             EditorFolders.Ensure("Assets/CookieClicker/Scenes");
 
@@ -79,7 +85,8 @@ namespace CookieClicker.EditorTools
 
             var cookie = CreateCookie(game, camera);
             var background = CreateBackgroundCanvas(game, camera, prefabs);
-            CreateUICanvas(game, cookie, config, prefabs, background);
+            var ui = CreateUICanvas(game, cookie, config, prefabs, background);
+            CreateExploreWorld(game, config, camera, cookie, background, ui);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddSceneToBuildSettings();
@@ -184,18 +191,18 @@ namespace CookieClicker.EditorTools
         /// root 아래에 ModelPivot을 만들고 모델을 넣는다. 어떤 모델이든 가장 긴 변이 1, 중심이 원점이 되도록 맞추므로
         /// 모델만 바꿔도 화면 크기·클릭 범위(SphereCollider)는 그대로 쓸 수 있다.
         /// </summary>
-        private static Transform AttachModel(Transform root, GameObject modelAsset)
+        private static Transform AttachModel(Transform root, GameObject modelAsset, Vector3? rotation = null)
         {
             // 크기 계산은 월드 기준이라 잠시 root를 원점·기본 크기로 돌려 놓고 계산한 뒤 되돌린다.
             Vector3 position = root.position;
-            Quaternion rotation = root.rotation;
+            Quaternion rootRotation = root.rotation;
             Vector3 scale = root.localScale;
             root.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             root.localScale = Vector3.one;
 
             var pivot = new GameObject(ModelPivotName).transform;
             pivot.SetParent(root, false);
-            pivot.localRotation = Quaternion.Euler(ModelRotation);
+            pivot.localRotation = Quaternion.Euler(rotation ?? ModelRotation);
 
             var model = modelAsset != null
                 ? PrefabUtility.InstantiatePrefab(modelAsset) as GameObject ?? Object.Instantiate(modelAsset)
@@ -204,7 +211,7 @@ namespace CookieClicker.EditorTools
             model.transform.SetParent(pivot, false);
             NormalizeToUnitSize(root, pivot);
 
-            root.SetPositionAndRotation(position, rotation);
+            root.SetPositionAndRotation(position, rootRotation);
             root.localScale = scale;
             return pivot;
         }
@@ -267,6 +274,7 @@ namespace CookieClicker.EditorTools
 
         private struct BackgroundParts
         {
+            public GameObject Root;
             public RectTransform Rays;
             public RectTransform Glow;
             public RectTransform RainArea;
@@ -291,15 +299,24 @@ namespace CookieClicker.EditorTools
             var rain = rainArea.gameObject.AddComponent<CookieRain>();
             Wire(rain, ("game", game), ("cookiePrefab", prefabs.RainCookie), ("area", rainArea));
 
-            return new BackgroundParts { Rays = rays, Glow = glow, RainArea = rainArea };
+            return new BackgroundParts { Root = root.gameObject, Rays = rays, Glow = glow, RainArea = rainArea };
         }
 
         // ------------------------------------------------------------------ UI
 
-        private static void CreateUICanvas(CookieGame game, CookieClickTarget cookie, GameConfig config, Prefabs prefabs,
+        private struct UiParts
+        {
+            public RectTransform Canvas;
+            /// <summary>클리커 화면 UI 전체. 구경하기 중에는 통째로 꺼진다.</summary>
+            public GameObject MainHud;
+            public Button ExploreButton;
+        }
+
+        private static UiParts CreateUICanvas(CookieGame game, CookieClickTarget cookie, GameConfig config, Prefabs prefabs,
             BackgroundParts background)
         {
-            var root = (RectTransform)CreateCanvas("UI Canvas", RenderMode.ScreenSpaceOverlay, null, 0, true).transform;
+            var canvas = (RectTransform)CreateCanvas("UI Canvas", RenderMode.ScreenSpaceOverlay, null, 0, true).transform;
+            var root = Stretch(CreateRect("MainHud", canvas), Vector2.zero, Vector2.one);
 
             // 왼쪽: 쿠키 수 표시
             var left = Stretch(CreateRect("LeftPanel", root), Vector2.zero, new Vector2(0.34f, 1f));
@@ -317,7 +334,7 @@ namespace CookieClicker.EditorTools
 
             var middle = CreateMiddlePanel(root, game);
             var store = CreateStorePanel(root, game, config, prefabs);
-            var news = CreateNewsTicker(root, game);
+            var news = CreateNewsTicker(root, game, out var exploreButton);
             var tabBar = CreateTabBar(root, out var storeTab, out var statsTab);
 
             // 맨 위: 이펙트 / 황금 쿠키 / 안내 문구 (배경 이미지가 없어서 클릭을 가로막지 않는다)
@@ -340,6 +357,8 @@ namespace CookieClicker.EditorTools
 
             ConfigureResponsiveLayout(root, cookie, goldenView, background,
                 left, middle, store, news, tabBar, storeTab, statsTab, popup);
+
+            return new UiParts { Canvas = canvas, MainHud = root.gameObject, ExploreButton = exploreButton };
         }
 
         /// <summary>
@@ -402,11 +421,18 @@ namespace CookieClicker.EditorTools
                 landscapeCookie, portraitCookie, tabBar.gameObject, storeTab, statsTab, store.gameObject, middle.gameObject);
         }
 
-        private static RectTransform CreateNewsTicker(RectTransform root, CookieGame game)
+        private static RectTransform CreateNewsTicker(RectTransform root, CookieGame game, out Button exploreButton)
         {
             var news = TopBand(CreateRect("NewsTicker", root), 0f, 70f, 5f, 5f);
             AddImage(news, null, new Color(0f, 0f, 0f, 0.45f));
-            var newsText = AddText(Stretch(CreateRect("Text", news), Vector2.zero, Vector2.one, new Vector2(20f, 0f), new Vector2(-20f, 0f)),
+
+            var buttonRect = Stretch(CreateRect("ExploreButton", news), new Vector2(1f, 0f), Vector2.one, new Vector2(-196f, 10f), new Vector2(-10f, -10f));
+            var buttonImage = AddImage(buttonRect, CookieArtFactory.RoundedRect, Gold, true);
+            exploreButton = AddButton(buttonRect, buttonImage);
+            AddText(Stretch(CreateRect("Label", buttonRect), Vector2.zero, Vector2.one), "건물 구경하기", 20, new Color(0.25f, 0.13f, 0.05f),
+                TextAnchor.MiddleCenter, FontStyle.Bold);
+
+            var newsText = AddText(Stretch(CreateRect("Text", news), Vector2.zero, Vector2.one, new Vector2(20f, 0f), new Vector2(-210f, 0f)),
                 "뉴스", 22, Cream, TextAnchor.MiddleCenter, FontStyle.Italic);
             Wire(news.gameObject.AddComponent<NewsTickerView>(), ("game", game), ("newsText", newsText));
             return news;
@@ -727,7 +753,7 @@ namespace CookieClicker.EditorTools
             text.fontSize = size;
             text.color = color;
             text.alignment = alignment;
-            text.fontStyle = style;
+            text.fontStyle = UIFontTool.AdjustStyle(font, style);
             text.supportRichText = true;
             text.raycastTarget = false;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;

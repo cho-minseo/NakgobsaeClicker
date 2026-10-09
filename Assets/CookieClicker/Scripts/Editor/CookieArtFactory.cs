@@ -113,7 +113,7 @@ namespace CookieClicker.EditorTools
             var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (existing != null) return existing;
 
-            EditorFolders.Ensure(ArtFolder);
+            EditorFolders.Ensure(path.Substring(0, path.LastIndexOf('/')));
             var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
             var material = new Material(shader);
             material.SetColor(material.HasProperty("_BaseColor") ? "_BaseColor" : "_Color", color);

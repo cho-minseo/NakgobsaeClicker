@@ -92,6 +92,20 @@ Assets/CookieClicker/
 - `OnPointerDown`: 카메라의 `PhysicsRaycaster`가 쿠키의 `SphereCollider`를 맞히면 EventSystem이 호출합니다. UI 버튼과 같은 입력 경로를 쓰기 때문에 UI 위를 클릭했을 때 뒤의 쿠키가 같이 눌리는 문제가 자동으로 막힙니다.
 - `FitToScreen`: 해상도가 바뀌어도 쿠키가 화면 왼쪽에 같은 비율로 보이게 합니다. 직접 배치하고 싶으면 Inspector에서 `Fit To Screen`을 끄면 됩니다.
 
+### Gameplay: 건물 구경하기 (1인칭)
+
+**`ExploreModeController`**: 뉴스 줄의 "건물 구경하기" 버튼 ↔ Esc로 클리커 화면과 1인칭 월드를 전환합니다.
+- `SetMode`: "클리커에서만 켤 것", "구경하기에서만 켤 것" 두 목록을 통째로 켜고 끕니다. 오브젝트를 새로 만들지 않으므로 두 화면 모두 Hierarchy에서 그대로 편집할 수 있습니다.
+
+**`FirstPersonController`**: WASD 이동, 마우스 시점, Shift 달리기, Space 점프.
+- 키를 직접 읽지 않고 `InputSystem_Actions` 에셋의 액션을 참조합니다. 키 배치 변경이나 게임패드 지원은 에셋만 수정하면 됩니다.
+
+**`BuildingPlot`**: 월드의 건물 자리. 하나도 안 샀으면 빈 땅이고, 사면 건물이 나타나며 5·10·25·50·100개마다 상자 더미가 늘어납니다.
+- 인덱스가 아니라 `BuildingDefinition`을 직접 참조해서 상점 순서를 바꿔도 자리가 엉키지 않습니다.
+
+**`HandPoseSwitcher`** / **`ViewmodelAnimator`**: 리깅 없는 "떠다니는 손".
+- 손 = 소켓(움직임) + 포즈별 모델(모양) 2단 구조입니다. 걷기 휘적임·시점 흔들림·주먹은 코드가 소켓을 움직여서 만들고, 손 모양은 `Pose_Open` / `Pose_Fist` 아래 모델만 바꾸면 됩니다. AI로 만든 손 모델은 여기에 넣으면 됩니다.
+
 ### View
 
 **`StoreView`**: 오른쪽 상점 패널.
@@ -151,3 +165,11 @@ Assets/CookieClicker/
 | 쿠키 위치·크기 | `Cookie` 오브젝트의 `CookieClickTarget` |
 | 쿠키 모델 방향 | `Cookie/ModelPivot`의 Rotation |
 | 상점 줄 디자인 | `Prefabs/BuildingRow.prefab` |
+
+## 사용한 외부 리소스
+
+| 리소스 | 라이선스 | 위치 |
+|---|---|---|
+| 카페24 아네모네 (Cafe24 Ohsquare) 폰트, 카페24(주) 제공 | SIL Open Font License 1.1 | `Assets/CookieClicker/Fonts/` (라이선스 PDF 동봉) |
+
+폰트를 바꾸려면 `CookieSceneBuilder.FontPath`를 수정한 뒤 **Tools > Cookie Clicker > Apply UI Font**를 실행하면 됩니다.
