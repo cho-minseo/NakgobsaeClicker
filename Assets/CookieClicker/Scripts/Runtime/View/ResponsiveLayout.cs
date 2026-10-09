@@ -1,0 +1,161 @@
+using System;
+using CookieClicker.Gameplay;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace CookieClicker.View
+{
+    /// <summary>RectTransform 하나의 앵커/오프셋 값. 가로·세로 배치를 데이터로 저장하기 위해 쓴다.</summary>
+    [Serializable]
+    public struct RectLayout
+    {
+        public Vector2 anchorMin;
+        public Vector2 anchorMax;
+        public Vector2 offsetMin;
+        public Vector2 offsetMax;
+
+        public RectLayout(Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin = default, Vector2 offsetMax = default)
+        {
+            this.anchorMin = anchorMin;
+            this.anchorMax = anchorMax;
+            this.offsetMin = offsetMin;
+            this.offsetMax = offsetMax;
+        }
+
+        public void ApplyTo(RectTransform target)
+        {
+            target.anchorMin = anchorMin;
+            target.anchorMax = anchorMax;
+            target.offsetMin = offsetMin;
+            target.offsetMax = offsetMax;
+        }
+    }
+
+    [Serializable]
+    public class PanelLayout
+    {
+        public RectTransform target;
+        public RectLayout landscape;
+        public RectLayout portrait;
+    }
+
+    [Serializable]
+    public struct CookieLayout
+    {
+        [Tooltip("화면 비율 좌표 (0,0 = 왼쪽 아래)")]
+        public Vector2 viewportPosition;
+        [Range(0.1f, 1f)] public float heightRatio;
+        [Range(0.1f, 1f)] public float maxWidthRatio;
+        [Tooltip("황금 쿠키가 나타날 수 있는 범위 (화면 비율)")]
+        public Rect goldenSpawnRect;
+    }
+
+    /// <summary>
+    /// 화면이 가로인지 세로인지 보고 패널 배치를 바꾼다.
+    /// 배치값은 코드가 아니라 Inspector의 데이터라서, 디자인을 바꿀 때 코드를 고칠 필요가 없다.
+    /// 세로 화면에서는 상점과 통계를 탭으로 전환한다.
+    /// </summary>
+    public class ResponsiveLayout : MonoBehaviour
+    {
+        [SerializeField] private PanelLayout[] panels = Array.Empty<PanelLayout>();
+
+        [Header("쿠키 위치")]
+        [SerializeField] private CookieClickTarget cookie;
+        [SerializeField] private GoldenCookieView goldenCookie;
+        [Tooltip("쿠키 위치를 따라다니는 장식 (후광 등). 앵커가 쿠키 화면 좌표로 맞춰진다.")]
+        [SerializeField] private RectTransform[] followCookie = Array.Empty<RectTransform>();
+        [SerializeField] private CookieLayout landscapeCookie;
+        [SerializeField] private CookieLayout portraitCookie;
+
+        [Header("세로 화면 탭")]
+        [SerializeField] private GameObject tabBar;
+        [SerializeField] private Button storeTabButton;
+        [SerializeField] private Button statsTabButton;
+        [SerializeField] private GameObject storePanel;
+        [SerializeField] private GameObject statsPanel;
+        [SerializeField] private Color selectedTabColor = new Color(0.95f, 0.75f, 0.35f);
+        [SerializeField] private Color normalTabColor = new Color(0.35f, 0.24f, 0.15f);
+
+        public bool IsPortrait { get; private set; }
+
+        private bool applied;
+        private bool showingStats;
+
+        private void Start()
+        {
+            storeTabButton.onClick.AddListener(() => SelectTab(false));
+            statsTabButton.onClick.AddListener(() => SelectTab(true));
+            Apply(Screen.height > Screen.width);
+        }
+
+        private void Update()
+        {
+            // 창 크기 변경·기기 회전을 감지한다. 바뀌었을 때만 다시 배치한다.
+            bool portrait = Screen.height > Screen.width;
+            if (!applied || portrait != IsPortrait) Apply(portrait);
+        }
+
+        public void Apply(bool portrait)
+        {
+            applied = true;
+            IsPortrait = portrait;
+
+            foreach (var panel in panels)
+            {
+                if (panel.target != null) (portrait ? panel.portrait : panel.landscape).ApplyTo(panel.target);
+            }
+
+            var layout = portrait ? portraitCookie : landscapeCookie;
+            if (cookie != null) cookie.SetScreenLayout(layout.viewportPosition, layout.heightRatio, layout.maxWidthRatio);
+            if (goldenCookie != null) goldenCookie.SpawnRect = layout.goldenSpawnRect;
+            foreach (var rt in followCookie)
+            {
+                if (rt == null) continue;
+                rt.anchorMin = rt.anchorMax = layout.viewportPosition;
+                rt.anchoredPosition = Vector2.zero;
+            }
+
+            if (tabBar != null) tabBar.SetActive(portrait);
+            RefreshTabs();
+        }
+
+        private void SelectTab(bool stats)
+        {
+            showingStats = stats;
+            RefreshTabs();
+        }
+
+        private void RefreshTabs()
+        {
+            storePanel.SetActive(!IsPortrait || !showingStats);
+            statsPanel.SetActive(!IsPortrait || showingStats);
+            storeTabButton.image.color = showingStats ? normalTabColor : selectedTabColor;
+            statsTabButton.image.color = showingStats ? selectedTabColor : normalTabColor;
+        }
+
+        [ContextMenu("미리보기: 가로 배치")]
+        private void PreviewLandscape() => Apply(false);
+
+        [ContextMenu("미리보기: 세로 배치")]
+        private void PreviewPortrait() => Apply(true);
+
+#if UNITY_EDITOR
+        public void EditorConfigure(PanelLayout[] newPanels, CookieClickTarget newCookie, GoldenCookieView newGolden,
+            RectTransform[] newFollowCookie, CookieLayout landscape, CookieLayout portrait,
+            GameObject newTabBar, Button storeTab, Button statsTab, GameObject newStorePanel, GameObject newStatsPanel)
+        {
+            panels = newPanels;
+            cookie = newCookie;
+            goldenCookie = newGolden;
+            followCookie = newFollowCookie;
+            landscapeCookie = landscape;
+            portraitCookie = portrait;
+            tabBar = newTabBar;
+            storeTabButton = storeTab;
+            statsTabButton = statsTab;
+            storePanel = newStorePanel;
+            statsPanel = newStatsPanel;
+        }
+#endif
+    }
+}

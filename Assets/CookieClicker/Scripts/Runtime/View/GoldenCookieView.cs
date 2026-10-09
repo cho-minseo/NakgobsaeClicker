@@ -19,6 +19,12 @@ namespace CookieClicker.View
         [SerializeField] private Rect normalizedSpawnRect = new Rect(0.04f, 0.1f, 0.6f, 0.75f);
         [SerializeField] private float fadeDuration = 1f;
 
+        public Rect SpawnRect
+        {
+            get => normalizedSpawnRect;
+            set => normalizedSpawnRect = value;
+        }
+
         private RectTransform rectTransform;
         private float waitTimer;
         private float visibleTimer;

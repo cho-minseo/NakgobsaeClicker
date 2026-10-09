@@ -68,6 +68,14 @@ namespace CookieClicker.Gameplay
             Clicked?.Invoke(amount, eventData.position);
         }
 
+        /// <summary>가로/세로 전환 시 ResponsiveLayout이 호출한다.</summary>
+        public void SetScreenLayout(Vector2 viewport, float newHeightRatio, float newMaxWidthRatio)
+        {
+            viewportPosition = viewport;
+            heightRatio = newHeightRatio;
+            maxWidthRatio = newMaxWidthRatio;
+        }
+
         public void OnPointerEnter(PointerEventData eventData) => hovered = true;
         public void OnPointerExit(PointerEventData eventData) => hovered = false;
 
