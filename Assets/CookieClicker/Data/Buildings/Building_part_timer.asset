@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69e60f879978a848989fa21e24e6f5e, type: 3}
+  m_Name: Building_part_timer
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
+  id: part_timer
+  displayName: "알바생"
+  description: "사장님 눈치 보면서 열심히 볶는 중."
+  baseCost: 100
+  baseCps: 1
+  iconColor: {r: 0.95, g: 0.6, b: 0.35, a: 1}

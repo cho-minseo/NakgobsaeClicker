@@ -24,7 +24,11 @@ namespace CookieClicker.EditorTools
     {
         private const string ScenePath = "Assets/CookieClicker/Scenes/CookieClicker.unity";
         private const string PrefabFolder = "Assets/CookieClicker/Prefabs";
-        private const string ModelPath = "Assets/CookieClicker/Models/Cookie.glb";
+        private const string ModelPath = "Assets/CookieClicker/Models/Nakgopsae.glb";
+        private const string ClickTargetName = "StewPot";
+        private const string ModelPivotName = "ModelPivot";
+        // 전골냄비는 윗면(+Y)이 위를 보고 있어서, 정면 카메라에서 국물이 보이도록 앞으로 기울인다.
+        private static readonly Vector3 ModelRotation = new Vector3(-55f, 0f, 0f);
         private const int UILayer = 5;
 
         private static readonly Color Cream = new Color(1f, 0.93f, 0.8f);
@@ -120,29 +124,47 @@ namespace CookieClicker.EditorTools
             go.AddComponent<InputSystemUIInputModule>().AssignDefaultActions();
         }
 
+        [MenuItem("Tools/Cookie Clicker/Replace Click Model (클릭 모델 교체)", priority = 1)]
+        public static void ReplaceClickModel()
+        {
+            var target = Object.FindAnyObjectByType<CookieClickTarget>();
+            if (target == null)
+            {
+                EditorUtility.DisplayDialog("Cookie Clicker", "열린 씬에 CookieClickTarget이 없습니다.\n먼저 Build Scene으로 씬을 만들어 주세요.", "확인");
+                return;
+            }
+            var modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
+            if (modelAsset == null)
+            {
+                EditorUtility.DisplayDialog("Cookie Clicker", $"{ModelPath}을 아직 불러오지 못했습니다.\n임포트가 끝난 뒤 다시 실행해 주세요.", "확인");
+                return;
+            }
+
+            var oldPivot = target.transform.Find(ModelPivotName);
+            if (oldPivot != null) Undo.DestroyObjectImmediate(oldPivot.gameObject);
+
+            var pivot = AttachModel(target.transform, modelAsset);
+            Undo.RegisterCreatedObjectUndo(pivot.gameObject, "Replace Click Model");
+            Undo.RecordObject(target.gameObject, "Replace Click Model");
+            target.gameObject.name = ClickTargetName;
+
+            EditorSceneManager.MarkSceneDirty(target.gameObject.scene);
+            Selection.activeGameObject = pivot.gameObject;
+            EditorUtility.DisplayDialog("Cookie Clicker",
+                "클릭 모델을 교체했습니다.\nCtrl+S로 씬을 저장해 주세요.\n\n각도가 어색하면 ModelPivot의 Rotation을 조절하면 됩니다.", "확인");
+        }
+
         private static CookieClickTarget CreateCookie(CookieGame game, Camera camera)
         {
-            var root = new GameObject("Cookie");
-            var pivot = new GameObject("ModelPivot").transform;
-            pivot.SetParent(root.transform, false);
-            // 모델 정면(+Z)이 카메라 쪽(-Z)을 보도록 돌려 둔다. 방향이 어색하면 이 값을 인스펙터에서 바꾸면 된다.
-            pivot.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            var root = new GameObject(ClickTargetName);
 
-            GameObject model;
             var modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
-            if (modelAsset != null)
+            if (modelAsset == null)
             {
-                model = PrefabUtility.InstantiatePrefab(modelAsset) as GameObject ?? Object.Instantiate(modelAsset);
+                Debug.LogWarning($"[CookieSceneBuilder] {ModelPath}을 불러오지 못해 임시 모델을 사용합니다. " +
+                                 "임포트가 끝난 뒤 Replace Click Model 메뉴로 교체하세요.");
             }
-            else
-            {
-                Debug.LogWarning($"[CookieSceneBuilder] {ModelPath}을 불러오지 못해 임시 쿠키를 사용합니다. " +
-                                 "glTFast 패키지 설치가 끝난 뒤 메뉴를 다시 실행하세요.");
-                model = CreateFallbackCookie();
-            }
-            model.name = "CookieModel";
-            model.transform.SetParent(pivot, false);
-            NormalizeToUnitSize(root.transform, pivot);
+            AttachModel(root.transform, modelAsset);
 
             root.AddComponent<SphereCollider>().radius = 0.48f;
             var target = root.AddComponent<CookieClickTarget>();
@@ -156,6 +178,35 @@ namespace CookieClicker.EditorTools
                                       new Vector3((0.17f - 0.5f) * visibleWidth, (0.47f - 0.5f) * visibleHeight, distance);
             root.transform.localScale = Vector3.one * Mathf.Min(visibleHeight * 0.42f, visibleWidth * 0.28f);
             return target;
+        }
+
+        /// <summary>
+        /// root 아래에 ModelPivot을 만들고 모델을 넣는다. 어떤 모델이든 가장 긴 변이 1, 중심이 원점이 되도록 맞추므로
+        /// 모델만 바꿔도 화면 크기·클릭 범위(SphereCollider)는 그대로 쓸 수 있다.
+        /// </summary>
+        private static Transform AttachModel(Transform root, GameObject modelAsset)
+        {
+            // 크기 계산은 월드 기준이라 잠시 root를 원점·기본 크기로 돌려 놓고 계산한 뒤 되돌린다.
+            Vector3 position = root.position;
+            Quaternion rotation = root.rotation;
+            Vector3 scale = root.localScale;
+            root.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            root.localScale = Vector3.one;
+
+            var pivot = new GameObject(ModelPivotName).transform;
+            pivot.SetParent(root, false);
+            pivot.localRotation = Quaternion.Euler(ModelRotation);
+
+            var model = modelAsset != null
+                ? PrefabUtility.InstantiatePrefab(modelAsset) as GameObject ?? Object.Instantiate(modelAsset)
+                : CreateFallbackCookie();
+            model.name = "Model";
+            model.transform.SetParent(pivot, false);
+            NormalizeToUnitSize(root, pivot);
+
+            root.SetPositionAndRotation(position, rotation);
+            root.localScale = scale;
+            return pivot;
         }
 
         /// <summary>모델 크기가 제각각이어도 가장 긴 변이 1이 되고 중심이 원점에 오도록 맞춘다.</summary>
@@ -254,8 +305,8 @@ namespace CookieClicker.EditorTools
             var left = Stretch(CreateRect("LeftPanel", root), Vector2.zero, new Vector2(0.34f, 1f));
             var header = TopBand(CreateRect("Header", left), 0f, 190f);
             AddImage(header, null, new Color(0f, 0f, 0f, 0.35f));
-            AddText(TopBand(CreateRect("BakeryName", header), 14f, 40f), "나의 쿠키 가게", 30, Cream, TextAnchor.MiddleCenter);
-            var countText = AddText(TopBand(CreateRect("CookieCount", header), 54f, 72f), "0 쿠키", 56, Color.white,
+            AddText(TopBand(CreateRect("BakeryName", header), 14f, 40f), "야르! 낙곱새 맛집", 30, Cream, TextAnchor.MiddleCenter);
+            var countText = AddText(TopBand(CreateRect("CookieCount", header), 54f, 72f), "0 낙곱새", 56, Color.white,
                 TextAnchor.MiddleCenter, FontStyle.Bold);
             AddOutline(countText);
             var cpsText = AddText(TopBand(CreateRect("CookiesPerSecond", header), 128f, 40f), "초당 0", 26, Cream, TextAnchor.MiddleCenter);

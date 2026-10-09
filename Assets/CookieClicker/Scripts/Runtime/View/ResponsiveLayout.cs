@@ -46,7 +46,7 @@ namespace CookieClicker.View
         public Vector2 viewportPosition;
         [Range(0.1f, 1f)] public float heightRatio;
         [Range(0.1f, 1f)] public float maxWidthRatio;
-        [Tooltip("황금 쿠키가 나타날 수 있는 범위 (화면 비율)")]
+        [Tooltip("황금 낙곱새가 나타날 수 있는 범위 (화면 비율)")]
         public Rect goldenSpawnRect;
     }
 
@@ -59,10 +59,10 @@ namespace CookieClicker.View
     {
         [SerializeField] private PanelLayout[] panels = Array.Empty<PanelLayout>();
 
-        [Header("쿠키 위치")]
+        [Header("클릭 대상(냄비) 위치")]
         [SerializeField] private CookieClickTarget cookie;
         [SerializeField] private GoldenCookieView goldenCookie;
-        [Tooltip("쿠키 위치를 따라다니는 장식 (후광 등). 앵커가 쿠키 화면 좌표로 맞춰진다.")]
+        [Tooltip("클릭 대상 위치를 따라다니는 장식 (후광 등). 앵커가 그 화면 좌표로 맞춰진다.")]
         [SerializeField] private RectTransform[] followCookie = Array.Empty<RectTransform>();
         [SerializeField] private CookieLayout landscapeCookie;
         [SerializeField] private CookieLayout portraitCookie;

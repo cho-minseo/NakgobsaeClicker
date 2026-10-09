@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f93c5c7aa77d59241adbb6648aaeea3a, type: 3}
+  m_Name: Upgrade_letsgo_wrist
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
+  id: letsgo_wrist
+  displayName: "가보자고 손목"
+  description: "저을 때 초당 생산량 +1% · 가보자고!"
+  cost: 5000000
+  iconColor: {r: 1, g: 0.55, b: 0.25, a: 1}
+  effectType: 1
+  targetBuilding: {fileID: 0}
+  multiplier: 2
+  alsoAffectsClick: 0
+  clickCpsPercent: 0.01
+  requiredBuilding: {fileID: 0}
+  requiredCount: 0
+  requiredHandmadeCookies: 100000

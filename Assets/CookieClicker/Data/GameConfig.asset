@@ -51,6 +51,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4d487f6aa235c354791fabfa0679694e, type: 2}
   - {fileID: 11400000, guid: 6cf45b39a95275245955b5c3698a4a74, type: 2}
   - {fileID: 11400000, guid: 991a82c6b0c6bf14e8ba48617882d8f1, type: 2}
+  currencyName: "낙곱새"
   costGrowth: 1.15
   revealCostRatio: 0.5
   goldenSpawnInterval: {x: 60, y: 150}
@@ -59,5 +60,5 @@ MonoBehaviour:
   frenzyMultiplier: 7
   luckyBankRatio: 0.15
   luckyMaxCpsSeconds: 900
-  saveKey: CookieClicker.Save
+  saveKey: Nakgopsae.Save
   autosaveInterval: 30

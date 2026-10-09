@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f93c5c7aa77d59241adbb6648aaeea3a, type: 3}
+  m_Name: Upgrade_worldline_device
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
+  id: worldline_device
+  displayName: "세계선 수렴 장치"
+  description: "평행세계 낙곱새집 x2 · 모든 세계선에서 낙곱새는 맛있다."
+  cost: 140000000000000
+  iconColor: {r: 0.35, g: 0.85, b: 0.85, a: 1}
+  effectType: 0
+  targetBuilding: {fileID: 11400000, guid: 0d1183bc6c3329c40ac36886db9504c9, type: 2}
+  multiplier: 2
+  alsoAffectsClick: 0
+  clickCpsPercent: 0
+  requiredBuilding: {fileID: 11400000, guid: 0d1183bc6c3329c40ac36886db9504c9, type: 2}
+  requiredCount: 1
+  requiredHandmadeCookies: 0

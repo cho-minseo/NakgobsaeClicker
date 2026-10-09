@@ -18,7 +18,7 @@ namespace CookieClicker.View
         private void Update()
         {
             // 매 프레임 문자열을 새로 대입하면 UI가 매번 다시 그려지므로, 표시가 바뀔 때만 갱신한다.
-            string cookieLabel = $"{NumberFormatter.Format(game.State.Cookies)} 쿠키";
+            string cookieLabel = $"{NumberFormatter.Format(game.State.Cookies)} {game.Config.CurrencyName}";
             if (cookieLabel != lastCookieLabel)
             {
                 cookieCountText.text = cookieLabel;
@@ -33,7 +33,7 @@ namespace CookieClicker.View
             }
 
             buffText.text = game.IsFrenzy
-                ? $"프렌지! 생산량 x{game.Config.FrenzyMultiplier:0} ({Mathf.CeilToInt(game.FrenzyTimeLeft)}초)"
+                ? $"가보자고! 생산량 x{game.Config.FrenzyMultiplier:0} ({Mathf.CeilToInt(game.FrenzyTimeLeft)}초)"
                 : string.Empty;
         }
     }

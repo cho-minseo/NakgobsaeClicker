@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69e60f879978a848989fa21e24e6f5e, type: 3}
+  m_Name: Building_shrimp_trawler
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
+  id: shrimp_trawler
+  displayName: "원양 새우잡이배"
+  description: "먼바다까지 나가서 새우를 잡아 옵니다. 선장님 뱃멀미 심함."
+  baseCost: 330000000
+  baseCps: 44000
+  iconColor: {r: 0.35, g: 0.55, b: 0.9, a: 1}

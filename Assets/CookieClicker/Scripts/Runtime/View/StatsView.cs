@@ -30,13 +30,14 @@ namespace CookieClicker.View
             var state = game.State;
             var config = game.Config;
             var production = game.Production;
+            string currency = config.CurrencyName;
 
             builder.Clear();
-            builder.AppendLine($"총 구운 쿠키   <b>{NumberFormatter.Format(state.TotalBaked)}</b>");
-            builder.AppendLine($"직접 클릭한 쿠키   <b>{NumberFormatter.Format(state.HandmadeCookies)}</b>");
-            builder.AppendLine($"클릭 횟수   <b>{state.Clicks:#,0}</b>");
-            builder.AppendLine($"클릭당 쿠키   <b>{NumberFormatter.Format(game.CookiesPerClick, true)}</b>");
-            builder.AppendLine($"황금 쿠키 클릭   <b>{state.GoldenClicks}</b>");
+            builder.AppendLine($"총 만든 {currency}   <b>{NumberFormatter.Format(state.TotalBaked)}</b>");
+            builder.AppendLine($"직접 저어서 만든 {currency}   <b>{NumberFormatter.Format(state.HandmadeCookies)}</b>");
+            builder.AppendLine($"냄비 저은 횟수   <b>{state.Clicks:#,0}</b>");
+            builder.AppendLine($"한 번 저을 때   <b>{NumberFormatter.Format(game.CookiesPerClick, true)}</b>");
+            builder.AppendLine($"황금 {currency} 획득   <b>{state.GoldenClicks}</b>");
             builder.AppendLine($"플레이 시간   <b>{NumberFormatter.FormatTime(state.PlayTimeSeconds)}</b>");
             builder.AppendLine();
             builder.AppendLine("<b><size=26>건물별 생산량</size></b>");
@@ -54,7 +55,7 @@ namespace CookieClicker.View
                     $"<color=#{color}>■</color> {config.Buildings[i].DisplayName} x{count}   " +
                     $"초당 {NumberFormatter.Format(production.BuildingCps[i], true)}  <color=#aaaaaa>({share:P0})</color>");
             }
-            if (!any) builder.AppendLine("<color=#aaaaaa>아직 건물이 없어요. 쿠키를 클릭해서 커서를 사 보세요!</color>");
+            if (!any) builder.AppendLine($"<color=#aaaaaa>아직 건물이 없어요. 냄비를 저어서 {config.Buildings[0].DisplayName}부터 사 보세요!</color>");
 
             statsText.text = builder.ToString();
         }

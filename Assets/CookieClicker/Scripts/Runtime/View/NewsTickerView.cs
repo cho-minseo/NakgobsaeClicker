@@ -14,10 +14,14 @@ namespace CookieClicker.View
         [SerializeField] private float fadeDuration = 0.5f;
         [SerializeField, TextArea] private string[] generalNews =
         {
-            "오늘의 날씨: 맑음, 가끔 쿠키 부스러기.",
-            "전문가: \"쿠키는 많을수록 좋다.\"",
-            "동네 주민, 갑자기 쿠키 냄새가 난다고 신고.",
-            "과학자들, 쿠키의 무한한 가능성에 주목.",
+            "속보) 낙지 회장님, 갯벌 탈출 시도… 3초 만에 체포",
+            "소 '음메에바', 오늘도 무표정으로 출근",
+            "새우 대리, 허리 펴기 도전 실패… \"원래 이랬다\"",
+            "전문가: \"낙곱새는 마지막에 밥 볶을 때가 진짜다\"",
+            "동네 주민들, 낙곱새 냄새에 단체로 배고픔 호소",
+            "오늘의 운세: 냄비를 저으면 좋은 일이 생김. 가보자고!",
+            "킹받는 사실: 낙곱새를 저을수록 배가 더 고파진다",
+            "야르! 오늘도 냄비는 보글보글",
         };
 
         private readonly List<string> candidates = new List<string>();
@@ -49,10 +53,10 @@ namespace CookieClicker.View
             {
                 int count = game.State.BuildingCounts[i];
                 if (count > 0)
-                    candidates.Add($"속보: {config.Buildings[i].DisplayName} {count}개가 쉬지 않고 쿠키를 만들고 있습니다.");
+                    candidates.Add($"속보: {config.Buildings[i].DisplayName} {count}개가 쉬지 않고 {config.CurrencyName}를 만들고 있습니다.");
             }
             if (game.State.Cookies >= 1_000_000)
-                candidates.Add($"화제의 빵집, 쿠키 {NumberFormatter.Format(game.State.Cookies)}개 보유 중!");
+                candidates.Add($"화제의 맛집, {config.CurrencyName} {NumberFormatter.Format(game.State.Cookies)}인분 보유 중! 줄이 끝이 안 보인다");
 
             newsText.text = candidates[Random.Range(0, candidates.Count)];
         }

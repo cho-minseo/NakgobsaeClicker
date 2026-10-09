@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f93c5c7aa77d59241adbb6648aaeea3a, type: 3}
+  m_Name: Upgrade_oxygen_pump
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
+  id: oxygen_pump
+  displayName: "산소 펌프 교체"
+  description: "새우 양식장 x2 · 새우들이 깊게 숨 쉰다."
+  cost: 1300000
+  iconColor: {r: 0.55, g: 0.6, b: 0.65, a: 1}
+  effectType: 0
+  targetBuilding: {fileID: 11400000, guid: 3b01098368843fa40b68b939f5bac4f5, type: 2}
+  multiplier: 2
+  alsoAffectsClick: 0
+  clickCpsPercent: 0
+  requiredBuilding: {fileID: 11400000, guid: 3b01098368843fa40b68b939f5bac4f5, type: 2}
+  requiredCount: 1
+  requiredHandmadeCookies: 0

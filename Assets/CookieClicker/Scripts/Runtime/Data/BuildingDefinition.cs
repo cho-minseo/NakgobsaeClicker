@@ -13,7 +13,7 @@ namespace CookieClicker.Data
         [SerializeField] private string displayName;
         [SerializeField, TextArea] private string description;
         [SerializeField] private double baseCost = 15;
-        [Tooltip("건물 1개가 1초에 만드는 쿠키 수 (업그레이드 적용 전)")]
+        [Tooltip("건물 1개가 1초에 만드는 양 (업그레이드 적용 전)")]
         [SerializeField] private double baseCps = 0.1;
         [SerializeField] private Color iconColor = Color.white;
 

@@ -160,7 +160,7 @@ namespace CookieClicker.Core
             return true;
         }
 
-        // ---------- 황금 쿠키 ----------
+        // ---------- 황금 낙곱새 ----------
 
         public GoldenCookieResult ClaimGoldenCookie()
         {

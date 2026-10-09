@@ -14,28 +14,33 @@ namespace CookieClicker.Data
         [SerializeField] private BuildingDefinition[] buildings = Array.Empty<BuildingDefinition>();
         [SerializeField] private UpgradeDefinition[] upgrades = Array.Empty<UpgradeDefinition>();
 
+        [Header("표시")]
+        [Tooltip("모으는 재화 이름. UI 문구 전체에 쓰인다.")]
+        [SerializeField] private string currencyName = "낙곱새";
+
         [Header("경제")]
         [Tooltip("건물을 하나 살 때마다 다음 가격에 곱해지는 값")]
         [SerializeField] private float costGrowth = 1.15f;
         [Tooltip("누적 생산량이 '건물 가격 x 이 값'을 넘으면 상점에 공개")]
         [SerializeField, Range(0f, 1f)] private float revealCostRatio = 0.5f;
 
-        [Header("황금 쿠키")]
+        [Header("황금 낙곱새")]
         [SerializeField] private Vector2 goldenSpawnInterval = new Vector2(60f, 150f);
         [SerializeField] private float goldenLifetime = 13f;
         [SerializeField] private float frenzyDuration = 77f;
         [SerializeField] private float frenzyMultiplier = 7f;
-        [Tooltip("럭키: 보유 쿠키의 몇 %를 줄지")]
+        [Tooltip("럭키: 보유량의 몇 %를 줄지")]
         [SerializeField, Range(0f, 1f)] private float luckyBankRatio = 0.15f;
         [Tooltip("럭키: 최대 몇 초 분량의 생산량까지 줄지")]
         [SerializeField] private float luckyMaxCpsSeconds = 900f;
 
         [Header("저장")]
-        [SerializeField] private string saveKey = "CookieClicker.Save";
+        [SerializeField] private string saveKey = "Nakgopsae.Save";
         [SerializeField] private float autosaveInterval = 30f;
 
         public IReadOnlyList<BuildingDefinition> Buildings => buildings;
         public IReadOnlyList<UpgradeDefinition> Upgrades => upgrades;
+        public string CurrencyName => currencyName;
         public float CostGrowth => costGrowth;
         public float RevealCostRatio => revealCostRatio;
         public Vector2 GoldenSpawnInterval => goldenSpawnInterval;

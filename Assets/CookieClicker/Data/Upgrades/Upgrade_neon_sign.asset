@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f93c5c7aa77d59241adbb6648aaeea3a, type: 3}
+  m_Name: Upgrade_neon_sign
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
+  id: neon_sign
+  displayName: "네온사인 간판"
+  description: "곱창 골목 x2 · 멀리서도 보인다. 눈이 부시다."
+  cost: 70000000
+  iconColor: {r: 0.95, g: 0.8, b: 0.3, a: 1}
+  effectType: 0
+  targetBuilding: {fileID: 11400000, guid: e0996f0d672c74c4fbf9880465118a88, type: 2}
+  multiplier: 2
+  alsoAffectsClick: 0
+  clickCpsPercent: 0
+  requiredBuilding: {fileID: 11400000, guid: e0996f0d672c74c4fbf9880465118a88, type: 2}
+  requiredCount: 5
+  requiredHandmadeCookies: 0
