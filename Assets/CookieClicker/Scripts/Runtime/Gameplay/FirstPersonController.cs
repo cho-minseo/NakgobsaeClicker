@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 namespace CookieClicker.Gameplay
 {
     /// <summary>
-    /// 1인칭 이동·시점. 키를 직접 읽지 않고 InputActionReference로 받아서,
+    /// 1인칭 이동·시점·수영. 키를 직접 읽지 않고 InputActionReference로 받아서,
     /// 키 배치를 바꾸거나 게임패드를 지원할 때 Input Actions 에셋만 수정하면 된다.
+    /// 물 판정은 WaterVolume에 위치를 물어보는 방식이라 물을 어디에 두든 코드 수정이 필요 없다.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     public class FirstPersonController : MonoBehaviour
@@ -17,6 +18,8 @@ namespace CookieClicker.Gameplay
         [SerializeField] private InputActionReference lookAction;
         [SerializeField] private InputActionReference jumpAction;
         [SerializeField] private InputActionReference sprintAction;
+        [Tooltip("물속에서 아래로 잠수")]
+        [SerializeField] private InputActionReference diveAction;
 
         [Header("이동")]
         [SerializeField] private float walkSpeed = 5f;
@@ -29,15 +32,35 @@ namespace CookieClicker.Gameplay
         [SerializeField] private float lookSensitivity = 0.1f;
         [SerializeField, Range(10f, 89f)] private float maxPitch = 85f;
 
+        [Header("수영")]
+        [SerializeField] private float swimSpeed = 3.2f;
+        [SerializeField] private float swimSprintSpeed = 5f;
+        [SerializeField] private float swimVerticalSpeed = 2.8f;
+        [Tooltip("발이 수면보다 이만큼 깊으면 수영 시작")]
+        [SerializeField] private float swimStartDepth = 1.15f;
+        [Tooltip("떠 있을 때 발이 수면 아래 이만큼에 머문다 (눈이 수면 위로 살짝 나옴)")]
+        [SerializeField] private float floatDepth = 1.4f;
+        [Tooltip("수면으로 떠오르려는 힘")]
+        [SerializeField] private float buoyancy = 2.5f;
+        [Tooltip("클수록 물속에서 빨리 멈춘다")]
+        [SerializeField] private float waterDrag = 4f;
+
         /// <summary>현재 수평 속도 / 걷기 속도. 손 흔들림 세기에 쓴다 (달리면 1보다 커짐).</summary>
         public float MoveRatio { get; private set; }
         /// <summary>이번 프레임의 시점 회전량. 손이 시점을 살짝 늦게 따라오는 연출에 쓴다.</summary>
         public Vector2 LookDelta { get; private set; }
         public bool IsGrounded => controller.isGrounded;
+        public bool IsSwimming { get; private set; }
+        public bool IsHeadUnderwater { get; private set; }
+        /// <summary>머리(카메라)가 수면 아래로 몇 m 들어가 있는지. 물 밖이면 0.</summary>
+        public float HeadDepth { get; private set; }
+        /// <summary>true면 잠수할 수 없고 수면으로 떠오른다 (산소 부족 등).</summary>
+        public bool DiveLocked { get; set; }
 
         private CharacterController controller;
         private Vector3 planarVelocity;
         private float verticalVelocity;
+        private Vector3 swimVelocity;
         private float pitch;
 
         private void Awake() => controller = GetComponent<CharacterController>();
@@ -48,12 +71,22 @@ namespace CookieClicker.Gameplay
             lookAction.action.Enable();
             jumpAction.action.Enable();
             sprintAction.action.Enable();
+            if (diveAction != null) diveAction.action.Enable();
         }
 
         private void Update()
         {
+            float dt = Time.deltaTime;
             Look();
-            Move(Time.deltaTime);
+
+            bool deepEnough = WaterVolume.TryGetSurface(transform.position, out float surface)
+                              && surface - transform.position.y > swimStartDepth;
+            if (deepEnough) Swim(dt, surface);
+            else Move(dt);
+
+            Vector3 head = cameraPivot.position;
+            IsHeadUnderwater = WaterVolume.TryGetSurface(head, out float headSurface) && head.y < headSurface;
+            HeadDepth = IsHeadUnderwater ? headSurface - head.y : 0f;
         }
 
         private void Look()
@@ -66,6 +99,14 @@ namespace CookieClicker.Gameplay
 
         private void Move(float dt)
         {
+            if (IsSwimming)
+            {
+                // 물에서 나올 때 헤엄치던 수평 속도를 이어받는다.
+                IsSwimming = false;
+                planarVelocity = new Vector3(swimVelocity.x, 0f, swimVelocity.z);
+                verticalVelocity = 0f;
+            }
+
             Vector2 input = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
             float speed = sprintAction.action.IsPressed() ? sprintSpeed : walkSpeed;
             Vector3 target = (transform.right * input.x + transform.forward * input.y) * speed;
@@ -84,6 +125,49 @@ namespace CookieClicker.Gameplay
             MoveRatio = controller.isGrounded ? planarVelocity.magnitude / walkSpeed : 0f;
         }
 
+        /// <summary>
+        /// 바라보는 방향으로 헤엄친다 (아래를 보고 앞으로 가면 잠수). Space = 위, 잠수 키 = 아래.
+        /// 아무것도 안 누르면 부력으로 수면에 떠오른다.
+        /// </summary>
+        private void Swim(float dt, float surface)
+        {
+            if (!IsSwimming)
+            {
+                IsSwimming = true;
+                swimVelocity = planarVelocity + Vector3.up * Mathf.Max(verticalVelocity, -6f);
+            }
+
+            Vector2 input = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
+            float speed = sprintAction.action.IsPressed() ? swimSprintSpeed : swimSpeed;
+            Vector3 direction = Vector3.ClampMagnitude(cameraPivot.forward * input.y + transform.right * input.x, 1f);
+            Vector3 target = direction * speed;
+
+            float vertical = 0f;
+            if (jumpAction.action.IsPressed()) vertical += 1f;
+            if (!DiveLocked && diveAction != null && diveAction.action.IsPressed()) vertical -= 1f;
+            target.y += vertical * swimVerticalSpeed;
+
+            float floatY = surface - floatDepth;
+            bool diving = vertical < 0f || target.y < -0.5f;
+            if (DiveLocked)
+            {
+                // 산소가 없으면 무조건 수면으로 빠르게 올라간다.
+                target.y = Mathf.Max(target.y, 3.5f);
+            }
+            else if (!diving)
+            {
+                // 잠수 중이 아니면 수면 쪽으로 천천히 떠오른다.
+                target.y += Mathf.Clamp((floatY - transform.position.y) * buoyancy, -1.5f, 2.5f);
+            }
+
+            // 물 밖으로 날아오르지 않도록 수면 높이에서 막는다 (해안에서는 바닥을 밟고 걸어 나간다).
+            if (transform.position.y >= floatY && target.y > 0f) target.y = 0f;
+
+            swimVelocity = Vector3.Lerp(swimVelocity, target, 1f - Mathf.Exp(-waterDrag * dt));
+            controller.Move(swimVelocity * dt);
+            MoveRatio = new Vector2(swimVelocity.x, swimVelocity.z).magnitude / walkSpeed;
+        }
+
         /// <summary>구경하기 시작할 때 정해진 위치로 보낸다. CharacterController는 끈 상태에서 옮겨야 순간이동이 적용된다.</summary>
         public void Teleport(Vector3 position, Quaternion rotation)
         {
@@ -93,6 +177,8 @@ namespace CookieClicker.Gameplay
             transform.SetPositionAndRotation(position, rotation);
             controller.enabled = true;
             planarVelocity = Vector3.zero;
+            swimVelocity = Vector3.zero;
+            verticalVelocity = 0f;
             pitch = 0f;
             cameraPivot.localRotation = Quaternion.identity;
         }

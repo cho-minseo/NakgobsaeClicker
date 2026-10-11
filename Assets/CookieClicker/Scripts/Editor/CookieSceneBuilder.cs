@@ -74,6 +74,7 @@ namespace CookieClicker.EditorTools
 
             var game = new GameObject("GameManager").AddComponent<CookieGame>();
             Wire(game, ("config", config));
+            Wire(game.gameObject.AddComponent<DebugCheats>(), ("game", game));
 
             var camera = CreateCamera();
             CreateLight("Key Light", new Vector3(35f, -25f, 0f), 1.3f, new Color(1f, 0.96f, 0.9f));

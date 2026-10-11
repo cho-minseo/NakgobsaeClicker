@@ -19,6 +19,8 @@ namespace CookieClicker.EditorTools
     public static partial class CookieSceneBuilder
     {
         private const string InputActionsPath = "Assets/InputSystem_Actions.inputactions";
+        private const string GrassMaterialPath = "Assets/CookieClicker/Art/Textures/StylizedGrass/Ground_StylizedGrass.mat";
+        private const string MudflatMaterialPath = "Assets/CookieClicker/Art/Textures/BrownMud03/Ground_MudflatCasual.mat";
         // 클리커 카메라(시야 100m)에 절대 보이지 않도록 아래쪽 멀리 둔다.
         private static readonly Vector3 WorldOrigin = new Vector3(0f, -500f, 0f);
         private static readonly int[] TierThresholds = { 5, 10, 25, 50, 100 };
@@ -30,11 +32,11 @@ namespace CookieClicker.EditorTools
             { "part_timer", new Vector2(8f, 7f) },
             { "cow_ranch", new Vector2(30f, 18f) },
             { "mudflat", new Vector2(-30f, 18f) },
-            { "shrimp_farm", new Vector2(-14f, -32f) },
+            { "shrimp_farm", new Vector2(-14f, -25f) },
             { "gopchang_alley", new Vector2(30f, -12f) },
             { "octopus_trap_fleet", new Vector2(-50f, -4f) },
             { "shrimp_trawler", new Vector2(14f, -55f) },
-            { "franchise", new Vector2(36f, -40f) },
+            { "franchise", new Vector2(48f, -20f) },
             { "giant_octopus_shrine", new Vector2(-54f, 44f) },
             { "space_ranch", new Vector2(54f, 48f) },
             { "parallel_kitchen", new Vector2(0f, 64f) },
@@ -46,7 +48,7 @@ namespace CookieClicker.EditorTools
             var world = new GameObject("ExploreWorld").transform;
             world.position = WorldOrigin;
 
-            CreateGround(world);
+            CreateGround(world, game, config);
             CreateHomeBase(world);
 
             var plots = new GameObject("Plots").transform;
@@ -69,6 +71,8 @@ namespace CookieClicker.EditorTools
 
             var player = CreatePlayer(world, spawn, out var playerCamera);
             var hud = CreateExploreHud(ui.Canvas, game, playerCamera);
+            // 바다(점점 깊어지는 해저 + 수면)와 수영·잠수 설치. 메뉴로 따로 실행할 수도 있다.
+            InstallSea(world, player, hud.GetComponent<ExploreHudView>());
 
             var mode = new GameObject("ExploreMode").AddComponent<ExploreModeController>();
             Wire(mode,
@@ -82,24 +86,26 @@ namespace CookieClicker.EditorTools
 
         // ------------------------------------------------------------------ 지형
 
-        private static void CreateGround(Transform world)
+        private static void CreateGround(Transform world, CookieGame game, GameConfig config)
         {
             var ground = new GameObject("Ground").transform;
             ground.SetParent(world, false);
 
-            Block(PrimitiveType.Cube, "Base", ground, Mat("Ground_Base", new Color(0.62f, 0.66f, 0.5f)),
+            // 들판은 만화풍 잔디 머티리얼 (없으면 단색). 목장(대창 지대)도 같은 들판이라 구역 판을 따로 깔지 않는다.
+            var grass = AssetDatabase.LoadAssetAtPath<Material>(GrassMaterialPath) ?? Mat("Ground_Base", new Color(0.62f, 0.66f, 0.5f));
+            Block(PrimitiveType.Cube, "Base", ground, grass,
                 new Vector3(0f, -0.5f, 0f), new Vector3(180f, 1f, 180f), collider: true);
-            // 구역은 바닥 위에 얇은 판을 깔아 색으로만 구분한다 (충돌은 Base가 담당).
-            Block(PrimitiveType.Cube, "Zone_Ranch", ground, Mat("Ground_Ranch", new Color(0.45f, 0.7f, 0.35f)),
-                new Vector3(40f, 0.01f, 22f), new Vector3(55f, 0.02f, 70f));
-            Block(PrimitiveType.Cube, "Zone_Mudflat", ground, Mat("Ground_Mudflat", new Color(0.5f, 0.4f, 0.3f)),
+            // 다른 구역은 바닥 위에 얇은 판을 깔아 색으로만 구분한다 (충돌은 Base가 담당).
+            var mudflat = AssetDatabase.LoadAssetAtPath<Material>(MudflatMaterialPath) ?? Mat("Ground_Mudflat", new Color(0.5f, 0.4f, 0.3f));
+            Block(PrimitiveType.Cube, "Zone_Mudflat", ground, mudflat,
                 new Vector3(-40f, 0.01f, 22f), new Vector3(55f, 0.02f, 70f));
-            Block(PrimitiveType.Cube, "Zone_Sea", ground, Mat("Ground_Sea", new Color(0.3f, 0.55f, 0.8f)),
-                new Vector3(0f, 0.01f, -60f), new Vector3(180f, 0.02f, 60f));
 
-            CreateWorldLabel(ground, "Sign_Ranch", "대창 지대", new Vector3(18f, 4f, 2f), Quaternion.Euler(0f, 90f, 0f), 90, Color.white);
-            CreateWorldLabel(ground, "Sign_Mudflat", "낙지 지대", new Vector3(-18f, 4f, 2f), Quaternion.Euler(0f, -90f, 0f), 90, Color.white);
-            CreateWorldLabel(ground, "Sign_Sea", "새우 지대", new Vector3(0f, 4f, -24f), Quaternion.Euler(0f, 180f, 0f), 90, Color.white);
+            CreateZoneSign(ground, game, config, "Sign_Ranch", "대창 지대", new Vector3(18f, 4f, 2f), Quaternion.Euler(0f, 90f, 0f),
+                "cow_ranch", "gopchang_alley", "space_ranch");
+            CreateZoneSign(ground, game, config, "Sign_Mudflat", "낙지 지대", new Vector3(-18f, 4f, 2f), Quaternion.Euler(0f, -90f, 0f),
+                "mudflat", "octopus_trap_fleet", "giant_octopus_shrine");
+            CreateZoneSign(ground, game, config, "Sign_Sea", "새우 지대", new Vector3(0f, 4f, -24f), Quaternion.Euler(0f, 180f, 0f),
+                "shrimp_farm", "shrimp_trawler");
 
             // 맵 밖으로 떨어지지 않게 보이지 않는 벽
             var walls = new GameObject("Walls").transform;
@@ -113,6 +119,25 @@ namespace CookieClicker.EditorTools
                     alongX ? new Vector3(180f, 10f, 1f) : new Vector3(1f, 10f, 180f), collider: true);
                 Object.DestroyImmediate(wall.GetComponent<MeshRenderer>());
             }
+        }
+
+        /// <summary>그 지대 건물을 하나도 안 가졌으면 "??? 지대"로 보이는 간판.</summary>
+        private static void CreateZoneSign(Transform parent, CookieGame game, GameConfig config, string name, string zoneName,
+            Vector3 position, Quaternion rotation, params string[] buildingIds)
+        {
+            var text = CreateWorldLabel(parent, name, "??? 지대", position, rotation, 90, Color.white);
+            var buildings = new List<BuildingDefinition>();
+            foreach (var id in buildingIds)
+            {
+                foreach (var b in config.Buildings)
+                    if (b.Id == id) buildings.Add(b);
+            }
+
+            var sign = text.transform.parent.gameObject.AddComponent<ZoneSign>();
+            Wire(sign, ("game", game), ("label", text), ("buildings", buildings.ToArray()));
+            var serialized = new SerializedObject(sign);
+            serialized.FindProperty("zoneName").stringValue = zoneName;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void CreateHomeBase(Transform world)
@@ -194,6 +219,9 @@ namespace CookieClicker.EditorTools
             }
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
+            // 목장은 울타리로 둘러 분위기를 낸다. 다른 건물은 Tools 메뉴로 따로 추가할 수 있다.
+            if (building.Id == "cow_ranch") FenceTool.AddFence(view);
+
             // 아직 안 산 건물은 빈 땅. 실행하면 BuildingPlot이 보유 개수에 맞춰 켜 준다.
             built.gameObject.SetActive(false);
         }
@@ -268,7 +296,8 @@ namespace CookieClicker.EditorTools
             HandPart("Palm", open, glove, new Vector3(0f, 0f, 0f), new Vector3(0.09f, 0.03f, 0.09f));
             for (int f = 0; f < 4; f++)
                 HandPart($"Finger{f}", open, glove, new Vector3(-0.03f + f * 0.02f, 0f, 0.08f), new Vector3(0.017f, 0.022f, 0.07f));
-            HandPart("Thumb", open, glove, new Vector3(side * 0.055f, 0f, 0.02f), new Vector3(0.022f, 0.022f, 0.05f), Quaternion.Euler(0f, side * -35f, 0f));
+            // 엄지 뿌리는 손바닥 안쪽 아래에 붙이고, 끝은 바깥으로 벌어지게 한다.
+            HandPart("Thumb", open, glove, new Vector3(side * 0.049f, 0f, -0.004f), new Vector3(0.022f, 0.022f, 0.05f), Quaternion.Euler(0f, side * 35f, 0f));
             HandPart("Cuff", open, cuff, new Vector3(0f, 0f, -0.06f), new Vector3(0.075f, 0.05f, 0.035f));
 
             var fist = new GameObject("Pose_Fist").transform;

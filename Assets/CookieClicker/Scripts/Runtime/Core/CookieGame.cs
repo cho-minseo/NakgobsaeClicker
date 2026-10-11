@@ -101,6 +101,12 @@ namespace CookieClicker.Core
             return amount;
         }
 
+        /// <summary>클릭이 아닌 경로(테스트 치트, 나중의 보상 등)로 재화를 지급한다.</summary>
+        public void GrantCookies(double amount)
+        {
+            if (amount > 0) Earn(amount);
+        }
+
         // ---------- 건물 ----------
 
         public int GetBuildingCount(int index) => State.BuildingCounts[index];

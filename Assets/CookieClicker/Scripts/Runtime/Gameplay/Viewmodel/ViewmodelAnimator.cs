@@ -10,6 +10,7 @@ namespace CookieClicker.Gameplay.Viewmodel
     /// - 가만히 있을 때: 숨 쉬듯 미세하게 위아래
     /// - 클릭: 오른손 주먹 쥐고 앞으로 툭
     /// - 달리기: 양손 주먹 쥐고 뛰기
+    /// - 수영: 양손을 앞으로 뻗었다 바깥으로 젓는 평영 동작
     /// 손 모델을 바꿔도 움직임은 소켓(leftHand/rightHand)에 걸려 있어서 그대로 유지된다.
     /// </summary>
     public class ViewmodelAnimator : MonoBehaviour
@@ -36,6 +37,11 @@ namespace CookieClicker.Gameplay.Viewmodel
         [SerializeField] private float breathAmount = 0.006f;
         [SerializeField] private float punchDistance = 0.12f;
         [SerializeField] private float punchRecover = 10f;
+        [Header("수영")]
+        [SerializeField] private float strokeWidth = 0.13f;
+        [SerializeField] private float strokeReach = 0.09f;
+        [SerializeField] private float strokeFrequency = 3f;
+
         [Tooltip("MoveRatio가 이 값을 넘으면 달리는 중으로 보고 양손 주먹을 쥔다")]
         [SerializeField] private float runFistThreshold = 1.2f;
 
@@ -47,6 +53,8 @@ namespace CookieClicker.Gameplay.Viewmodel
         private float swingWeight;
         private Vector3 sway;
         private float punch;
+        private float strokePhase;
+        private float swimWeight;
 
         private void Awake()
         {
@@ -64,14 +72,17 @@ namespace CookieClicker.Gameplay.Viewmodel
 
             // 주먹: 누르는 동안 쥐고, 누른 순간 앞으로 툭 내민다.
             float moveRatio = player.MoveRatio;
-            bool running = moveRatio > runFistThreshold;
+            bool swimming = player.IsSwimming;
+            bool running = !swimming && moveRatio > runFistThreshold;
             if (attackAction.action.WasPressedThisFrame()) punch = 1f;
             rightPose.SetPose(running || attackAction.action.IsPressed() ? HandPose.Fist : HandPose.Open);
             leftPose.SetPose(running ? HandPose.Fist : HandPose.Open);
             punch = Mathf.Lerp(punch, 0f, punchRecover * dt);
 
-            // 걷는 속도만큼 박자가 빨라지고, 멈추면 휘적임이 서서히 줄어든다.
-            swingWeight = Mathf.Lerp(swingWeight, Mathf.Clamp01(moveRatio), 8f * dt);
+            // 걷는 속도만큼 박자가 빨라지고, 멈추면 휘적임이 서서히 줄어든다. 수영 중에는 휘적임 대신 젓기.
+            swimWeight = Mathf.Lerp(swimWeight, swimming ? 1f : 0f, 6f * dt);
+            strokePhase += dt * strokeFrequency * (0.5f + Mathf.Clamp01(moveRatio));
+            swingWeight = Mathf.Lerp(swingWeight, swimming ? 0f : Mathf.Clamp01(moveRatio), 8f * dt);
             phase += dt * swingFrequency * Mathf.Max(0.6f, moveRatio);
 
             Vector2 look = player.LookDelta;
@@ -90,9 +101,15 @@ namespace CookieClicker.Gameplay.Viewmodel
             float bob = Mathf.Abs(Mathf.Cos(phase)) * swingBob;
 
             Vector3 swing = new Vector3(0f, bob, s * swingDistance) * swingWeight;
-            Vector3 offset = swing + sway + Vector3.up * breath + Vector3.forward * (punchAmount * punchDistance);
+            // 평영: 앞으로 모았다(뻗기) → 바깥으로 벌리며 당기기. 양손은 거울 대칭(바깥 = -side).
+            float open = Mathf.Sin(strokePhase) * 0.5f + 0.5f;
+            Vector3 stroke = new Vector3(-side * open * strokeWidth, 0.05f, Mathf.Cos(strokePhase) * strokeReach) * swimWeight;
+
+            Vector3 offset = swing + stroke + sway + Vector3.up * breath + Vector3.forward * (punchAmount * punchDistance);
             hand.localPosition = basePosition + offset;
-            hand.localRotation = baseRotation * Quaternion.Euler(-s * swingRoll * swingWeight, 0f, s * swingRoll * 0.5f * swingWeight);
+            hand.localRotation = baseRotation
+                                 * Quaternion.Euler(-s * swingRoll * swingWeight, 0f, s * swingRoll * 0.5f * swingWeight)
+                                 * Quaternion.Euler(0f, side * open * 35f * swimWeight, -side * 20f * swimWeight);
         }
     }
 }

@@ -37,3 +37,7 @@ sysinfo.txt
 # OS
 .DS_Store
 Thumbs.db
+
+# Unity 충돌 복구 씬
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta

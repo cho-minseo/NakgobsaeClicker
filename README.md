@@ -171,5 +171,6 @@ Assets/CookieClicker/
 | 리소스 | 라이선스 | 위치 |
 |---|---|---|
 | 카페24 아네모네 (Cafe24 Ohsquare) 폰트, 카페24(주) 제공 | SIL Open Font License 1.1 | `Assets/CookieClicker/Fonts/` (라이선스 PDF 동봉) |
+| Brown Mud 03 텍스처, Rob Tuytel / [Poly Haven](https://polyhaven.com/a/brown_mud_03) (갯벌 바닥, 캐주얼 보정본 포함) | CC0 (퍼블릭 도메인, 상업적 이용 가능) | `Assets/CookieClicker/Art/Textures/BrownMud03/` |
 
 폰트를 바꾸려면 `CookieSceneBuilder.FontPath`를 수정한 뒤 **Tools > Cookie Clicker > Apply UI Font**를 실행하면 됩니다.
