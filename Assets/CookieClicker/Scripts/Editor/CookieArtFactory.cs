@@ -22,6 +22,10 @@ namespace CookieClicker.EditorTools
         public static Sprite GoldenCookie => GetOrCreate("GoldenCookie2D", 128, 128,
             (x, y, w, h) => CookiePixel(x, y, w, new Color(1f, 0.82f, 0.3f), new Color(0.75f, 0.5f, 0.1f)), Vector4.zero);
 
+        /// <summary>파티클용: 국물 거품 돔, 십자 모양 반짝이.</summary>
+        public static Sprite SoupBubble => GetOrCreate("SoupBubble", 64, 64, SoupBubblePixel, Vector4.zero);
+        public static Sprite Sparkle => GetOrCreate("Sparkle", 128, 128, SparklePixel, Vector4.zero);
+
         private static Sprite GetOrCreate(string name, int width, int height, Func<int, int, int, int, Color> pixel, Vector4 border)
         {
             string path = $"{ArtFolder}/{name}.png";
@@ -64,6 +68,39 @@ namespace CookieClicker.EditorTools
             float r = Radius(x, y, w);
             float a = Mathf.Clamp01(1f - r);
             return new Color(1, 1, 1, a * a);
+        }
+
+        /// <summary>
+        /// 국물이 부풀어 오른 빨간 거품 돔. 비누방울처럼 투명하면 재료 색에 묻히므로 국물 색을 칠하고,
+        /// 가장자리는 어둡게·가운데 위쪽은 밝게 해서 볼록해 보이게 한 뒤 흰 반사광을 찍는다.
+        /// </summary>
+        private static Color SoupBubblePixel(int x, int y, int w, int h)
+        {
+            float r = Radius(x, y, w);
+            if (r > 1f) return Color.clear;
+            var uv = new Vector2((x + 0.5f) / w, (y + 0.5f) / h);
+
+            float light = Mathf.Clamp01(1f - Vector2.Distance(uv, new Vector2(0.42f, 0.6f)) * 1.6f);
+            var c = Color.Lerp(new Color(0.5f, 0.09f, 0.05f), new Color(0.98f, 0.4f, 0.2f), light);
+            // 가장자리 얇은 밝은 테 (표면장력으로 빛나는 막)
+            c = Color.Lerp(c, new Color(1f, 0.72f, 0.5f), Mathf.Clamp01((r - 0.78f) / 0.1f) * 0.85f);
+            float highlight = Mathf.Clamp01(1f - Vector2.Distance(uv, new Vector2(0.36f, 0.68f)) * 6f);
+            c = Color.Lerp(c, Color.white, highlight * highlight * 1.5f);
+            // 가운데는 살짝 비쳐서 아래 국물이 보이고, 테두리와 반사광은 진하게 (방울토마토처럼 보이지 않게)
+            float body = Mathf.Lerp(0.7f, 1f, r * r);
+            c.a = Mathf.Clamp01((1f - r) * w * 0.3f) * Mathf.Max(body, highlight);
+            return c;
+        }
+
+        private static Color SparklePixel(int x, int y, int w, int h)
+        {
+            var p = new Vector2((x + 0.5f) / w * 2f - 1f, (y + 0.5f) / h * 2f - 1f);
+            // 가로·세로로 가늘고 긴 빛줄기 + 가운데 둥근 빛
+            float cross = Mathf.Max(
+                Mathf.Clamp01(1f - Mathf.Abs(p.y) * 14f) * Mathf.Clamp01(1f - Mathf.Abs(p.x)),
+                Mathf.Clamp01(1f - Mathf.Abs(p.x) * 14f) * Mathf.Clamp01(1f - Mathf.Abs(p.y)));
+            float core = Mathf.Clamp01(1f - p.magnitude * 3f);
+            return new Color(1, 1, 1, Mathf.Clamp01(cross + core * core));
         }
 
         private static Color RaysPixel(int x, int y, int w, int h)

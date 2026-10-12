@@ -85,6 +85,7 @@ namespace CookieClicker.EditorTools
             RenderSettings.ambientLight = new Color(0.5f, 0.47f, 0.45f);
 
             var cookie = CreateCookie(game, camera);
+            InstallPotFX(cookie, game);
             var background = CreateBackgroundCanvas(game, camera, prefabs);
             var ui = CreateUICanvas(game, cookie, config, prefabs, background);
             CreateExploreWorld(game, config, camera, cookie, background, ui);
