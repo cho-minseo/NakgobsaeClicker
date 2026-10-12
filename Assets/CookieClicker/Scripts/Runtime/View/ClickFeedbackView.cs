@@ -24,6 +24,15 @@ namespace CookieClicker.View
         [SerializeField] private float popupDuration = 2.5f;
 
         private float popupTimer;
+        private UIParticlePool floatingTexts;
+        private UIParticlePool crumbs;
+
+        private void Awake()
+        {
+            // 연타해도 화면에 동시에 떠 있는 개수는 한정적이라, 그만큼만 만들어 두고 돌려 쓴다.
+            floatingTexts = new UIParticlePool(floatingTextPrefab, effectLayer, 16, 64);
+            crumbs = new UIParticlePool(crumbPrefab, effectLayer, 32, 128);
+        }
 
         private void OnEnable()
         {
@@ -55,13 +64,13 @@ namespace CookieClicker.View
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(effectLayer, screenPosition, null, out var local))
                 return;
 
-            var label = Instantiate(floatingTextPrefab, effectLayer);
+            var label = floatingTexts.Get();
             if (label.Graphic is Text text) text.text = "+" + NumberFormatter.Format(amount, true);
             label.Launch(local + new Vector2(0f, 20f), new Vector2(Random.Range(-25f, 25f), 140f), 0f, 0f, 1f);
 
             for (int i = 0; i < crumbsPerClick; i++)
             {
-                var crumb = Instantiate(crumbPrefab, effectLayer);
+                var crumb = crumbs.Get();
                 Vector2 direction = Quaternion.Euler(0f, 0f, Random.Range(-60f, 60f)) * Vector2.up;
                 crumb.Launch(local, direction * Random.Range(250f, 450f), 1400f, Random.Range(-360f, 360f), 0.8f);
             }

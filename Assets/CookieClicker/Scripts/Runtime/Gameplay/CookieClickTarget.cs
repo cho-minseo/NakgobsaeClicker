@@ -26,7 +26,12 @@ namespace CookieClicker.Gameplay
 
         [Header("연출")]
         [SerializeField] private float hoverScale = 1.06f;
-        [SerializeField] private float pressScale = 0.9f;
+        [Tooltip("클릭하면 납작하게 눌렸다가(스쿼시) 위로 늘어나며(스트레치) 튕겨 돌아온다. 눌리는 정도")]
+        [SerializeField, Range(0f, 0.5f)] private float squashAmount = 0.2f;
+        [Tooltip("스프링 세기. 클수록 빨리 튕긴다")]
+        [SerializeField] private float squashStiffness = 260f;
+        [Tooltip("스프링 감쇠. 작을수록 여러 번 출렁인다")]
+        [SerializeField] private float squashDamping = 11f;
         [SerializeField] private float scaleSmoothTime = 0.08f;
         [SerializeField] private Vector2 wobbleAngles = new Vector2(6f, 14f);
         [SerializeField] private float wobbleSpeed = 0.5f;
@@ -40,6 +45,8 @@ namespace CookieClicker.Gameplay
         private float scaleFactor = 1f;
         private float scaleVelocity;
         private bool hovered;
+        private float squash;
+        private float squashVelocity;
 
         private void Awake()
         {
@@ -54,7 +61,13 @@ namespace CookieClicker.Gameplay
 
             float target = hovered ? hoverScale : 1f;
             scaleFactor = Mathf.SmoothDamp(scaleFactor, target, ref scaleVelocity, scaleSmoothTime);
-            transform.localScale = size * scaleFactor;
+            // 감쇠 스프링: 눌린 값(squash)이 0으로 돌아가며 반대로 한 번 넘쳤다가(stretch) 멈춘다.
+            float dt = Time.deltaTime;
+            squashVelocity += (-squashStiffness * squash - squashDamping * squashVelocity) * dt;
+            squash += squashVelocity * dt;
+            // 부피가 대충 유지되도록 세로로 줄면 가로·깊이는 늘어난다.
+            var squashScale = new Vector3(1f - squash * 0.5f, 1f + squash, 1f - squash * 0.5f);
+            transform.localScale = Vector3.Scale(size * scaleFactor, squashScale);
 
             transform.localRotation = baseRotation * CalculateWobble();
         }
@@ -63,7 +76,8 @@ namespace CookieClicker.Gameplay
         {
             if (eventData.button != PointerEventData.InputButton.Left) return;
 
-            scaleFactor = pressScale;
+            squash = -squashAmount;
+            squashVelocity = 0f;
             double amount = game.ClickCookie();
             Clicked?.Invoke(amount, eventData.position);
         }

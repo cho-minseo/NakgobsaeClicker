@@ -14,6 +14,9 @@ namespace CookieClicker.FX
         [SerializeField] private Vector2 sizeRange = new Vector2(36f, 64f);
 
         private float spawnBudget;
+        private UIParticlePool pool;
+
+        private void Awake() => pool = new UIParticlePool(cookiePrefab, area, 16, 64);
 
         private void Update()
         {
@@ -35,7 +38,7 @@ namespace CookieClicker.FX
             float speed = Random.Range(fallSpeed.x, fallSpeed.y);
             float size = Random.Range(sizeRange.x, sizeRange.y);
 
-            var particle = Instantiate(cookiePrefab, area);
+            var particle = pool.Get();
             ((RectTransform)particle.transform).sizeDelta = new Vector2(size, size);
             particle.Launch(
                 new Vector2(Random.Range(rect.xMin, rect.xMax), rect.yMax + size),
