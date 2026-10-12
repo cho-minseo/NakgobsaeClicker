@@ -82,6 +82,9 @@ namespace CookieClicker.EditorTools
                 ("exitAction", FindAction("UI/Cancel")),
                 ("player", player),
                 ("spawnPoint", spawn));
+
+            // 건물을 보고 F를 누르면 뜨는 팝업
+            InstallPlotPopup(hud.GetComponent<ExploreHudView>(), player, playerCamera, mode);
         }
 
         // ------------------------------------------------------------------ 지형
@@ -221,6 +224,8 @@ namespace CookieClicker.EditorTools
 
             // 목장은 울타리로 둘러 분위기를 낸다. 다른 건물은 Tools 메뉴로 따로 추가할 수 있다.
             if (building.Id == "cow_ranch") FenceTool.AddFence(view);
+            // 직접 만든 3D 모델이 있는 건물은 옆에 랜드마크로 세운다.
+            if (building.Id == "ladle") AddLadleLandmark(view);
 
             // 아직 안 산 건물은 빈 땅. 실행하면 BuildingPlot이 보유 개수에 맞춰 켜 준다.
             built.gameObject.SetActive(false);

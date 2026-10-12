@@ -26,6 +26,8 @@ namespace CookieClicker.Gameplay
         [SerializeField] private bool returnToSpawnOnEnter = true;
 
         public bool IsExploring { get; private set; }
+        /// <summary>true면 Esc로 구경하기를 나가지 않는다 (팝업이 열려 있어서 Esc가 팝업 닫기로 쓰일 때).</summary>
+        public bool ExitBlocked { get; set; }
         public event Action<bool> ModeChanged;
 
         private void Start()
@@ -38,7 +40,7 @@ namespace CookieClicker.Gameplay
 
         private void Update()
         {
-            if (IsExploring && exitAction.action.WasPressedThisFrame()) Exit();
+            if (IsExploring && !ExitBlocked && exitAction.action.WasPressedThisFrame()) Exit();
         }
 
         public void Enter()
