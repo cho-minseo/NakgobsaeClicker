@@ -172,5 +172,8 @@ Assets/CookieClicker/
 |---|---|---|
 | 카페24 아네모네 (Cafe24 Ohsquare) 폰트, 카페24(주) 제공 | SIL Open Font License 1.1 | `Assets/CookieClicker/Fonts/` (라이선스 PDF 동봉) |
 | Brown Mud 03 텍스처, Rob Tuytel / [Poly Haven](https://polyhaven.com/a/brown_mud_03) (갯벌 바닥, 캐주얼 보정본 포함) | CC0 (퍼블릭 도메인, 상업적 이용 가능) | `Assets/CookieClicker/Art/Textures/BrownMud03/` |
+| [Impact Sounds](https://kenney.nl/assets/impact-sounds), Kenney (잔디 발소리, 착지음) | CC0 | `Assets/CookieClicker/Audio/Explore/Footsteps/`, `Jump/` |
+| [40 CC0 water / splash / slime SFX](https://opengameart.org/content/40-cc0-water-splash-slime-sfx), rubberduck (헤엄·입수 첨벙, 갯벌 발소리, 물속 배경음) | CC0 | `Assets/CookieClicker/Audio/Explore/` |
+| [Bubble Sound Effects](https://opengameart.org/content/bubble-sound-effects), Brian MacIntosh (BMacZero) (물속 공기 방울) | CC0 | `Assets/CookieClicker/Audio/Explore/Underwater/` |
 
 폰트를 바꾸려면 `CookieSceneBuilder.FontPath`를 수정한 뒤 **Tools > Cookie Clicker > Apply UI Font**를 실행하면 됩니다.

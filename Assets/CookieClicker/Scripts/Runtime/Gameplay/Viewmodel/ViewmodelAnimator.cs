@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -56,6 +57,9 @@ namespace CookieClicker.Gameplay.Viewmodel
         private float strokePhase;
         private float swimWeight;
 
+        /// <summary>수영 중 팔로 물을 한 번 밀 때마다. 인자는 이동 세기(0 = 제자리 떠 있기, 1 = 헤엄쳐 나아감).</summary>
+        public event Action<float> Stroked;
+
         private void Awake()
         {
             leftBasePosition = leftHand.localPosition;
@@ -81,7 +85,10 @@ namespace CookieClicker.Gameplay.Viewmodel
 
             // 걷는 속도만큼 박자가 빨라지고, 멈추면 휘적임이 서서히 줄어든다. 수영 중에는 휘적임 대신 젓기.
             swimWeight = Mathf.Lerp(swimWeight, swimming ? 1f : 0f, 6f * dt);
+            float previousStroke = strokePhase;
             strokePhase += dt * strokeFrequency * (0.5f + Mathf.Clamp01(moveRatio));
+            // 팔을 가장 넓게 벌린 순간(sin = 1)이 물을 밀어내는 순간. 헤엄 소리를 이 박자에 맞춘다.
+            if (swimming && StrokeCount(strokePhase) > StrokeCount(previousStroke)) Stroked?.Invoke(Mathf.Clamp01(moveRatio));
             swingWeight = Mathf.Lerp(swingWeight, swimming ? 0f : Mathf.Clamp01(moveRatio), 8f * dt);
             phase += dt * swingFrequency * Mathf.Max(0.6f, moveRatio);
 
@@ -93,6 +100,8 @@ namespace CookieClicker.Gameplay.Viewmodel
             Apply(leftHand, leftBasePosition, leftBaseRotation, 1f, breath, 0f);
             Apply(rightHand, rightBasePosition, rightBaseRotation, -1f, breath, punch);
         }
+
+        private static int StrokeCount(float strokePhase) => Mathf.FloorToInt((strokePhase - Mathf.PI * 0.5f) / (Mathf.PI * 2f));
 
         /// <param name="side">왼손 1, 오른손 -1. 서로 반대 박자로 흔들리게 한다.</param>
         private void Apply(Transform hand, Vector3 basePosition, Quaternion baseRotation, float side, float breath, float punchAmount)

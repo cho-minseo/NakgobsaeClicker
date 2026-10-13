@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8985dd094e9d5304cb4302c77903394c, type: 3}
+  m_Name: Footsteps_Grass
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Audio.SoundSet
+  clips:
+  - {fileID: 8300000, guid: 10e20014dd048f9408a2362eb50cd5a4, type: 3}
+  - {fileID: 8300000, guid: 25c1a9864f400594eb5a5857ac9b9776, type: 3}
+  - {fileID: 8300000, guid: f656dee075cb6e34aaf5a898800e52b5, type: 3}
+  - {fileID: 8300000, guid: 1ff523fe5fafb054fae81016ae181013, type: 3}
+  - {fileID: 8300000, guid: e32c22676e441a24ab2f86eb37b1fb50, type: 3}
+  volume: {x: 0.85, y: 1}
+  pitch: {x: 0.9, y: 1.1}

@@ -73,6 +73,8 @@ namespace CookieClicker.EditorTools
             var hud = CreateExploreHud(ui.Canvas, game, playerCamera);
             // 바다(점점 깊어지는 해저 + 수면)와 수영·잠수 설치. 메뉴로 따로 실행할 수도 있다.
             InstallSea(world, player, hud.GetComponent<ExploreHudView>());
+            // 발소리·점프·수영·잠수 효과음
+            InstallPlayerAudio(world, player);
 
             var mode = new GameObject("ExploreMode").AddComponent<ExploreModeController>();
             Wire(mode,

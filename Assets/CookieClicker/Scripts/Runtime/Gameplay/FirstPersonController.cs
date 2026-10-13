@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -27,6 +28,8 @@ namespace CookieClicker.Gameplay
         [SerializeField] private float acceleration = 12f;
         [SerializeField] private float jumpHeight = 1.2f;
         [SerializeField] private float gravity = -20f;
+        [Tooltip("이 속도(m/s)보다 빨리 떨어져 땅에 닿으면 착지로 본다 (착지 소리 등)")]
+        [SerializeField] private float minLandingSpeed = 3f;
 
         [Header("시점")]
         [SerializeField] private float lookSensitivity = 0.1f;
@@ -56,6 +59,11 @@ namespace CookieClicker.Gameplay
         public float HeadDepth { get; private set; }
         /// <summary>true면 잠수할 수 없고 수면으로 떠오른다 (산소 부족 등).</summary>
         public bool DiveLocked { get; set; }
+
+        /// <summary>땅에서 점프한 순간. 소리·연출은 이 이벤트를 구독해서 이동 코드와 분리한다.</summary>
+        public event Action Jumped;
+        /// <summary>공중에서 땅에 닿은 순간. 인자는 닿을 때 떨어지던 속도(m/s).</summary>
+        public event Action<float> Landed;
 
         private CharacterController controller;
         private Vector3 planarVelocity;
@@ -113,16 +121,23 @@ namespace CookieClicker.Gameplay
             // 바로 최고 속도가 되지 않고 부드럽게 가속·감속한다.
             planarVelocity = Vector3.MoveTowards(planarVelocity, target, acceleration * speed * dt);
 
-            if (controller.isGrounded)
+            bool wasGrounded = controller.isGrounded;
+            if (wasGrounded)
             {
                 verticalVelocity = -2f;
                 if (jumpAction.action.WasPressedThisFrame())
+                {
                     verticalVelocity = Mathf.Sqrt(2f * jumpHeight * -gravity);
+                    Jumped?.Invoke();
+                }
             }
             verticalVelocity += gravity * dt;
 
+            float fallSpeed = -verticalVelocity;
             controller.Move((planarVelocity + Vector3.up * verticalVelocity) * dt);
             MoveRatio = controller.isGrounded ? planarVelocity.magnitude / walkSpeed : 0f;
+            // 경사를 내려갈 때 잠깐 떠도 착지로 치지 않도록 일정 속도 이상으로 떨어졌을 때만 알린다.
+            if (!wasGrounded && controller.isGrounded && fallSpeed > minLandingSpeed) Landed?.Invoke(fallSpeed);
         }
 
         /// <summary>
