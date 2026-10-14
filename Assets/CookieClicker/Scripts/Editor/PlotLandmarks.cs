@@ -20,11 +20,81 @@ namespace CookieClicker.EditorTools
             int count = 0;
             foreach (var plot in Object.FindObjectsByType<BuildingPlot>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
-                if (plot.Building != null && plot.Building.Id == "ladle" && AddLadleLandmark(plot, true)) count++;
+                if (plot.Building == null) continue;
+                if (plot.Building.Id == "ladle" && AddLadleLandmark(plot, true)) count++;
+                if (AddModelLandmark(plot, true)) count++;
             }
             EditorUtility.DisplayDialog("Cookie Clicker",
-                count > 0 ? "자동 국자 건물 둘레를 도는 국자를 설치했습니다.\nCtrl+S로 씬을 저장해 주세요."
-                          : $"설치하지 못했습니다.\n씬에 Plot_ladle이 있는지, {LadleModelPath}이 임포트됐는지 확인해 주세요.", "확인");
+                count > 0 ? $"건물 모델 {count}개를 설치했습니다.\nCtrl+S로 씬을 저장해 주세요."
+                          : "설치하지 못했습니다.\n씬에 Plot_* 건물이 있는지, Models 폴더의 모델이 임포트됐는지 확인해 주세요.", "확인");
+        }
+
+        /// <summary>
+        /// 건물 옆에 세우는 모델: 건물 ID, 오브젝트 이름, 모델 파일, 크기(가장 긴 변, m), 바라보는 방향(도, 0 = 본진 쪽).
+        /// 모델을 추가하려면 여기에 한 줄만 넣으면 된다.
+        /// </summary>
+        private static readonly (string buildingId, string name, string modelPath, float length, float yaw)[] ModelLandmarks =
+        {
+            ("part_timer", "Landmark_Staff", "Assets/CookieClicker/Models/Staff.glb", 1.7f, -20f),
+            ("mudflat", "Landmark_Octopus", "Assets/CookieClicker/Models/Octopus.glb", 3.2f, 35f),
+            ("shrimp_farm", "Landmark_Shrimp", "Assets/CookieClicker/Models/Shrimp.glb", 2.4f, 60f),
+        };
+
+        /// <summary>
+        /// 건물 앞쪽 비스듬한 자리(상자 더미 바깥)에 모델을 땅에 딛고 서게 놓는다. 이미 있으면 새로 만든다.
+        /// 위치·크기·방향은 씬에서 Landmark_* 오브젝트를 옮겨 조정하면 된다.
+        /// </summary>
+        internal static bool AddModelLandmark(BuildingPlot plot, bool undo = false)
+        {
+            if (plot.Building == null) return false;
+            int index = System.Array.FindIndex(ModelLandmarks, l => l.buildingId == plot.Building.Id);
+            if (index < 0) return false;
+            var (_, name, modelPath, length, yaw) = ModelLandmarks[index];
+
+            var modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+            var built = new SerializedObject(plot).FindProperty("builtRoot").objectReferenceValue as GameObject;
+            if (modelAsset == null || built == null) return false;
+
+            var old = built.transform.Find(name);
+            if (old != null)
+            {
+                if (undo) Undo.DestroyObjectImmediate(old.gameObject);
+                else Object.DestroyImmediate(old.gameObject);
+            }
+
+            // 꺼진 오브젝트는 Renderer.bounds가 비어서 크기를 못 재므로, 재는 동안만 켠다.
+            bool wasActive = built.activeSelf;
+            built.SetActive(true);
+
+            var root = new GameObject(name).transform;
+            root.SetParent(built.transform, false);
+            AttachModel(root, modelAsset, Vector3.zero);
+            root.localScale = Vector3.one * length;
+            root.localRotation = Quaternion.Euler(0f, yaw, 0f);
+
+            // 상자 더미(반지름 = 건물 크기 * 0.75 + 1.2)보다 바깥, 정면에서 54도 옆 (상자 사이 빈 각도)
+            var body = built.transform.Find("Body");
+            float buildingSize = body != null ? body.localScale.x : 3f;
+            float distance = buildingSize * 0.75f + 1.2f + length * 0.5f + 0.6f;
+            float angle = 54f * Mathf.Deg2Rad;
+            root.localPosition = new Vector3(Mathf.Cos(angle) * distance, 0f, Mathf.Sin(angle) * distance);
+
+            // 모델 바닥이 땅(건물 터 높이)에 닿게 올린다.
+            var renderers = root.GetComponentsInChildren<Renderer>();
+            if (renderers.Length > 0)
+            {
+                var bounds = renderers[0].bounds;
+                foreach (var r in renderers) bounds.Encapsulate(r.bounds);
+                root.position += Vector3.up * (built.transform.position.y - bounds.min.y);
+            }
+            built.SetActive(wasActive);
+
+            if (undo)
+            {
+                Undo.RegisterCreatedObjectUndo(root.gameObject, "Install Building Models");
+                EditorSceneManager.MarkSceneDirty(plot.gameObject.scene);
+            }
+            return true;
         }
 
         /// <summary>

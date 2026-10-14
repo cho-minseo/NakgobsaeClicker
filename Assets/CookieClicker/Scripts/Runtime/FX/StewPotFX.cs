@@ -6,7 +6,7 @@ namespace CookieClicker.FX
 {
     /// <summary>
     /// 전골냄비 파티클 연출. 파티클 시스템은 씬(StewPot/PotFX 아래)에 미리 만들어 두고, 이 스크립트는 "언제·얼마나"만 정한다.
-    /// - 클릭: 재료(낙지·곱창·새우·대파)가 튀어 오르고 반짝임이 터진다.
+    /// - 클릭: 재료(우동 사리·마늘·낙지·새우 3D 모델)가 튀어 오르고 반짝임이 터진다.
     /// - 상시: 국물이 보글보글 끓고 김이 오른다. 초당 생산량이 높을수록 더 세게 끓는다.
     /// 모양·색·수명 같은 겉모습은 각 Particle System의 Inspector에서 바로 고치면 된다.
     /// </summary>
@@ -16,7 +16,8 @@ namespace CookieClicker.FX
         [SerializeField] private CookieClickTarget pot;
 
         [Header("클릭")]
-        [SerializeField] private ParticleSystem ingredientBurst;
+        [Tooltip("재료마다 따로인 파티클 (모델마다 텍스처가 달라 머티리얼을 나눠야 한다). 클릭할 때 무작위로 섞어 튀긴다")]
+        [SerializeField] private ParticleSystem[] ingredientBursts;
         [SerializeField] private ParticleSystem sparkleBurst;
         [SerializeField, Min(0)] private int ingredientsPerClick = 6;
         [SerializeField, Min(0)] private int sparklesPerClick = 8;
@@ -61,7 +62,14 @@ namespace CookieClicker.FX
         private void OnPotClicked(double amount, Vector2 screenPosition)
         {
             // Emit(n)은 이미 만들어 둔 파티클 버퍼를 쓰므로 클릭마다 오브젝트가 생기지 않는다.
-            if (ingredientBurst != null) ingredientBurst.Emit(ingredientsPerClick);
+            if (ingredientBursts != null && ingredientBursts.Length > 0)
+            {
+                for (int i = 0; i < ingredientsPerClick; i++)
+                {
+                    var burst = ingredientBursts[Random.Range(0, ingredientBursts.Length)];
+                    if (burst != null) burst.Emit(1);
+                }
+            }
             if (sparkleBurst != null) sparkleBurst.Emit(sparklesPerClick);
         }
 

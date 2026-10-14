@@ -175,5 +175,6 @@ Assets/CookieClicker/
 | [Impact Sounds](https://kenney.nl/assets/impact-sounds), Kenney (잔디 발소리, 착지음) | CC0 | `Assets/CookieClicker/Audio/Explore/Footsteps/`, `Jump/` |
 | [40 CC0 water / splash / slime SFX](https://opengameart.org/content/40-cc0-water-splash-slime-sfx), rubberduck (헤엄·입수 첨벙, 갯벌 발소리, 물속 배경음) | CC0 | `Assets/CookieClicker/Audio/Explore/` |
 | [Bubble Sound Effects](https://opengameart.org/content/bubble-sound-effects), Brian MacIntosh (BMacZero) (물속 공기 방울) | CC0 | `Assets/CookieClicker/Audio/Explore/Underwater/` |
+| 우동 사리·마늘·낙지·식당 직원 3D 모델, 직접 생성 ([Tripo](https://www.tripo3d.ai) 유료 플랜) 후 Blender로 경량화 | 유료 플랜 생성물, 상업적 이용 가능 | `Assets/CookieClicker/Models/` |
 
 폰트를 바꾸려면 `CookieSceneBuilder.FontPath`를 수정한 뒤 **Tools > Cookie Clicker > Apply UI Font**를 실행하면 됩니다.

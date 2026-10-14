@@ -46,36 +46,80 @@ namespace CookieClicker.EditorTools
             var root = new GameObject(PotFXName).transform;
             root.SetParent(pot.transform, false);
 
-            var ingredients = CreateIngredientBurst(root);
+            var ingredients = CreateIngredientBursts(root);
             var sparkles = CreateSparkleBurst(root);
             var bubbles = CreateBubbles(root);
             var steam = CreateSteam(root);
 
             Wire(root.gameObject.AddComponent<StewPotFX>(),
                 ("game", game), ("pot", pot),
-                ("ingredientBurst", ingredients), ("sparkleBurst", sparkles),
+                ("ingredientBursts", ingredients), ("sparkleBurst", sparkles),
                 ("bubbles", bubbles), ("steam", steam));
         }
 
         // ------------------------------------------------------------------ 각 파티클
 
-        /// <summary>클릭하면 낙지·곱창·새우·대파 조각이 튀어 올랐다가 중력으로 떨어진다. 3D 메시 파티클.</summary>
-        private static ParticleSystem CreateIngredientBurst(Transform parent)
+        /// <summary>튀어 오르는 재료: 모델 파일, 크기 배율(모양마다 눈에 보이는 크기를 맞춤)</summary>
+        private static readonly (string name, string modelPath, float sizeScale)[] Ingredients =
         {
-            var ps = CreateParticleSystem("IngredientBurst", parent, SoupCenter, 120);
+            ("Udon", "Assets/CookieClicker/Models/Udon.glb", 1.25f),
+            ("Garlic", "Assets/CookieClicker/Models/Garlic.glb", 0.8f),
+            ("Octopus", "Assets/CookieClicker/Models/Octopus.glb", 1.4f),
+            ("Shrimp", "Assets/CookieClicker/Models/Shrimp.glb", 1f),
+        };
+
+        /// <summary>
+        /// 재료 모델마다 파티클 시스템을 하나씩 만든다 (모델마다 텍스처가 달라 머티리얼을 나눠야 하기 때문).
+        /// 모델 파일이 없는 재료는 건너뛰고, 하나도 없으면 기본 도형으로 대신한다.
+        /// </summary>
+        private static ParticleSystem[] CreateIngredientBursts(Transform parent)
+        {
+            var group = new GameObject("Ingredients").transform;
+            group.SetParent(parent, false);
+
+            var bursts = new System.Collections.Generic.List<ParticleSystem>();
+            foreach (var (name, modelPath, sizeScale) in Ingredients)
+            {
+                var model = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+                var filter = model != null ? model.GetComponentInChildren<MeshFilter>() : null;
+                if (filter == null || filter.sharedMesh == null) continue;
+
+                var source = filter.GetComponent<Renderer>().sharedMaterial;
+                Texture texture = null;
+                if (source != null)
+                    texture = source.HasProperty("baseColorTexture") ? source.GetTexture("baseColorTexture") : source.mainTexture;
+
+                var ps = CreateIngredientBurst(group, $"Ingredient_{name}", filter.sharedMesh, sizeScale);
+                ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = ParticleMaterial($"Ingredient_{name}", texture, ParticleBlend.Lit);
+                bursts.Add(ps);
+            }
+
+            if (bursts.Count == 0)
+            {
+                var fallback = CreateIngredientBurst(group, "Ingredient_Shapes", BuiltinMesh("Sphere.fbx"), 0.5f);
+                fallback.GetComponent<ParticleSystemRenderer>().sharedMaterial = ParticleMaterial("Ingredient", null, ParticleBlend.Lit);
+                bursts.Add(fallback);
+            }
+            return bursts.ToArray();
+        }
+
+        /// <summary>클릭하면 재료 하나가 튀어 올랐다가 중력으로 떨어진다. 3D 메시 파티클.</summary>
+        private static ParticleSystem CreateIngredientBurst(Transform parent, string name, Mesh mesh, float sizeScale)
+        {
+            var ps = CreateParticleSystem(name, parent, SoupCenter, 40);
             var main = ps.main;
             main.startLifetime = new ParticleSystem.MinMaxCurve(0.9f, 1.3f);
             // Scaling Mode가 Hierarchy라 속도·크기에도 냄비 크기(약 2.5배)가 곱해진다.
             main.startSpeed = new ParticleSystem.MinMaxCurve(1.4f, 2.4f);
-            main.startSize = new ParticleSystem.MinMaxCurve(0.025f, 0.045f);
+            // 모델의 가장 긴 변이 냄비 지름의 약 1/6이 되도록 맞춘다.
+            float longest = Mathf.Max(mesh.bounds.size.x, mesh.bounds.size.y, mesh.bounds.size.z);
+            float startSize = 0.075f / Mathf.Max(0.0001f, longest) * sizeScale;
+            main.startSize = new ParticleSystem.MinMaxCurve(startSize * 0.8f, startSize * 1.15f);
             main.startRotation3D = true;
             main.startRotationX = main.startRotationY = main.startRotationZ = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
             main.gravityModifier = 0.9f;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
-            // 낙지(빨강)·곱창(뽀얀 살구)·새우(주황)·대파(초록) 중 하나씩 무작위로
-            main.startColor = new ParticleSystem.MinMaxGradient(Palette(
-                new Color(0.85f, 0.22f, 0.18f), new Color(0.98f, 0.82f, 0.68f),
-                new Color(1f, 0.5f, 0.32f), new Color(0.38f, 0.72f, 0.28f))) { mode = ParticleSystemGradientMode.RandomColor };
+            main.startColor = Color.white; // 색은 모델 텍스처 그대로
 
             var shape = ps.shape;
             shape.shapeType = ParticleSystemShapeType.Cone;
@@ -95,9 +139,10 @@ namespace CookieClicker.EditorTools
 
             var renderer = ps.GetComponent<ParticleSystemRenderer>();
             renderer.renderMode = ParticleSystemRenderMode.Mesh;
-            renderer.SetMeshes(new[] { BuiltinMesh("Capsule.fbx"), BuiltinMesh("Sphere.fbx"), BuiltinMesh("Cube.fbx") });
+            renderer.mesh = mesh;
+            // 모델 중심이 원점이 아니어도 제자리에서 돌도록 회전 중심을 모델 가운데로 옮긴다 (단위: 파티클 크기).
+            renderer.pivot = -mesh.bounds.center;
             renderer.alignment = ParticleSystemRenderSpace.Local;
-            renderer.sharedMaterial = ParticleMaterial("Ingredient", null, ParticleBlend.Lit);
             return ps;
         }
 

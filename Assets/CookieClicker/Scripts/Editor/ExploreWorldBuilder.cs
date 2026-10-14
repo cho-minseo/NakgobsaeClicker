@@ -228,6 +228,7 @@ namespace CookieClicker.EditorTools
             if (building.Id == "cow_ranch") FenceTool.AddFence(view);
             // 직접 만든 3D 모델이 있는 건물은 옆에 랜드마크로 세운다.
             if (building.Id == "ladle") AddLadleLandmark(view);
+            AddModelLandmark(view);
 
             // 아직 안 산 건물은 빈 땅. 실행하면 BuildingPlot이 보유 개수에 맞춰 켜 준다.
             built.gameObject.SetActive(false);
