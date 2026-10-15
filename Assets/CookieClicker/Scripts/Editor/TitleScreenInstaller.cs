@@ -78,9 +78,10 @@ namespace CookieClicker.EditorTools
             var buttons = CreateRect("Buttons", root);
             buttons.anchorMin = buttons.anchorMax = new Vector2(0.5f, 0f);
             buttons.sizeDelta = Vector2.zero;
-            var start = CreateTitleButton(buttons, "Start", "시작하기", StartButtonRest, new Vector2(460f, 104f), 46, StartRed);
-            var settingsButton = CreateTitleButton(buttons, "Settings", "설정", SettingsButtonRest, new Vector2(220f, 74f), 30, Wood);
-            var quit = CreateTitleButton(buttons, "Quit", "종료", QuitButtonRest, new Vector2(220f, 74f), 30, Wood);
+            // 배경 없이 글씨만 보이는 버튼. 마우스를 올리면 글씨가 노랗게 바뀌며 살짝 커진다.
+            var start = CreateTextOnlyButton(buttons, "Start", "시작하기", StartButtonRest, new Vector2(460f, 104f), 60);
+            var settingsButton = CreateTextOnlyButton(buttons, "Settings", "설정", SettingsButtonRest, new Vector2(220f, 74f), 38);
+            var quit = CreateTextOnlyButton(buttons, "Quit", "종료", QuitButtonRest, new Vector2(220f, 74f), 38);
 
             var settings = CreateSettingsWindow(root);
 
@@ -107,6 +108,31 @@ namespace CookieClicker.EditorTools
             button.targetGraphic.color = color;
             text.fontSize = fontSize;
             AddOutline(text);
+            return button;
+        }
+
+        /// <summary>
+        /// 글씨만 보이는 버튼. 배경 이미지는 지우지 않고 투명하게만 둔다 (글씨는 클릭을 받지 않으므로
+        /// 투명한 이미지가 클릭 영역 역할을 한다). 마우스 반응 색은 글씨에 걸리도록 Target Graphic을 글씨로 바꾼다.
+        /// </summary>
+        private static Button CreateTextOnlyButton(RectTransform parent, string name, string label, Vector2 position, Vector2 size, int fontSize)
+        {
+            var button = CreateTitleButton(parent, name, label, position, size, fontSize, new Color(1f, 1f, 1f, 0f));
+            var text = button.GetComponentInChildren<Text>();
+            text.color = Color.white; // 실제 색은 아래 버튼 색(ColorTint)이 곱해져 정해진다
+            text.GetComponents<Outline>().ToList().ForEach(Object.DestroyImmediate);
+            AddThickOutline(text, new Color(0.3f, 0.1f, 0.04f, 0.95f), 3f);
+
+            button.targetGraphic = text;
+            var colors = button.colors;
+            colors.normalColor = Cream;
+            colors.highlightedColor = Gold;
+            colors.pressedColor = new Color(0.85f, 0.55f, 0.2f);
+            colors.selectedColor = Cream;
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+
+            Wire(button.gameObject.AddComponent<HoverScale>(), ("target", text.transform));
             return button;
         }
 
