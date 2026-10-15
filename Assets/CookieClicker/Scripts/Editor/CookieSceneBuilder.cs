@@ -89,6 +89,7 @@ namespace CookieClicker.EditorTools
             var background = CreateBackgroundCanvas(game, camera, prefabs);
             var ui = CreateUICanvas(game, cookie, config, prefabs, background);
             CreateExploreWorld(game, config, camera, cookie, background, ui);
+            InstallTitleScreen(ui.MainHud.GetComponent<ResponsiveLayout>(), cookie.GetComponentInChildren<StewPotFX>());
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddSceneToBuildSettings();

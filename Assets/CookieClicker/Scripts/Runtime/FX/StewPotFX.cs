@@ -39,6 +39,9 @@ namespace CookieClicker.FX
         /// <summary>0 = 약불, 1 = 최대로 끓음. 다른 연출(소리 등)이 같이 쓸 수 있게 공개한다.</summary>
         public float Boil => boil;
 
+        /// <summary>생산량과 상관없이 최소 이만큼은 끓게 한다 (타이틀 화면처럼 처음부터 보글보글해야 할 때).</summary>
+        public float MinBoil { get; set; }
+
         private void OnEnable()
         {
             pot.Clicked += OnPotClicked;
@@ -53,24 +56,28 @@ namespace CookieClicker.FX
         {
             // 생산량은 몇 자리씩 커지므로 로그로 0~1에 맞춘다.
             float target = Mathf.Clamp01(Mathf.Log10((float)game.CookiesPerSecond + 1f) / maxBoilLog10);
+            target = Mathf.Max(target, MinBoil);
             boil = Mathf.SmoothDamp(boil, target, ref boilVelocity, boilSmoothTime);
 
             SetRate(bubbles, Mathf.Lerp(bubbleRate.x, bubbleRate.y, boil));
             SetRate(steam, Mathf.Lerp(steamRate.x, steamRate.y, boil));
         }
 
-        private void OnPotClicked(double amount, Vector2 screenPosition)
+        private void OnPotClicked(double amount, Vector2 screenPosition) => Splash(ingredientsPerClick, sparklesPerClick);
+
+        /// <summary>재료를 튀기고 반짝임을 터뜨린다. 클릭할 때, 그리고 타이틀 화면에서 가끔 저절로 쓴다.</summary>
+        public void Splash(int ingredients, int sparkles)
         {
             // Emit(n)은 이미 만들어 둔 파티클 버퍼를 쓰므로 클릭마다 오브젝트가 생기지 않는다.
             if (ingredientBursts != null && ingredientBursts.Length > 0)
             {
-                for (int i = 0; i < ingredientsPerClick; i++)
+                for (int i = 0; i < ingredients; i++)
                 {
                     var burst = ingredientBursts[Random.Range(0, ingredientBursts.Length)];
                     if (burst != null) burst.Emit(1);
                 }
             }
-            if (sparkleBurst != null) sparkleBurst.Emit(sparklesPerClick);
+            if (sparkleBurst != null) sparkleBurst.Emit(sparkles);
         }
 
         private static void SetRate(ParticleSystem system, float rate)

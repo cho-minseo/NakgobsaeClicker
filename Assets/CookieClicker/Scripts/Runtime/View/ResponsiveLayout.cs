@@ -105,18 +105,30 @@ namespace CookieClicker.View
                 if (panel.target != null) (portrait ? panel.portrait : panel.landscape).ApplyTo(panel.target);
             }
 
-            var layout = portrait ? portraitCookie : landscapeCookie;
-            if (cookie != null) cookie.SetScreenLayout(layout.viewportPosition, layout.heightRatio, layout.maxWidthRatio);
+            var layout = CurrentCookieLayout;
+            if (!CookieLayoutOverridden) PlaceCookie(layout.viewportPosition, layout.heightRatio, layout.maxWidthRatio);
             if (goldenCookie != null) goldenCookie.SpawnRect = layout.goldenSpawnRect;
-            foreach (var rt in followCookie)
-            {
-                if (rt == null) continue;
-                rt.anchorMin = rt.anchorMax = layout.viewportPosition;
-                rt.anchoredPosition = Vector2.zero;
-            }
 
             if (tabBar != null) tabBar.SetActive(portrait);
             RefreshTabs();
+        }
+
+        /// <summary>지금 화면 방향(가로/세로)에서 게임 중 쿠키가 있어야 할 자리.</summary>
+        public CookieLayout CurrentCookieLayout => IsPortrait ? portraitCookie : landscapeCookie;
+
+        /// <summary>true인 동안은 화면을 돌려도 쿠키 자리를 건드리지 않는다 (타이틀 화면이 쿠키를 가운데로 옮겨 쓰는 동안).</summary>
+        public bool CookieLayoutOverridden { get; set; }
+
+        /// <summary>쿠키와 그 뒤의 후광(followCookie)을 화면의 한 자리로 함께 옮긴다.</summary>
+        public void PlaceCookie(Vector2 viewportPosition, float heightRatio, float maxWidthRatio)
+        {
+            if (cookie != null) cookie.SetScreenLayout(viewportPosition, heightRatio, maxWidthRatio);
+            foreach (var rt in followCookie)
+            {
+                if (rt == null) continue;
+                rt.anchorMin = rt.anchorMax = viewportPosition;
+                rt.anchoredPosition = Vector2.zero;
+            }
         }
 
         private void SelectTab(bool stats)

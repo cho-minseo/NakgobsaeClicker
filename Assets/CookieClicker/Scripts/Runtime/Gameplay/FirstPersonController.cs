@@ -1,4 +1,5 @@
 using System;
+using CookieClicker.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -99,7 +100,7 @@ namespace CookieClicker.Gameplay
 
         private void Look()
         {
-            LookDelta = lookAction.action.ReadValue<Vector2>() * lookSensitivity;
+            LookDelta = lookAction.action.ReadValue<Vector2>() * (lookSensitivity * GameSettings.LookSensitivity);
             transform.Rotate(0f, LookDelta.x, 0f);
             pitch = Mathf.Clamp(pitch - LookDelta.y, -maxPitch, maxPitch);
             cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
