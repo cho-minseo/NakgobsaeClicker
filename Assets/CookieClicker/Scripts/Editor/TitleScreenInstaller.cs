@@ -64,11 +64,11 @@ namespace CookieClicker.EditorTools
             var logo = Place(CreateRect("Logo", root), new Vector2(0.5f, 0.82f), new Vector2(1100f, 320f));
             var sub = Place(CreateRect("Sub", logo), new Vector2(0.5f, 0.5f), new Vector2(900f, 120f));
             sub.anchoredPosition = LogoSubRest;
-            var subText = AddText(sub, "보글보글", 86, Cream, TextAnchor.MiddleCenter, FontStyle.Bold);
+            var subText = Localize(AddText(sub, "보글보글", 86, Cream, TextAnchor.MiddleCenter, FontStyle.Bold), "Bubble Bubble");
             AddThickOutline(subText, new Color(0.35f, 0.12f, 0.05f, 0.9f), 4f);
             var main = Place(CreateRect("Main", logo), new Vector2(0.5f, 0.5f), new Vector2(1100f, 220f));
             main.anchoredPosition = LogoMainRest;
-            var mainText = AddText(main, "낙곱새", 190, TitleOrange, TextAnchor.MiddleCenter, FontStyle.Bold);
+            var mainText = Localize(AddText(main, "낙곱새", 190, TitleOrange, TextAnchor.MiddleCenter, FontStyle.Bold), "Nakgopsae");
             AddThickOutline(mainText, new Color(0.45f, 0.08f, 0.04f, 1f), 6f);
             var shadow = mainText.gameObject.AddComponent<Shadow>();
             shadow.effectColor = new Color(0f, 0f, 0f, 0.5f);
@@ -149,35 +149,87 @@ namespace CookieClicker.EditorTools
 
         // ------------------------------------------------------------------ 설정 창
 
+        /// <summary>
+        /// 설정 창만 새로 만든다 (타이틀 화면의 다른 부분은 그대로). 설정 항목이 늘었을 때 기존 씬에 반영하는 용도.
+        /// </summary>
+        [MenuItem("Tools/Cookie Clicker/Update Settings Window (설정 창 업데이트)", priority = 24)]
+        private static void UpdateSettingsWindowMenu()
+        {
+            if (font == null) font = AssetDatabase.LoadAssetAtPath<Font>(FontPath) ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var title = Object.FindAnyObjectByType<TitleScreenView>(FindObjectsInactive.Include);
+            var old = Object.FindAnyObjectByType<SettingsView>(FindObjectsInactive.Include);
+            if (title == null || old == null)
+            {
+                EditorUtility.DisplayDialog("Cookie Clicker", "타이틀 화면(설정 창)이 없습니다.\n먼저 Install Title Screen을 실행해 주세요.", "확인");
+                return;
+            }
+
+            var parent = (RectTransform)old.transform.parent;
+            int index = old.transform.GetSiblingIndex();
+            Undo.DestroyObjectImmediate(old.gameObject);
+            var view = CreateSettingsWindow(parent);
+            view.transform.SetSiblingIndex(index);
+            Undo.RegisterCreatedObjectUndo(view.gameObject, "Update Settings Window");
+            Wire(title, ("settings", view));
+
+            EditorSceneManager.MarkSceneDirty(title.gameObject.scene);
+            EditorUtility.DisplayDialog("Cookie Clicker", "설정 창을 새로 만들었습니다.\nCtrl+S로 씬을 저장해 주세요.", "확인");
+        }
+
         private static SettingsView CreateSettingsWindow(RectTransform parent)
         {
             var root = Stretch(CreateRect("Settings", parent), Vector2.zero, Vector2.one);
             var panel = Stretch(CreateRect("Panel", root), Vector2.zero, Vector2.one);
             AddImage(panel, null, new Color(0f, 0f, 0f, 0.55f), true);
 
-            var window = Place(CreateRect("Window", panel), new Vector2(0.5f, 0.5f), new Vector2(720f, 470f));
+            var window = Place(CreateRect("Window", panel), new Vector2(0.5f, 0.5f), new Vector2(760f, 640f));
             AddImage(window, CookieArtFactory.RoundedRect, new Color(0.24f, 0.15f, 0.09f, 0.97f), true);
-            AddOutline(AddText(TopBand(CreateRect("Title", window), 28f, 64f), "설정", 46, Gold, TextAnchor.MiddleCenter, FontStyle.Bold));
+            var title = AddText(TopBand(CreateRect("Title", window), 26f, 64f), "설정", 46, Gold, TextAnchor.MiddleCenter, FontStyle.Bold);
+            AddOutline(title);
+            Localize(title, "Settings");
 
-            var volume = CreateSettingRow(window, "Volume", "소리 크기", 140f, 0f, 1f, out var volumeValue);
-            var sensitivity = CreateSettingRow(window, "Sensitivity", "마우스 감도\n<size=20>(구경하기)</size>", 250f, 0.2f, 3f, out var sensitivityValue);
+            var volume = CreateSettingRow(window, "Volume", "소리 크기", "Volume", 110f, 0f, 1f, out var volumeValue);
+            var sensitivity = CreateSettingRow(window, "Sensitivity", "마우스 감도\n<size=20>(구경하기)</size>",
+                "Mouse speed\n<size=20>(explore)</size>", 200f, 0.2f, 3f, out var sensitivityValue);
 
-            var close = CreateTitleButton(window, "Close", "닫기", Vector2.zero, new Vector2(220f, 72f), 30, StartRed);
-            var closeRect = (RectTransform)close.transform;
-            closeRect.anchorMin = closeRect.anchorMax = new Vector2(0.5f, 0f);
-            closeRect.anchoredPosition = new Vector2(0f, 70f);
+            // 언어: 고른 쪽이 밝은 금색으로 보인다 (SettingsView가 고른 버튼을 비활성 = 선택 표시로 둔다).
+            var languageRow = CreateSettingLabelRow(window, "Language", "언어", "Language", 290f);
+            var korean = CreateChoiceButton(languageRow, "Korean", "한국어", new Vector2(0.34f, 0.12f), new Vector2(0.57f, 0.88f), out _);
+            var english = CreateChoiceButton(languageRow, "English", "English", new Vector2(0.59f, 0.12f), new Vector2(0.82f, 0.88f), out _);
+
+            // 클릭 대체 키: 버튼을 누른 뒤 키를 누르면 바뀐다. 글자(현재 키 이름)는 SettingsView가 채운다.
+            var keyRow = CreateSettingLabelRow(window, "ClickKey", "클릭 대체 키\n<size=20>(냄비 누르기)</size>",
+                "Click key\n<size=20>(stir the pot)</size>", 380f);
+            var keyButton = CreateChoiceButton(keyRow, "KeyButton", "Space", new Vector2(0.34f, 0.12f), new Vector2(0.82f, 0.88f), out var keyLabel);
+            keyButton.colors = WithDisabledAsSelected(keyButton.colors, 1f);
+
+            // 아래: [기본값] [취소] [저장]. 바꾼 값은 저장을 눌러야 남는다.
+            var reset = CreateWindowButton(window, "Reset", "기본값", "Defaults", new Vector2(-220f, 64f), new Color(0.5f, 0.36f, 0.22f));
+            var cancel = CreateWindowButton(window, "Cancel", "취소", "Cancel", new Vector2(0f, 64f), new Color(0.42f, 0.32f, 0.26f));
+            var save = CreateWindowButton(window, "Save", "저장", "Save", new Vector2(220f, 64f), StartRed);
 
             var view = root.gameObject.AddComponent<SettingsView>();
             Wire(view, ("panel", panel.gameObject), ("volumeSlider", volume), ("volumeValue", volumeValue),
-                ("sensitivitySlider", sensitivity), ("sensitivityValue", sensitivityValue), ("closeButton", close));
+                ("sensitivitySlider", sensitivity), ("sensitivityValue", sensitivityValue),
+                ("koreanButton", korean), ("englishButton", english),
+                ("clickKeyButton", keyButton), ("clickKeyLabel", keyLabel),
+                ("resetButton", reset), ("cancelButton", cancel), ("saveButton", save));
             panel.gameObject.SetActive(false);
             return view;
         }
 
-        private static Slider CreateSettingRow(RectTransform window, string name, string label, float top, float min, float max, out Text valueText)
+        /// <summary>왼쪽에 항목 이름(언어별), 오른쪽은 비워 둔 한 줄.</summary>
+        private static RectTransform CreateSettingLabelRow(RectTransform window, string name, string label, string englishLabel, float top)
         {
             var row = TopBand(CreateRect(name, window), top, 80f, 48f, 48f);
-            AddText(Stretch(CreateRect("Label", row), Vector2.zero, new Vector2(0.32f, 1f)), label, 28, Cream, TextAnchor.MiddleLeft);
+            Localize(AddText(Stretch(CreateRect("Label", row), Vector2.zero, new Vector2(0.32f, 1f)), label, 28, Cream, TextAnchor.MiddleLeft), englishLabel);
+            return row;
+        }
+
+        private static Slider CreateSettingRow(RectTransform window, string name, string label, string englishLabel, float top,
+            float min, float max, out Text valueText)
+        {
+            var row = CreateSettingLabelRow(window, name, label, englishLabel, top);
             valueText = AddText(Stretch(CreateRect("Value", row), new Vector2(0.84f, 0f), Vector2.one), "", 28, Gold, TextAnchor.MiddleRight, FontStyle.Bold);
 
             var sliderObject = DefaultControls.CreateSlider(new DefaultControls.Resources
@@ -201,6 +253,55 @@ namespace CookieClicker.EditorTools
             handle.GetComponent<Image>().color = Cream;
             handle.sizeDelta = new Vector2(36f, 20f);
             return slider;
+        }
+
+        /// <summary>
+        /// 한 줄 안에 들어가는 고르기 버튼. 고른 버튼은 비활성(interactable = false)으로 두는데,
+        /// 비활성 색을 가장 밝게 해서 "선택됨"으로 보이게 한다 (안 고른 쪽은 어둡게).
+        /// </summary>
+        private static Button CreateChoiceButton(RectTransform row, string name, string label, Vector2 anchorMin, Vector2 anchorMax, out Text text)
+        {
+            var rt = Stretch(CreateRect(name, row), anchorMin, anchorMax);
+            var image = AddImage(rt, CookieArtFactory.RoundedRect, Gold, true);
+            var button = AddButton(rt, image);
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+            button.colors = WithDisabledAsSelected(button.colors, 0.45f);
+            text = AddText(Stretch(CreateRect("Label", rt), Vector2.zero, Vector2.one), label, 26, new Color(0.25f, 0.13f, 0.05f),
+                TextAnchor.MiddleCenter, FontStyle.Bold);
+            return button;
+        }
+
+        private static ColorBlock WithDisabledAsSelected(ColorBlock colors, float normal)
+        {
+            colors.normalColor = new Color(normal + 0.15f, normal + 0.1f, normal, 1f);
+            colors.highlightedColor = new Color(0.85f, 0.8f, 0.7f, 1f);
+            colors.pressedColor = new Color(0.7f, 0.6f, 0.45f, 1f);
+            colors.selectedColor = colors.normalColor;
+            colors.disabledColor = Color.white;
+            colors.fadeDuration = 0.08f;
+            return colors;
+        }
+
+        /// <summary>설정 창 아래쪽 버튼 (창 아래 가운데 기준 위치).</summary>
+        private static Button CreateWindowButton(RectTransform window, string name, string label, string englishLabel, Vector2 position, Color color)
+        {
+            var button = CreateTitleButton(window, name, label, Vector2.zero, new Vector2(200f, 70f), 28, color);
+            var rt = (RectTransform)button.transform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0f);
+            rt.anchoredPosition = position;
+            Localize(button.GetComponentInChildren<Text>(), englishLabel);
+            return button;
+        }
+
+        /// <summary>씬에 고정된 글자에 영어 문구를 붙인다 (언어를 바꾸면 LocalizedText가 바꿔 끼운다).</summary>
+        internal static Text Localize(Text text, string english)
+        {
+            if (text == null || string.IsNullOrEmpty(english)) return text;
+            var localized = text.GetComponent<LocalizedText>();
+            if (localized == null) localized = text.gameObject.AddComponent<LocalizedText>();
+            localized.EditorSet(text.text, english);
+            EditorUtility.SetDirty(localized);
+            return text;
         }
 
         // ------------------------------------------------------------------ 애니메이션

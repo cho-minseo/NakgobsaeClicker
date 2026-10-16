@@ -163,6 +163,8 @@ namespace CookieClicker.EditorTools
             AttachModel(pot, modelAsset, Vector3.zero);
             pot.localPosition = new Vector3(0f, 1.55f, 0f);
             pot.localScale = Vector3.one * 1.8f;
+            // 냄비 원본은 약 195만 삼각형이라, 조금만 떨어져도 가벼운 LOD 모델로 바꿔 그린다.
+            SetupLods(pot);
 
             CreateWorldLabel(home, "Sign_Home", "본진: 낙곱새 냄비", new Vector3(0f, 3.6f, 0f), Quaternion.identity, 70, new Color(1f, 0.85f, 0.4f));
         }
@@ -223,6 +225,8 @@ namespace CookieClicker.EditorTools
                 element.FindPropertyRelative("visual").objectReferenceValue = tierObjects[t];
             }
             serialized.ApplyModifiedPropertiesWithoutUndo();
+            // 보유 개수에 따라 건물 모습이 바뀌는 단계 (처음엔 박스를 단계마다 높인 임시 모습)
+            InstallStages(view);
 
             // 목장은 울타리로 둘러 분위기를 낸다. 다른 건물은 Tools 메뉴로 따로 추가할 수 있다.
             if (building.Id == "cow_ranch") FenceTool.AddFence(view);

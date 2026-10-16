@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: Upgrade_dual_ladle
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: dual_ladle
-  displayName: "양손 국자 스킬"
-  description: "젓기·국자 x2 · 양손이면 두 배. 수학적으로 완벽."
+  displayName: "\uC591\uC190 \uAD6D\uC790 \uC2A4\uD0AC"
+  description: "\uC813\uAE30\xB7\uAD6D\uC790 x2 \xB7 \uC591\uC190\uC774\uBA74 \uB450
+    \uBC30. \uC218\uD559\uC801\uC73C\uB85C \uC644\uBCBD."
+  displayNameEn: Two-Handed Ladle
+  descriptionEn: "Stirring & Auto Ladle x2 \xB7 Two hands, twice as much. Mathematically
+    perfect."
   cost: 10000
   iconColor: {r: 0.85, g: 0.85, b: 0.9, a: 1}
   effectType: 0

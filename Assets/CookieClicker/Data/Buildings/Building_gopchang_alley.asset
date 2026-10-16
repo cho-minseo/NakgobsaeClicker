@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_gopchang_alley
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: gopchang_alley
-  displayName: "곱창 골목"
-  description: "지나가기만 해도 배고파지는 골목."
+  displayName: "\uACF1\uCC3D \uACE8\uBAA9"
+  description: "\uC9C0\uB098\uAC00\uAE30\uB9CC \uD574\uB3C4 \uBC30\uACE0\uD30C\uC9C0\uB294
+    \uACE8\uBAA9."
+  displayNameEn: Gopchang Alley
+  descriptionEn: An alley that makes you hungry just by walking through.
   baseCost: 1400000
   baseCps: 1400
   iconColor: {r: 0.85, g: 0.35, b: 0.3, a: 1}

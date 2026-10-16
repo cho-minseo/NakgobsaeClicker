@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_shrimp_farm
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: shrimp_farm
-  displayName: "새우 양식장"
-  description: "허리 굽은 새우들이 쑥쑥 자랍니다. 허리는 원래 굽어 있음."
+  displayName: "\uC0C8\uC6B0 \uC591\uC2DD\uC7A5"
+  description: "\uD5C8\uB9AC \uAD7D\uC740 \uC0C8\uC6B0\uB4E4\uC774 \uC465\uC465 \uC790\uB78D\uB2C8\uB2E4.
+    \uD5C8\uB9AC\uB294 \uC6D0\uB798 \uAD7D\uC5B4 \uC788\uC74C."
+  displayNameEn: Shrimp Farm
+  descriptionEn: Hunched shrimp grow up fast. They were always hunched.
   baseCost: 130000
   baseCps: 260
   iconColor: {r: 1, g: 0.55, b: 0.45, a: 1}

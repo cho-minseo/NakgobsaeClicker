@@ -90,6 +90,8 @@ namespace CookieClicker.EditorTools
             var ui = CreateUICanvas(game, cookie, config, prefabs, background);
             CreateExploreWorld(game, config, camera, cookie, background, ui);
             InstallTitleScreen(ui.MainHud.GetComponent<ResponsiveLayout>(), cookie.GetComponentInChildren<StewPotFX>());
+            // 영어판 문구 (건물·업그레이드 에셋, 씬의 고정 글자)
+            InstallEnglish();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddSceneToBuildSettings();

@@ -47,11 +47,12 @@ namespace CookieClicker.View
             icon.color = building.IconColor;
             iconLabel.text = string.IsNullOrEmpty(building.DisplayName) ? "?" : building.DisplayName.Substring(0, 1);
             nameText.text = buyAmount > 1 ? $"{building.DisplayName} x{buyAmount}" : building.DisplayName;
-            costText.text = $"가격 {NumberFormatter.Format(cost)}";
+            costText.text = $"{Loc.T("가격", "Cost")} {NumberFormatter.Format(cost)}";
             costText.color = canAfford ? affordableCostColor : expensiveCostColor;
             infoText.text = owned > 0
-                ? $"1개당 초당 {NumberFormatter.Format(unitCps, true)} · 합계 초당 {NumberFormatter.Format(totalCps, true)}"
-                : $"1개당 초당 {NumberFormatter.Format(unitCps, true)}";
+                ? Loc.T($"1개당 초당 {NumberFormatter.Format(unitCps, true)} · 합계 초당 {NumberFormatter.Format(totalCps, true)}",
+                    $"Each {NumberFormatter.Format(unitCps, true)}/s · Total {NumberFormatter.Format(totalCps, true)}/s")
+                : Loc.T($"1개당 초당 {NumberFormatter.Format(unitCps, true)}", $"Each {NumberFormatter.Format(unitCps, true)}/s");
             countText.text = owned > 0 ? owned.ToString() : string.Empty;
         }
 
@@ -65,7 +66,7 @@ namespace CookieClicker.View
             icon.color = mysteryIconColor;
             iconLabel.text = "?";
             nameText.text = "???";
-            costText.text = $"가격 {NumberFormatter.Format(cost)}";
+            costText.text = $"{Loc.T("가격", "Cost")} {NumberFormatter.Format(cost)}";
             costText.color = expensiveCostColor;
             infoText.text = string.Empty;
             countText.text = string.Empty;

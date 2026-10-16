@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_classical_music
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: classical_music
-  displayName: "클래식 음악 틀어주기"
-  description: "소 목장 x2 · 소가 행복하면 대창도 행복하다."
+  displayName: "\uD074\uB798\uC2DD \uC74C\uC545 \uD2C0\uC5B4\uC8FC\uAE30"
+  description: "\uC18C \uBAA9\uC7A5 x2 \xB7 \uC18C\uAC00 \uD589\uBCF5\uD558\uBA74
+    \uB300\uCC3D\uB3C4 \uD589\uBCF5\uD558\uB2E4."
+  displayNameEn: Classical Music for Cows
+  descriptionEn: "Cow Ranch x2 \xB7 Happy cow, happy daechang."
   cost: 55000
   iconColor: {r: 0.45, g: 0.75, b: 0.35, a: 1}
   effectType: 0

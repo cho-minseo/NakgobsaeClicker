@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_legendary_wok
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: legendary_wok
-  displayName: "전설의 웍질"
-  description: "저을 때 초당 생산량 +1% · 불 쇼는 덤."
+  displayName: "\uC804\uC124\uC758 \uC6CD\uC9C8"
+  description: "\uC800\uC744 \uB54C \uCD08\uB2F9 \uC0DD\uC0B0\uB7C9 +1% \xB7 \uBD88
+    \uC1FC\uB294 \uB364."
+  displayNameEn: Legendary Wok Toss
+  descriptionEn: "Each stir +1% of production per second \xB7 Free fire show included."
   cost: 500000000
   iconColor: {r: 1, g: 0.55, b: 0.25, a: 1}
   effectType: 1

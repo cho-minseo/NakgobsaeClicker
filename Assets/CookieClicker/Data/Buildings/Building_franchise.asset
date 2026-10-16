@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_franchise
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: franchise
-  displayName: "낙곱새 프랜차이즈"
-  description: "전국 어디서나 같은 맛. 가맹 문의 폭주."
+  displayName: "\uB099\uACF1\uC0C8 \uD504\uB79C\uCC28\uC774\uC988"
+  description: "\uC804\uAD6D \uC5B4\uB514\uC11C\uB098 \uAC19\uC740 \uB9DB. \uAC00\uB9F9
+    \uBB38\uC758 \uD3ED\uC8FC."
+  displayNameEn: Nakgopsae Franchise
+  descriptionEn: Same taste everywhere. Franchise inquiries are flooding in.
   baseCost: 5100000000
   baseCps: 260000
   iconColor: {r: 1, g: 0.75, b: 0.25, a: 1}

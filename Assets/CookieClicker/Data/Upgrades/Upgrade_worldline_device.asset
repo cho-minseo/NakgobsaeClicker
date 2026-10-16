@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: Upgrade_worldline_device
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: worldline_device
-  displayName: "세계선 수렴 장치"
-  description: "평행세계 낙곱새집 x2 · 모든 세계선에서 낙곱새는 맛있다."
+  displayName: "\uC138\uACC4\uC120 \uC218\uB834 \uC7A5\uCE58"
+  description: "\uD3C9\uD589\uC138\uACC4 \uB099\uACF1\uC0C8\uC9D1 x2 \xB7 \uBAA8\uB4E0
+    \uC138\uACC4\uC120\uC5D0\uC11C \uB099\uACF1\uC0C8\uB294 \uB9DB\uC788\uB2E4."
+  displayNameEn: Worldline Converger
+  descriptionEn: "Parallel-World Kitchen x2 \xB7 Nakgopsae is delicious in every
+    worldline."
   cost: 140000000000000
   iconColor: {r: 0.35, g: 0.85, b: 0.85, a: 1}
   effectType: 0

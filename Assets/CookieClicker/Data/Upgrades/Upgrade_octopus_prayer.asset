@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_octopus_prayer
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: octopus_prayer
-  displayName: "대왕낙지 기도문"
-  description: "대왕낙지 신전 x2 · 다리 8개로 동시에 합장."
+  displayName: "\uB300\uC655\uB099\uC9C0 \uAE30\uB3C4\uBB38"
+  description: "\uB300\uC655\uB099\uC9C0 \uC2E0\uC804 x2 \xB7 \uB2E4\uB9AC 8\uAC1C\uB85C
+    \uB3D9\uC2DC\uC5D0 \uD569\uC7A5."
+  displayNameEn: Giant Octopus Prayer
+  descriptionEn: "Giant Octopus Shrine x2 \xB7 Praying with all eight arms at once."
   cost: 750000000000
   iconColor: {r: 1, g: 0.85, b: 0.45, a: 1}
   effectType: 0

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_ladle
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: ladle
-  displayName: "자동 국자"
-  description: "알아서 냄비를 저어 줍니다. 손목 보호는 덤."
+  displayName: "\uC790\uB3D9 \uAD6D\uC790"
+  description: "\uC54C\uC544\uC11C \uB0C4\uBE44\uB97C \uC800\uC5B4 \uC90D\uB2C8\uB2E4.
+    \uC190\uBAA9 \uBCF4\uD638\uB294 \uB364."
+  displayNameEn: Auto Ladle
+  descriptionEn: Stirs the pot all by itself. Saves your wrists, too.
   baseCost: 15
   baseCps: 0.1
   iconColor: {r: 0.8, g: 0.82, b: 0.86, a: 1}

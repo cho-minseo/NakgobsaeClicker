@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_cow_ranch
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: cow_ranch
-  displayName: "소 목장"
-  description: "무표정한 소 '음메에바'가 대창을 책임집니다."
+  displayName: "\uC18C \uBAA9\uC7A5"
+  description: "\uBB34\uD45C\uC815\uD55C \uC18C '\uC74C\uBA54\uC5D0\uBC14'\uAC00
+    \uB300\uCC3D\uC744 \uCC45\uC784\uC9D1\uB2C8\uB2E4."
+  displayNameEn: Cow Ranch
+  descriptionEn: Poker-faced cow 'Moomeeba' is in charge of the daechang.
   baseCost: 1100
   baseCps: 8
   iconColor: {r: 0.55, g: 0.8, b: 0.4, a: 1}

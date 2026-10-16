@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_neon_sign
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: neon_sign
-  displayName: "네온사인 간판"
-  description: "곱창 골목 x2 · 멀리서도 보인다. 눈이 부시다."
+  displayName: "\uB124\uC628\uC0AC\uC778 \uAC04\uD310"
+  description: "\uACF1\uCC3D \uACE8\uBAA9 x2 \xB7 \uBA40\uB9AC\uC11C\uB3C4 \uBCF4\uC778\uB2E4.
+    \uB208\uC774 \uBD80\uC2DC\uB2E4."
+  displayNameEn: Neon Sign
+  descriptionEn: "Gopchang Alley x2 \xB7 Visible from far away. Blinding."
   cost: 70000000
   iconColor: {r: 0.95, g: 0.8, b: 0.3, a: 1}
   effectType: 0

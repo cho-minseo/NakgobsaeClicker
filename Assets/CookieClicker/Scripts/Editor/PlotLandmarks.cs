@@ -73,7 +73,7 @@ namespace CookieClicker.EditorTools
             root.localRotation = Quaternion.Euler(0f, yaw, 0f);
 
             // 상자 더미(반지름 = 건물 크기 * 0.75 + 1.2)보다 바깥, 정면에서 54도 옆 (상자 사이 빈 각도)
-            var body = built.transform.Find("Body");
+            var body = FindBuildingBody(built.transform);
             float buildingSize = body != null ? body.localScale.x : 3f;
             float distance = buildingSize * 0.75f + 1.2f + length * 0.5f + 0.6f;
             float angle = 54f * Mathf.Deg2Rad;
@@ -88,6 +88,8 @@ namespace CookieClicker.EditorTools
                 root.position += Vector3.up * (built.transform.position.y - bounds.min.y);
             }
             built.SetActive(wasActive);
+            // 멀리서는 가벼운 모델로 바꿔 그린다 (Models/LOD에 LOD 모델이 있을 때).
+            SetupLods(root);
 
             if (undo)
             {
@@ -132,6 +134,7 @@ namespace CookieClicker.EditorTools
             // 모델 그대로의 방향(회전 0). 국자 끝이 상자 더미 위로 지나가도록 띄운다.
             root.localPosition = new Vector3(2.8f, 1.4f + length * 0.5f, 0f);
             root.localRotation = Quaternion.identity;
+            SetupLods(root);
 
             if (undo)
             {

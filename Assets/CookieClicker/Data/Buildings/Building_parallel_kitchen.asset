@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_parallel_kitchen
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: parallel_kitchen
-  displayName: "평행세계 낙곱새집"
-  description: "다른 세계선의 내가 끓인 낙곱새를 가져옵니다."
+  displayName: "\uD3C9\uD589\uC138\uACC4 \uB099\uACF1\uC0C8\uC9D1"
+  description: "\uB2E4\uB978 \uC138\uACC4\uC120\uC758 \uB0B4\uAC00 \uB053\uC778 \uB099\uACF1\uC0C8\uB97C
+    \uAC00\uC838\uC635\uB2C8\uB2E4."
+  displayNameEn: Parallel-World Kitchen
+  descriptionEn: Brings in nakgopsae cooked by you from another worldline.
   baseCost: 14000000000000
   baseCps: 65000000
   iconColor: {r: 0.75, g: 0.95, b: 0.5, a: 1}

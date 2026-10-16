@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_mudflat_map
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: mudflat_map
-  displayName: "갯벌 보물지도"
-  description: "갯벌 x2 · X 표시 아래 낙지가 있다. 대충."
+  displayName: "\uAC2F\uBC8C \uBCF4\uBB3C\uC9C0\uB3C4"
+  description: "\uAC2F\uBC8C x2 \xB7 X \uD45C\uC2DC \uC544\uB798 \uB099\uC9C0\uAC00
+    \uC788\uB2E4. \uB300\uCDA9."
+  displayNameEn: Mudflat Treasure Map
+  descriptionEn: "Mudflat x2 \xB7 Octopus under the X. Roughly."
   cost: 600000
   iconColor: {r: 0.6, g: 0.5, b: 0.4, a: 1}
   effectType: 0

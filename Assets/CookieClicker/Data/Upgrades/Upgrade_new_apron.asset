@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Upgrade_new_apron
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: new_apron
-  displayName: "새 앞치마"
-  description: "알바생 x2 · 기름 튀어도 괜찮아."
+  displayName: "\uC0C8 \uC55E\uCE58\uB9C8"
+  description: "\uC54C\uBC14\uC0DD x2 \xB7 \uAE30\uB984 \uD280\uC5B4\uB3C4 \uAD1C\uCC2E\uC544."
+  displayNameEn: New Apron
+  descriptionEn: "Part-Timer x2 \xB7 Oil splashes? No problem."
   cost: 5000
   iconColor: {r: 0.9, g: 0.6, b: 0.7, a: 1}
   effectType: 0

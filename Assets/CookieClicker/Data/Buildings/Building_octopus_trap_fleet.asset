@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_octopus_trap_fleet
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: octopus_trap_fleet
-  displayName: "낙지 통발 선단"
-  description: "통발 100개 투척 완료. 낙지 회장님은 매번 탈출 시도."
+  displayName: "\uB099\uC9C0 \uD1B5\uBC1C \uC120\uB2E8"
+  description: "\uD1B5\uBC1C 100\uAC1C \uD22C\uCC99 \uC644\uB8CC. \uB099\uC9C0 \uD68C\uC7A5\uB2D8\uC740
+    \uB9E4\uBC88 \uD0C8\uCD9C \uC2DC\uB3C4."
+  displayNameEn: Octopus Trap Fleet
+  descriptionEn: 100 traps in the water. Chairman Octopus tries to escape every time.
   baseCost: 20000000
   baseCps: 7800
   iconColor: {r: 0.7, g: 0.35, b: 0.55, a: 1}

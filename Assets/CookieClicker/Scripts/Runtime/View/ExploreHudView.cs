@@ -23,13 +23,15 @@ namespace CookieClicker.View
         [SerializeField] private Text hintText;
         [SerializeField, TextArea] private string walkHint = "WASD 이동 · Shift 달리기(주먹 쥐고 뛰기) · Space 점프 · 클릭 주먹 · Esc 돌아가기";
         [SerializeField, TextArea] private string swimHint = "바라보는 방향으로 헤엄 · Space 위로 · C 잠수 · Shift 빠르게 · Esc 돌아가기";
+        [SerializeField, TextArea] private string walkHintEn = "WASD Move · Shift Run (fists up) · Space Jump · Click Punch · Esc Back";
+        [SerializeField, TextArea] private string swimHintEn = "Swim where you look · Space Up · C Dive · Shift Faster · Esc Back";
         [SerializeField] private Color breathColor = new Color(0.55f, 0.85f, 1f);
         [SerializeField] private Color breathLowColor = new Color(1f, 0.4f, 0.35f);
 
         private void Update()
         {
             currencyText.text =
-                $"{NumberFormatter.Format(game.State.Cookies)} {game.Config.CurrencyName}   초당 {NumberFormatter.Format(game.CookiesPerSecond, true)}";
+                $"{NumberFormatter.Format(game.State.Cookies)} {game.Config.CurrencyName}   {Loc.T("초당", "per second:")} {NumberFormatter.Format(game.CookiesPerSecond, true)}";
 
             lookInfoText.text = !IsUnderwater() && TryGetLookedPlot(out var plot)
                 ? $"{plot.Building.DisplayName} x{plot.Count}\n<size=20>{plot.Building.Description}</size>"
@@ -44,7 +46,7 @@ namespace CookieClicker.View
         {
             if (player == null) return;
 
-            string hint = player.IsSwimming ? swimHint : walkHint;
+            string hint = player.IsSwimming ? Loc.T(swimHint, swimHintEn) : Loc.T(walkHint, walkHintEn);
             if (hintText != null && hintText.text != hint) hintText.text = hint;
 
             if (breath == null) return;
@@ -56,7 +58,7 @@ namespace CookieClicker.View
                 ? Color.Lerp(breathLowColor, breathColor, Mathf.PingPong(Time.time * 4f, 1f))
                 : breathColor;
 
-            if (alertText != null) alertText.text = breath.IsOutOfBreath ? "숨 막혀! 수면으로!" : string.Empty;
+            if (alertText != null) alertText.text = breath.IsOutOfBreath ? Loc.T("숨 막혀! 수면으로!", "Out of air! Swim up!") : string.Empty;
         }
 
         private bool TryGetLookedPlot(out BuildingPlot plot)

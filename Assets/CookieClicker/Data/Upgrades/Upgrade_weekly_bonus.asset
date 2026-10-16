@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Upgrade_weekly_bonus
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: weekly_bonus
-  displayName: "주휴수당 지급"
-  description: "알바생 x2 · 사기 급상승."
+  displayName: "\uC8FC\uD734\uC218\uB2F9 \uC9C0\uAE09"
+  description: "\uC54C\uBC14\uC0DD x2 \xB7 \uC0AC\uAE30 \uAE09\uC0C1\uC2B9."
+  displayNameEn: Weekly Holiday Pay
+  descriptionEn: "Part-Timer x2 \xB7 Morale skyrockets."
   cost: 1000
   iconColor: {r: 0.9, g: 0.6, b: 0.7, a: 1}
   effectType: 0

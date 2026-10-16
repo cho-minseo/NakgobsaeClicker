@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Upgrade_cow_massage
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: cow_massage
-  displayName: "소 전용 마사지"
-  description: "소 목장 x2 · 음메에바: \"...음메.\""
+  displayName: "\uC18C \uC804\uC6A9 \uB9C8\uC0AC\uC9C0"
+  description: "\uC18C \uBAA9\uC7A5 x2 \xB7 \uC74C\uBA54\uC5D0\uBC14: \"...\uC74C\uBA54.\""
+  displayNameEn: Cow Massage
+  descriptionEn: "Cow Ranch x2 \xB7 Moomeeba: \"...moo.\""
   cost: 550000
   iconColor: {r: 0.45, g: 0.75, b: 0.35, a: 1}
   effectType: 0

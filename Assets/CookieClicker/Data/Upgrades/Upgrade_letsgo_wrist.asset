@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Upgrade_letsgo_wrist
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: letsgo_wrist
-  displayName: "가보자고 손목"
-  description: "저을 때 초당 생산량 +1% · 가보자고!"
+  displayName: "\uAC00\uBCF4\uC790\uACE0 \uC190\uBAA9"
+  description: "\uC800\uC744 \uB54C \uCD08\uB2F9 \uC0DD\uC0B0\uB7C9 +1% \xB7 \uAC00\uBCF4\uC790\uACE0!"
+  displayNameEn: Let's-Go Wrist
+  descriptionEn: "Each stir +1% of production per second \xB7 Let's go!"
   cost: 5000000
   iconColor: {r: 1, g: 0.55, b: 0.25, a: 1}
   effectType: 1

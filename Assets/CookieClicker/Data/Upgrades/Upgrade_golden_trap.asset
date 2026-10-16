@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_golden_trap
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: golden_trap
-  displayName: "황금 통발"
-  description: "낙지 통발 선단 x2 · 낙지 회장님도 탈출 포기."
+  displayName: "\uD669\uAE08 \uD1B5\uBC1C"
+  description: "\uB099\uC9C0 \uD1B5\uBC1C \uC120\uB2E8 x2 \xB7 \uB099\uC9C0 \uD68C\uC7A5\uB2D8\uB3C4
+    \uD0C8\uCD9C \uD3EC\uAE30."
+  displayNameEn: Golden Trap
+  descriptionEn: "Octopus Trap Fleet x2 \xB7 Even Chairman Octopus gives up escaping."
   cost: 200000000
   iconColor: {r: 0.85, g: 0.55, b: 0.3, a: 1}
   effectType: 0

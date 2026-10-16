@@ -23,11 +23,30 @@ namespace CookieClicker.View
             "킹받는 사실: 낙곱새를 저을수록 배가 더 고파진다",
             "야르! 오늘도 냄비는 보글보글",
         };
+        [SerializeField, TextArea] private string[] generalNewsEn =
+        {
+            "Breaking: Chairman Octopus attempts mudflat escape... caught in 3 seconds",
+            "Cow 'Moomeeba' clocks in with a blank stare, as usual",
+            "Assistant Manager Shrimp fails to straighten his back: \"It was always like this\"",
+            "Expert: \"The real nakgopsae starts when you fry the rice at the end\"",
+            "Neighbors report mass hunger caused by nakgopsae smell",
+            "Today's fortune: stir the pot and good things happen. Let's go!",
+            "Annoying fact: the more you stir nakgopsae, the hungrier you get",
+            "Yarr! The pot is bubbling again today",
+        };
 
         private readonly List<string> candidates = new List<string>();
         private float timer;
 
-        private void Start() => ShowNext();
+        private void Start()
+        {
+            // 영어 문장이 길면 뉴스 칸을 넘치지 않게 글자를 줄인다.
+            newsText.resizeTextMaxSize = newsText.fontSize;
+            newsText.resizeTextMinSize = Mathf.Min(14, newsText.fontSize);
+            newsText.resizeTextForBestFit = true;
+            newsText.verticalOverflow = VerticalWrapMode.Truncate;
+            ShowNext();
+        }
 
         private void Update()
         {
@@ -46,17 +65,19 @@ namespace CookieClicker.View
         {
             timer = 0f;
             candidates.Clear();
-            candidates.AddRange(generalNews);
+            candidates.AddRange(Loc.English && generalNewsEn.Length > 0 ? generalNewsEn : generalNews);
 
             var config = game.Config;
             for (int i = 0; i < config.Buildings.Count; i++)
             {
                 int count = game.State.BuildingCounts[i];
                 if (count > 0)
-                    candidates.Add($"속보: {config.Buildings[i].DisplayName} {count}개가 쉬지 않고 {config.CurrencyName}를 만들고 있습니다.");
+                    candidates.Add(Loc.T($"속보: {config.Buildings[i].DisplayName} {count}개가 쉬지 않고 {config.CurrencyName}를 만들고 있습니다.",
+                        $"Breaking: {count} x {config.Buildings[i].DisplayName} making {config.CurrencyName} nonstop."));
             }
             if (game.State.Cookies >= 1_000_000)
-                candidates.Add($"화제의 맛집, {config.CurrencyName} {NumberFormatter.Format(game.State.Cookies)}인분 보유 중! 줄이 끝이 안 보인다");
+                candidates.Add(Loc.T($"화제의 맛집, {config.CurrencyName} {NumberFormatter.Format(game.State.Cookies)}인분 보유 중! 줄이 끝이 안 보인다",
+                    $"Hot spot holds {NumberFormatter.Format(game.State.Cookies)} servings of {config.CurrencyName}! The line never ends"));
 
             newsText.text = candidates[Random.Range(0, candidates.Count)];
         }

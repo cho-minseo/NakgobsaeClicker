@@ -1,3 +1,4 @@
+using CookieClicker.Gameplay;
 using System.Collections;
 using CookieClicker.FX;
 using UnityEngine;
@@ -63,12 +64,14 @@ namespace CookieClicker.View
         {
             if (!showOnLaunch)
             {
+                CookieClickTarget.KeyClickBlocked = false;
                 gameObject.SetActive(false);
                 return;
             }
 
             SetHud(0f, false);
             SetHidden(false);
+            CookieClickTarget.KeyClickBlocked = true; // 타이틀에서는 스페이스 등으로 냄비를 누르지 않는다
             layout.CookieLayoutOverridden = true;
             layout.PlaceCookie(potViewport, potHeightRatio, potMaxWidthRatio);
             potFX.MinBoil = titleBoil;
@@ -120,6 +123,7 @@ namespace CookieClicker.View
             potFX.MinBoil = 0f;
             SetHud(1f, true);
             SetHidden(true);
+            CookieClickTarget.KeyClickBlocked = false;
             transitionFinished = true;
             TryClose();
         }

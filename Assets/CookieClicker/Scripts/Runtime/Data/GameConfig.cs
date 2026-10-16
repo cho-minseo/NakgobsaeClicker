@@ -17,6 +17,7 @@ namespace CookieClicker.Data
         [Header("표시")]
         [Tooltip("모으는 재화 이름. UI 문구 전체에 쓰인다.")]
         [SerializeField] private string currencyName = "낙곱새";
+        [SerializeField] private string currencyNameEn = "Nakgopsae";
 
         [Header("경제")]
         [Tooltip("건물을 하나 살 때마다 다음 가격에 곱해지는 값")]
@@ -40,7 +41,7 @@ namespace CookieClicker.Data
 
         public IReadOnlyList<BuildingDefinition> Buildings => buildings;
         public IReadOnlyList<UpgradeDefinition> Upgrades => upgrades;
-        public string CurrencyName => currencyName;
+        public string CurrencyName => Core.Loc.T(currencyName, currencyNameEn);
         public float CostGrowth => costGrowth;
         public float RevealCostRatio => revealCostRatio;
         public Vector2 GoldenSpawnInterval => goldenSpawnInterval;

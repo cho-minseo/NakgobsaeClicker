@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: Upgrade_snap_stir
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: snap_stir
-  displayName: "킹받는 스냅"
-  description: "저을 때 초당 생산량 +1% · 손목에서 킹받는 소리가 난다."
+  displayName: "\uD0B9\uBC1B\uB294 \uC2A4\uB0C5"
+  description: "\uC800\uC744 \uB54C \uCD08\uB2F9 \uC0DD\uC0B0\uB7C9 +1% \xB7 \uC190\uBAA9\uC5D0\uC11C
+    \uD0B9\uBC1B\uB294 \uC18C\uB9AC\uAC00 \uB09C\uB2E4."
+  displayNameEn: Annoying Snap
+  descriptionEn: "Each stir +1% of production per second \xB7 Your wrist makes an
+    annoying sound."
   cost: 50000
   iconColor: {r: 1, g: 0.55, b: 0.25, a: 1}
   effectType: 1

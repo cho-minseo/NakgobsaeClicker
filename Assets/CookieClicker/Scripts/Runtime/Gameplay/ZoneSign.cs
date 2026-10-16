@@ -16,6 +16,8 @@ namespace CookieClicker.Gameplay
         [SerializeField] private Text label;
         [SerializeField] private string zoneName = "대창 지대";
         [SerializeField] private string hiddenName = "??? 지대";
+        [SerializeField] private string zoneNameEn = "Daechang Zone";
+        [SerializeField] private string hiddenNameEn = "??? Zone";
         [Tooltip("이 중 하나라도 보유하면 이름이 공개된다")]
         [SerializeField] private BuildingDefinition[] buildings = Array.Empty<BuildingDefinition>();
 
@@ -25,6 +27,7 @@ namespace CookieClicker.Gameplay
         {
             game.BuildingPurchased += OnBuildingPurchased;
             game.ProgressReset += Refresh;
+            GameSettings.Changed += OnSettingsChanged;
             if (game.State != null) Refresh();
         }
 
@@ -34,9 +37,14 @@ namespace CookieClicker.Gameplay
         {
             game.BuildingPurchased -= OnBuildingPurchased;
             game.ProgressReset -= Refresh;
+            GameSettings.Changed -= OnSettingsChanged;
         }
 
         private void OnBuildingPurchased(int _) => Refresh();
+        private void OnSettingsChanged()
+        {
+            if (game.State != null) Refresh();
+        }
 
         public void Refresh()
         {
@@ -50,7 +58,7 @@ namespace CookieClicker.Gameplay
                     break;
                 }
             }
-            label.text = IsRevealed ? zoneName : hiddenName;
+            label.text = IsRevealed ? Loc.T(zoneName, zoneNameEn) : Loc.T(hiddenName, hiddenNameEn);
         }
     }
 }

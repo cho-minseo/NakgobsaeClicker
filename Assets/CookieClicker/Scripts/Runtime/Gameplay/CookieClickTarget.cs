@@ -40,6 +40,12 @@ namespace CookieClicker.Gameplay
         /// <summary>클릭으로 얻은 쿠키 수와 화면 좌표. 이펙트 쪽에서 구독한다.</summary>
         public event Action<double, Vector2> Clicked;
 
+        /// <summary>true면 대체 키로 누르지 않는다 (타이틀·설정 창이 떠 있을 때 TitleScreenView가 켠다).</summary>
+        public static bool KeyClickBlocked { get; set; }
+
+        // 설정의 "클릭 대체 키". 마우스 왼쪽 클릭과 똑같이 냄비를 누른다.
+        private InputAction clickKeyAction;
+
         private Quaternion baseRotation;
         private Vector3 baseScale;
         private float scaleFactor = 1f;
@@ -53,6 +59,38 @@ namespace CookieClicker.Gameplay
             baseRotation = transform.localRotation;
             baseScale = transform.localScale;
             if (viewCamera == null) viewCamera = Camera.main;
+        }
+
+        private void OnEnable()
+        {
+            GameSettings.Changed += RebindClickKey;
+            RebindClickKey();
+        }
+
+        private void OnDisable()
+        {
+            GameSettings.Changed -= RebindClickKey;
+            clickKeyAction?.Dispose();
+            clickKeyAction = null;
+        }
+
+        /// <summary>설정에서 키가 바뀌면 액션을 새 키로 다시 만든다 (같은 키면 그대로 둔다).</summary>
+        private void RebindClickKey()
+        {
+            string path = GameSettings.ClickKey;
+            if (clickKeyAction != null && clickKeyAction.bindings[0].path == path) return;
+            clickKeyAction?.Dispose();
+            clickKeyAction = new InputAction("ClickPot", InputActionType.Button, path);
+            clickKeyAction.Enable();
+        }
+
+        private void Update()
+        {
+            if (clickKeyAction == null || KeyClickBlocked || !clickKeyAction.WasPressedThisFrame()) return;
+            // 키로 누를 때는 마우스 위치 대신 냄비 위치(조금씩 흩어지게)에서 연출이 나온다.
+            Vector2 screen = viewCamera.WorldToScreenPoint(transform.position);
+            screen += UnityEngine.Random.insideUnitCircle * (Screen.height * 0.06f);
+            Press(screen);
         }
 
         private void LateUpdate()
@@ -75,11 +113,15 @@ namespace CookieClicker.Gameplay
         public void OnPointerDown(PointerEventData eventData)
         {
             if (eventData.button != PointerEventData.InputButton.Left) return;
+            Press(eventData.position);
+        }
 
+        private void Press(Vector2 screenPosition)
+        {
             squash = -squashAmount;
             squashVelocity = 0f;
             double amount = game.ClickCookie();
-            Clicked?.Invoke(amount, eventData.position);
+            Clicked?.Invoke(amount, screenPosition);
         }
 
         /// <summary>가로/세로 전환 시 ResponsiveLayout이 호출한다.</summary>

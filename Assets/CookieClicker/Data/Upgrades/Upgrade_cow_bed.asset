@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_cow_bed
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: cow_bed
-  displayName: "음메에바 전용 침대"
-  description: "소 목장 x2 · 음메에바가 웃었다. (착각일 수도)"
+  displayName: "\uC74C\uBA54\uC5D0\uBC14 \uC804\uC6A9 \uCE68\uB300"
+  description: "\uC18C \uBAA9\uC7A5 x2 \xB7 \uC74C\uBA54\uC5D0\uBC14\uAC00 \uC6C3\uC5C8\uB2E4.
+    (\uCC29\uAC01\uC77C \uC218\uB3C4)"
+  displayNameEn: Moomeeba's Own Bed
+  descriptionEn: "Cow Ranch x2 \xB7 Moomeeba smiled. (Maybe.)"
   cost: 11000
   iconColor: {r: 0.45, g: 0.75, b: 0.35, a: 1}
   effectType: 0

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_shrimp_stretching
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: shrimp_stretching
-  displayName: "새우 허리 스트레칭"
-  description: "새우 양식장 x2 · 허리 펴기 실패. 원래 굽었음."
+  displayName: "\uC0C8\uC6B0 \uD5C8\uB9AC \uC2A4\uD2B8\uB808\uCE6D"
+  description: "\uC0C8\uC6B0 \uC591\uC2DD\uC7A5 x2 \xB7 \uD5C8\uB9AC \uD3B4\uAE30
+    \uC2E4\uD328. \uC6D0\uB798 \uAD7D\uC5C8\uC74C."
+  displayNameEn: Shrimp Back Stretches
+  descriptionEn: "Shrimp Farm x2 \xB7 Failed to straighten up. Always been bent."
   cost: 6500000
   iconColor: {r: 0.55, g: 0.6, b: 0.65, a: 1}
   effectType: 0

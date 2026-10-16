@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_part_timer
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: part_timer
-  displayName: "알바생"
-  description: "사장님 눈치 보면서 열심히 볶는 중."
+  displayName: "\uC54C\uBC14\uC0DD"
+  description: "\uC0AC\uC7A5\uB2D8 \uB208\uCE58 \uBCF4\uBA74\uC11C \uC5F4\uC2EC\uD788
+    \uBCF6\uB294 \uC911."
+  displayNameEn: Part-Timer
+  descriptionEn: Stir-frying hard while dodging the boss's glare.
   baseCost: 100
   baseCps: 1
   iconColor: {r: 0.95, g: 0.6, b: 0.35, a: 1}

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_shrimp_trawler
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: shrimp_trawler
-  displayName: "원양 새우잡이배"
-  description: "먼바다까지 나가서 새우를 잡아 옵니다. 선장님 뱃멀미 심함."
+  displayName: "\uC6D0\uC591 \uC0C8\uC6B0\uC7A1\uC774\uBC30"
+  description: "\uBA3C\uBC14\uB2E4\uAE4C\uC9C0 \uB098\uAC00\uC11C \uC0C8\uC6B0\uB97C
+    \uC7A1\uC544 \uC635\uB2C8\uB2E4. \uC120\uC7A5\uB2D8 \uBC43\uBA40\uBBF8 \uC2EC\uD568."
+  displayNameEn: Deep-Sea Shrimp Trawler
+  descriptionEn: Sails far out for shrimp. The captain gets terribly seasick.
   baseCost: 330000000
   baseCps: 44000
   iconColor: {r: 0.35, g: 0.55, b: 0.9, a: 1}

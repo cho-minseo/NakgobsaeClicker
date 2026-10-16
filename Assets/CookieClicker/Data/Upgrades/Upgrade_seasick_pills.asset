@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: Upgrade_seasick_pills
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: seasick_pills
-  displayName: "선장님 멀미약"
-  description: "원양 새우잡이배 x2 · 선장님이 드디어 바다를 즐긴다."
+  displayName: "\uC120\uC7A5\uB2D8 \uBA40\uBBF8\uC57D"
+  description: "\uC6D0\uC591 \uC0C8\uC6B0\uC7A1\uC774\uBC30 x2 \xB7 \uC120\uC7A5\uB2D8\uC774
+    \uB4DC\uB514\uC5B4 \uBC14\uB2E4\uB97C \uC990\uAE34\uB2E4."
+  displayNameEn: Captain's Seasick Pills
+  descriptionEn: "Deep-Sea Shrimp Trawler x2 \xB7 The captain finally enjoys the
+    sea."
   cost: 3300000000
   iconColor: {r: 0.6, g: 0.45, b: 0.9, a: 1}
   effectType: 0

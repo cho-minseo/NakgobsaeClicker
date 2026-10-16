@@ -1,3 +1,4 @@
+using CookieClicker.Core;
 using UnityEngine;
 
 namespace CookieClicker.Data
@@ -12,19 +13,28 @@ namespace CookieClicker.Data
         [SerializeField] private string id;
         [SerializeField] private string displayName;
         [SerializeField, TextArea] private string description;
+        [Header("영어 (비워 두면 한국어를 그대로 보여 줌)")]
+        [SerializeField] private string displayNameEn;
+        [SerializeField, TextArea] private string descriptionEn;
         [SerializeField] private double baseCost = 15;
         [Tooltip("건물 1개가 1초에 만드는 양 (업그레이드 적용 전)")]
         [SerializeField] private double baseCps = 0.1;
         [SerializeField] private Color iconColor = Color.white;
 
         public string Id => id;
-        public string DisplayName => displayName;
-        public string Description => description;
+        public string DisplayName => Loc.T(displayName, displayNameEn);
+        public string Description => Loc.T(description, descriptionEn);
         public double BaseCost => baseCost;
         public double BaseCps => baseCps;
         public Color IconColor => iconColor;
 
 #if UNITY_EDITOR
+        public void EditorSetEnglish(string name, string newDescription)
+        {
+            displayNameEn = name;
+            descriptionEn = newDescription;
+        }
+
         public void EditorInitialize(string newId, string newName, string newDescription,
             double cost, double cps, Color color)
         {

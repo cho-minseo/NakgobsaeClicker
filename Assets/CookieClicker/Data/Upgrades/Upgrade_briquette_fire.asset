@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Upgrade_briquette_fire
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: briquette_fire
-  displayName: "연탄불 화력 강화"
-  description: "곱창 골목 x2 · 불맛 +100."
+  displayName: "\uC5F0\uD0C4\uBD88 \uD654\uB825 \uAC15\uD654"
+  description: "\uACF1\uCC3D \uACE8\uBAA9 x2 \xB7 \uBD88\uB9DB +100."
+  displayNameEn: Briquette Fire Boost
+  descriptionEn: "Gopchang Alley x2 \xB7 Smoky flavor +100."
   cost: 14000000
   iconColor: {r: 0.95, g: 0.8, b: 0.3, a: 1}
   effectType: 0

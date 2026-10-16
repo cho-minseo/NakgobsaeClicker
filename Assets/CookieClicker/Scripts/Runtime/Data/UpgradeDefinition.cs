@@ -1,3 +1,4 @@
+using CookieClicker.Core;
 using UnityEngine;
 
 namespace CookieClicker.Data
@@ -20,6 +21,9 @@ namespace CookieClicker.Data
         [SerializeField] private string id;
         [SerializeField] private string displayName;
         [SerializeField, TextArea] private string description;
+        [Header("영어 (비워 두면 한국어를 그대로 보여 줌)")]
+        [SerializeField] private string displayNameEn;
+        [SerializeField, TextArea] private string descriptionEn;
         [SerializeField] private double cost = 100;
         [SerializeField] private Color iconColor = Color.white;
 
@@ -36,8 +40,8 @@ namespace CookieClicker.Data
         [SerializeField] private double requiredHandmadeCookies;
 
         public string Id => id;
-        public string DisplayName => displayName;
-        public string Description => description;
+        public string DisplayName => Loc.T(displayName, displayNameEn);
+        public string Description => Loc.T(description, descriptionEn);
         public double Cost => cost;
         public Color IconColor => iconColor;
         public UpgradeEffectType EffectType => effectType;
@@ -50,6 +54,12 @@ namespace CookieClicker.Data
         public double RequiredHandmadeCookies => requiredHandmadeCookies;
 
 #if UNITY_EDITOR
+        public void EditorSetEnglish(string name, string newDescription)
+        {
+            displayNameEn = name;
+            descriptionEn = newDescription;
+        }
+
         public void EditorInitialize(string newId, string newName, string newDescription, double newCost,
             Color color, UpgradeEffectType type, BuildingDefinition target, float mult, bool affectsClick,
             float cpsPercent, BuildingDefinition required, int count, double handmade)

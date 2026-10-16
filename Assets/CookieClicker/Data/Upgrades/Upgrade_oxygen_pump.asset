@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_oxygen_pump
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: oxygen_pump
-  displayName: "산소 펌프 교체"
-  description: "새우 양식장 x2 · 새우들이 깊게 숨 쉰다."
+  displayName: "\uC0B0\uC18C \uD38C\uD504 \uAD50\uCCB4"
+  description: "\uC0C8\uC6B0 \uC591\uC2DD\uC7A5 x2 \xB7 \uC0C8\uC6B0\uB4E4\uC774
+    \uAE4A\uAC8C \uC228 \uC270\uB2E4."
+  displayNameEn: New Oxygen Pump
+  descriptionEn: "Shrimp Farm x2 \xB7 The shrimp breathe deeply."
   cost: 1300000
   iconColor: {r: 0.55, g: 0.6, b: 0.65, a: 1}
   effectType: 0

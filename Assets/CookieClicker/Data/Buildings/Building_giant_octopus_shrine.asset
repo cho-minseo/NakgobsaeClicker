@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_giant_octopus_shrine
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: giant_octopus_shrine
-  displayName: "대왕낙지 신전"
-  description: "심해의 대왕낙지가 다리 8개로 동시에 요리합니다."
+  displayName: "\uB300\uC655\uB099\uC9C0 \uC2E0\uC804"
+  description: "\uC2EC\uD574\uC758 \uB300\uC655\uB099\uC9C0\uAC00 \uB2E4\uB9AC 8\uAC1C\uB85C
+    \uB3D9\uC2DC\uC5D0 \uC694\uB9AC\uD569\uB2C8\uB2E4."
+  displayNameEn: Giant Octopus Shrine
+  descriptionEn: The giant octopus of the deep cooks with all eight arms at once.
   baseCost: 75000000000
   baseCps: 1600000
   iconColor: {r: 0.55, g: 0.3, b: 0.75, a: 1}

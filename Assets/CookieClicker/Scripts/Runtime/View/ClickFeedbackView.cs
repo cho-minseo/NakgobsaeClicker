@@ -79,8 +79,8 @@ namespace CookieClicker.View
         private void OnGoldenCookieClaimed(GoldenCookieResult result)
         {
             popupText.text = result.Effect == GoldenCookieEffect.Lucky
-                ? $"야르! {game.Config.CurrencyName} +{NumberFormatter.Format(result.Cookies)}"
-                : $"가보자고! {result.Duration:0}초 동안 생산량 x{game.Config.FrenzyMultiplier:0}";
+                ? Loc.T($"야르! {game.Config.CurrencyName} +{NumberFormatter.Format(result.Cookies)}", $"Yarr! {game.Config.CurrencyName} +{NumberFormatter.Format(result.Cookies)}")
+                : Loc.T($"가보자고! {result.Duration:0}초 동안 생산량 x{game.Config.FrenzyMultiplier:0}", $"Let's go! Production x{game.Config.FrenzyMultiplier:0} for {result.Duration:0}s");
             popupTimer = popupDuration;
         }
     }

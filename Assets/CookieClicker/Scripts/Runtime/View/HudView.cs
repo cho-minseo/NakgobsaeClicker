@@ -12,6 +12,19 @@ namespace CookieClicker.View
         [SerializeField] private Text cpsText;
         [SerializeField] private Text buffText;
 
+        // 영어("3.55 million Nakgopsae")처럼 길어지면 칸을 넘치지 않게 글자를 줄인다 (원래 크기가 최대).
+        private void Awake()
+        {
+            foreach (var text in new[] { cookieCountText, cpsText })
+            {
+                if (text == null) continue;
+                text.resizeTextMaxSize = text.fontSize;
+                text.resizeTextMinSize = Mathf.Min(18, text.fontSize);
+                text.resizeTextForBestFit = true;
+                text.verticalOverflow = VerticalWrapMode.Truncate;
+            }
+        }
+
         private string lastCookieLabel;
         private string lastCpsLabel;
 
@@ -25,7 +38,7 @@ namespace CookieClicker.View
                 lastCookieLabel = cookieLabel;
             }
 
-            string cpsLabel = $"초당 {NumberFormatter.Format(game.CookiesPerSecond, true)}";
+            string cpsLabel = Loc.T($"초당 {NumberFormatter.Format(game.CookiesPerSecond, true)}", $"per second: {NumberFormatter.Format(game.CookiesPerSecond, true)}");
             if (cpsLabel != lastCpsLabel)
             {
                 cpsText.text = cpsLabel;
@@ -33,7 +46,8 @@ namespace CookieClicker.View
             }
 
             buffText.text = game.IsFrenzy
-                ? $"가보자고! 생산량 x{game.Config.FrenzyMultiplier:0} ({Mathf.CeilToInt(game.FrenzyTimeLeft)}초)"
+                ? Loc.T($"가보자고! 생산량 x{game.Config.FrenzyMultiplier:0} ({Mathf.CeilToInt(game.FrenzyTimeLeft)}초)",
+                    $"Let's go! Production x{game.Config.FrenzyMultiplier:0} ({Mathf.CeilToInt(game.FrenzyTimeLeft)}s)")
                 : string.Empty;
         }
     }

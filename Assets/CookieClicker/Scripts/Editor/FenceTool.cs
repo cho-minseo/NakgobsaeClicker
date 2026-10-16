@@ -34,7 +34,7 @@ namespace CookieClicker.EditorTools
         public static GameObject AddFence(BuildingPlot plot, float margin = 2.8f)
         {
             var built = plot.transform.Find("Built");
-            var body = built.Find("Body");
+            var body = CookieSceneBuilder.FindBuildingBody(built);
             float half = body.localScale.x * 0.5f + margin;
 
             var old = built.Find("Fence");

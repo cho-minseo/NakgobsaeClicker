@@ -15,8 +15,8 @@ namespace CookieClicker.View
         [SerializeField] private float confirmWindow = 3f;
         [SerializeField] private float noticeDuration = 2f;
 
-        private const string ResetLabel = "초기화";
-        private const string ConfirmLabel = "정말요?";
+        private static string ResetLabel => Loc.T("초기화", "Reset");
+        private static string ConfirmLabel => Loc.T("정말요?", "Sure?");
 
         private float confirmTimer;
         private float noticeTimer;
@@ -26,6 +26,7 @@ namespace CookieClicker.View
             saveButton.onClick.AddListener(game.SaveGame);
             resetButton.onClick.AddListener(OnResetClicked);
             game.Saved += OnSaved;
+            GameSettings.Changed += OnSettingsChanged;
             resetButtonLabel.text = ResetLabel;
             noticeText.text = string.Empty;
         }
@@ -33,6 +34,13 @@ namespace CookieClicker.View
         private void OnDestroy()
         {
             if (game != null) game.Saved -= OnSaved;
+            GameSettings.Changed -= OnSettingsChanged;
+        }
+
+        // 언어를 바꾸면 버튼 글자도 바꾼다 (확인 대기 중이면 그대로 둔다).
+        private void OnSettingsChanged()
+        {
+            if (confirmTimer <= 0f) resetButtonLabel.text = ResetLabel;
         }
 
         private void Update()
@@ -61,10 +69,10 @@ namespace CookieClicker.View
             confirmTimer = 0f;
             resetButtonLabel.text = ResetLabel;
             game.ResetProgress();
-            ShowNotice("처음부터 다시 시작합니다.");
+            ShowNotice(Loc.T("처음부터 다시 시작합니다.", "Starting over from scratch."));
         }
 
-        private void OnSaved() => ShowNotice("저장했습니다.");
+        private void OnSaved() => ShowNotice(Loc.T("저장했습니다.", "Saved."));
 
         private void ShowNotice(string message)
         {

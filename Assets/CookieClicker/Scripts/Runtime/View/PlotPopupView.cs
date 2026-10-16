@@ -1,3 +1,4 @@
+using CookieClicker.Core;
 using CookieClicker.Gameplay;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -119,21 +120,32 @@ namespace CookieClicker.View
         private void Refresh()
         {
             titleText.text = $"{openPlot.Building.DisplayName} x{openPlot.Count}";
-            bodyText.text = openPlot.Building.Description;
+            bodyText.text = openPlot.Building.Description + StageLine(openPlot);
             if (openSpeed == null) return;
 
             string next = openSpeed.IsMaxed
-                ? "최고 속도 도달!"
-                : $"다음 단계까지 {openSpeed.NextStepCount - openPlot.Count}개 ({openSpeed.NextStepCount}개 보유 시)";
+                ? Loc.T("최고 속도 도달!", "Top speed reached!")
+                : Loc.T($"다음 단계까지 {openSpeed.NextStepCount - openPlot.Count}개 ({openSpeed.NextStepCount}개 보유 시)",
+                    $"{openSpeed.NextStepCount - openPlot.Count} more to the next step (at {openSpeed.NextStepCount})");
             speedText.text =
-                $"공전 속도 <color=#FFD15A>x{openSpeed.CurrentMultiplier:0.##}</color>   " +
-                $"<size=20>({openSpeed.CountPerStep}개마다 +{openSpeed.BonusPerStep * 100f:0}%)</size>\n<size=20>{next}</size>";
+                $"{Loc.T("공전 속도", "Orbit speed")} <color=#FFD15A>x{openSpeed.CurrentMultiplier:0.##}</color>   " +
+                $"<size=20>({Loc.T($"{openSpeed.CountPerStep}개마다", $"every {openSpeed.CountPerStep}")} +{openSpeed.BonusPerStep * 100f:0}%)</size>\n<size=20>{next}</size>";
 
             // 지금 고른 쪽은 눌린 상태로 보이게 비활성화한다.
             baseSpeedButton.interactable = !openSpeed.UseBaseSpeed;
             countSpeedButton.interactable = openSpeed.UseBaseSpeed;
-            baseSpeedLabel.text = openSpeed.UseBaseSpeed ? "처음 속도 (사용 중)" : "처음 속도로";
-            countSpeedLabel.text = openSpeed.UseBaseSpeed ? "원래대로" : $"원래대로 (사용 중, x{openSpeed.CountMultiplier:0.##})";
+            baseSpeedLabel.text = openSpeed.UseBaseSpeed ? Loc.T("처음 속도 (사용 중)", "Base speed (on)") : Loc.T("처음 속도로", "Base speed");
+            countSpeedLabel.text = openSpeed.UseBaseSpeed ? Loc.T("원래대로", "By count") : Loc.T($"원래대로 (사용 중, x{openSpeed.CountMultiplier:0.##})", $"By count (on, x{openSpeed.CountMultiplier:0.##})");
+        }
+
+        /// <summary>건물 단계가 있으면 "건물 단계 2/5 · 다음 단계까지 N개" 한 줄을 덧붙인다.</summary>
+        private static string StageLine(BuildingPlot plot)
+        {
+            if (plot.StageCount == 0 || plot.StageIndex < 0) return string.Empty;
+            string next = plot.NextStageCount < 0
+                ? Loc.T("최고 단계!", "Max stage!")
+                : Loc.T($"다음 단계까지 {plot.NextStageCount - plot.Count}개", $"{plot.NextStageCount - plot.Count} more to the next stage");
+            return $"\n\n<size=20><color=#FFD15A>{Loc.T("건물 단계", "Stage")} {plot.StageIndex + 1}/{plot.StageCount}</color> · {next}</size>";
         }
     }
 }

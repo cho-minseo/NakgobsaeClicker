@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Building_space_ranch
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.BuildingDefinition
   id: space_ranch
-  displayName: "우주 소 방목장"
-  description: "무중력에서 키운 소는 대창이 더 쫄깃하다는 소문."
+  displayName: "\uC6B0\uC8FC \uC18C \uBC29\uBAA9\uC7A5"
+  description: "\uBB34\uC911\uB825\uC5D0\uC11C \uD0A4\uC6B4 \uC18C\uB294 \uB300\uCC3D\uC774
+    \uB354 \uCAC4\uAE43\uD558\uB2E4\uB294 \uC18C\uBB38."
+  displayNameEn: Space Cow Pasture
+  descriptionEn: Rumor has it zero-g cows make chewier daechang.
   baseCost: 1000000000000
   baseCps: 10000000
   iconColor: {r: 0.4, g: 0.85, b: 0.9, a: 1}

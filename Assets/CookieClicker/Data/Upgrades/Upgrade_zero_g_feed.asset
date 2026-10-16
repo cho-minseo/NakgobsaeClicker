@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_zero_g_feed
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: zero_g_feed
-  displayName: "무중력 여물"
-  description: "우주 소 방목장 x2 · 여물도 소도 떠다닌다."
+  displayName: "\uBB34\uC911\uB825 \uC5EC\uBB3C"
+  description: "\uC6B0\uC8FC \uC18C \uBC29\uBAA9\uC7A5 x2 \xB7 \uC5EC\uBB3C\uB3C4
+    \uC18C\uB3C4 \uB5A0\uB2E4\uB2CC\uB2E4."
+  displayNameEn: Zero-G Fodder
+  descriptionEn: "Space Cow Pasture x2 \xB7 The fodder floats. So do the cows."
   cost: 10000000000000
   iconColor: {r: 0.75, g: 0.35, b: 0.75, a: 1}
   effectType: 0

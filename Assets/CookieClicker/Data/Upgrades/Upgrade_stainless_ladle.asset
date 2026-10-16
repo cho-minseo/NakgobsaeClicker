@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Upgrade_stainless_ladle
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Data.UpgradeDefinition
   id: stainless_ladle
-  displayName: "스테인리스 국자"
-  description: "젓기·국자 x2 · 녹슬지 않는다. 의지도."
+  displayName: "\uC2A4\uD14C\uC778\uB9AC\uC2A4 \uAD6D\uC790"
+  description: "\uC813\uAE30\xB7\uAD6D\uC790 x2 \xB7 \uB179\uC2AC\uC9C0 \uC54A\uB294\uB2E4.
+    \uC758\uC9C0\uB3C4."
+  displayNameEn: Stainless Ladle
+  descriptionEn: "Stirring & Auto Ladle x2 \xB7 Never rusts. Neither does your will."
   cost: 100
   iconColor: {r: 0.85, g: 0.85, b: 0.9, a: 1}
   effectType: 0
