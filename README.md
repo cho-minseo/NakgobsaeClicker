@@ -1,31 +1,56 @@
-# Cookie Clicker (Unity 6)
+# 보글보글 낙곱새 (Unity 6)
 
-Unity 6 (6000.3, URP)로 만든 쿠키 클리커 클론입니다. 가운데 쿠키는 3D 모델(`Cookie.glb`)이고, 클릭하면 쿠키를 얻고 건물과 업그레이드를 사서 자동 생산량을 늘립니다.
+전골냄비를 저어 낙곱새를 모으고, 그 돈으로 산 건물들이 자라나는 마을을 **1인칭으로 직접 걸어 다니며 구경하는** 방치형 클리커 게임입니다.
+Unity 6 (6000.3, URP)로 만들었습니다.
+
+- 개발일지: https://cho-minseo.github.io/NakgobsaeClicker-devlog/
+
+## 기획 의도
+
+클리커 게임의 성장은 보통 화면 위 숫자로만 보입니다. 숫자가 커져도 "내가 무엇을 이뤘는지"는 잘 느껴지지 않습니다.
+이 게임은 **산 건물이 월드에 생기고, 많이 살수록 모습이 달라지는 것을 플레이어가 직접 걸어 다니며 보게 해서** 성장을 눈으로 확인하는 성취감을 주는 것을 목표로 합니다.
+
+## 원작 참고 표기
+
+기본 게임 구조(클릭으로 재화 획득 → 건물 구매로 자동 생산 → 업그레이드로 배수 증가, 황금 보너스)는
+Orteil(DashNet)의 [Cookie Clicker](https://orteil.dashnet.org/cookieclicker/)를 참고했습니다.
+원작의 그림·문구·이름·캐릭터는 사용하지 않았고, 테마·캐릭터·건물·문구는 모두 새로 만들었습니다.
+
+## 원작과 다른 점
+
+- **1인칭 건물 구경하기**: 클리커 화면과 3D 월드를 버튼 하나로 오가며, 구경하는 동안에도 생산은 계속됩니다.
+- **눈에 보이는 성장** (현재 구현된 것)
+  - 건물을 하나 이상 사야 월드에 나타나고, 아직 해금되지 않은 지대는 간판이 "??? 지대"로 보입니다.
+  - 보유 개수가 5·10·25·50·100개를 넘을 때마다 건물 옆 상자 더미가 늘어납니다.
+  - 자동 국자 건물 둘레를 도는 국자는 50개마다 더 빨리 돕니다. 건물을 보고 F를 누르면 보유 개수와 다음 단계까지 남은 개수가 나옵니다.
+  - 건물 옆에 그 건물을 나타내는 랜드마크(직원, 낙지, 새우)가 섭니다.
+  - 건물 본체는 아직 블록아웃(박스) 단계이고, 개수에 따라 건물 모델 자체가 바뀌는 연출은 앞으로 만들 예정입니다.
+- **돌아다니는 재미**: 바다 수영·잠수(산소 게이지), 바닥별 발소리, 물속 먹먹한 소리
+- **낙곱새 테마**: 전골냄비 클릭, 재료(우동·마늘·낙지·새우)가 튀는 파티클, 생산량에 따라 더 세게 끓는 국물, 오리지널 캐릭터(음메에바, 낙지 회장님, 새우 대리)
 
 ## 처음 여는 방법
 
-1. Unity Hub에서 이 폴더를 엽니다. `glTFast` 패키지가 자동으로 설치되고 `Cookie.glb`가 임포트됩니다 (모델이 커서 처음엔 1~2분 걸릴 수 있습니다).
-2. 상단 메뉴에서 **Tools > Cookie Clicker > Build Scene (씬 만들기)** 를 한 번 누릅니다.
-3. `Assets/CookieClicker/Scenes/CookieClicker.unity`가 열리면 ▶ Play를 누릅니다.
+1. Unity Hub에서 이 폴더를 엽니다. 3D 모델은 Git LFS로 관리하므로 클론할 때 Git LFS가 필요합니다.
+2. `Assets/CookieClicker/Scenes/CookieClicker.unity`를 열고 ▶ Play를 누릅니다.
 
-씬 만들기는 처음 한 번만 하면 됩니다. 그 뒤로는 일반 씬처럼 Hierarchy와 Inspector에서 직접 편집하면 됩니다.
-다시 실행하면 씬과 프리팹은 새로 만들지만, 건물·업그레이드 데이터 에셋은 덮어쓰지 않습니다.
+씬과 프리팹은 저장소에 들어 있어서 Hierarchy와 Inspector에서 바로 편집할 수 있습니다.
+`Tools > Cookie Clicker > Build Scene`은 씬을 처음부터 다시 만드는 메뉴라, 실행하면 직접 고친 씬·프리팹 내용이 덮어써집니다 (건물·업그레이드 데이터 에셋은 유지).
 
 ## 기능
 
-- 3D 쿠키 클릭 (누를 때 찌그러짐, 마우스를 따라 기울어짐, 부스러기와 +N 글자 연출)
+- 3D 전골냄비 클릭 (누르면 스쿼시 & 스트레치, 재료·반짝임 파티클, +N 글자)
 - 건물 12종, 1개/10개/100개 단위 구매, 가격은 하나 살 때마다 1.15배
 - 업그레이드 25종 (건물 2배, 클릭 2배, 클릭할 때 초당 생산량의 1% 추가)
-- 황금 쿠키: 럭키(쿠키 즉시 획득) 또는 프렌지(77초 동안 생산량 7배)
-- 쿠키 비, 회전하는 후광, 뉴스 문구, 통계
-- 30초마다 자동 저장, 종료할 때도 저장, 초기화(두 번 눌러야 실행)
+- 황금 낙곱새: 야르!(즉시 획득) 또는 가보자고!(77초 동안 생산량 7배)
+- 타이틀 화면(Animator 로고 연출), 설정 창(소리 크기, 마우스 감도)
+- 가로/세로 화면 자동 배치, 30초마다 자동 저장, 초기화(두 번 눌러야 실행)
 
 ## 폴더 구조
 
 ```
 Assets/CookieClicker/
 ├─ Data/          건물·업그레이드·GameConfig 에셋 (밸런스 수치는 여기서 수정)
-├─ Models/        Cookie.glb
+├─ Models/        Nakgopsae.glb(전골냄비), 재료·랜드마크 모델 (Git LFS)
 ├─ Prefabs/       BuildingRow, UpgradeRow, FloatingText, Crumb, RainCookie
 ├─ Scenes/        CookieClicker.unity
 ├─ Art/Generated/ UI 스프라이트 (같은 이름의 PNG로 덮어쓰면 교체됨)
@@ -88,7 +113,7 @@ Assets/CookieClicker/
 
 ### Gameplay
 
-**`CookieClickTarget`**: 씬의 3D 쿠키(`Cookie` 오브젝트).
+**`CookieClickTarget`**: 씬의 3D 전골냄비(`StewPot` 오브젝트).
 - `OnPointerDown`: 카메라의 `PhysicsRaycaster`가 쿠키의 `SphereCollider`를 맞히면 EventSystem이 호출합니다. UI 버튼과 같은 입력 경로를 쓰기 때문에 UI 위를 클릭했을 때 뒤의 쿠키가 같이 눌리는 문제가 자동으로 막힙니다.
 - `FitToScreen`: 해상도가 바뀌어도 쿠키가 화면 왼쪽에 같은 비율로 보이게 합니다. 직접 배치하고 싶으면 Inspector에서 `Fit To Screen`을 끄면 됩니다.
 
@@ -162,8 +187,8 @@ Assets/CookieClicker/
 | 건물 가격·생산량 변경 | `Data/Buildings/Building_*.asset` |
 | 새 건물 추가 | 에셋 생성(우클릭 > Create > Cookie Clicker > Building) → `GameConfig`의 Buildings에 추가 → `StorePanel`에 `BuildingRow` 프리팹을 하나 더 넣고 `StoreView`의 Building Rows에 연결 |
 | 황금 쿠키 빈도 | `Data/GameConfig.asset` |
-| 쿠키 위치·크기 | `Cookie` 오브젝트의 `CookieClickTarget` |
-| 쿠키 모델 방향 | `Cookie/ModelPivot`의 Rotation |
+| 냄비 위치·크기 | `StewPot` 오브젝트의 `CookieClickTarget` |
+| 냄비 모델 방향 | `StewPot/ModelPivot`의 Rotation |
 | 상점 줄 디자인 | `Prefabs/BuildingRow.prefab` |
 
 ## 사용한 외부 리소스
