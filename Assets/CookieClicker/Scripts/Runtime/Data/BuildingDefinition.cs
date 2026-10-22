@@ -20,6 +20,8 @@ namespace CookieClicker.Data
         [Tooltip("건물 1개가 1초에 만드는 양 (업그레이드 적용 전)")]
         [SerializeField] private double baseCps = 0.1;
         [SerializeField] private Color iconColor = Color.white;
+        [Tooltip("상점 줄에 보이는 그림. 비워 두면 이름 첫 글자를 iconColor 칸에 쓴다.")]
+        [SerializeField] private Sprite icon;
 
         public string Id => id;
         public string DisplayName => Loc.T(displayName, displayNameEn);
@@ -27,8 +29,11 @@ namespace CookieClicker.Data
         public double BaseCost => baseCost;
         public double BaseCps => baseCps;
         public Color IconColor => iconColor;
+        public Sprite Icon => icon;
 
 #if UNITY_EDITOR
+        public void EditorSetIcon(Sprite sprite) => icon = sprite;
+
         public void EditorSetEnglish(string name, string newDescription)
         {
             displayNameEn = name;

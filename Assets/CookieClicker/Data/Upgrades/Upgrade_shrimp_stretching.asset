@@ -20,6 +20,7 @@ MonoBehaviour:
   descriptionEn: "Shrimp Farm x2 \xB7 Failed to straighten up. Always been bent."
   cost: 6500000
   iconColor: {r: 0.55, g: 0.6, b: 0.65, a: 1}
+  icon: {fileID: 0}
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: 3b01098368843fa40b68b939f5bac4f5, type: 2}
   multiplier: 2

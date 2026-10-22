@@ -20,6 +20,7 @@ MonoBehaviour:
   descriptionEn: "Cow Ranch x2 \xB7 Moomeeba smiled. (Maybe.)"
   cost: 11000
   iconColor: {r: 0.45, g: 0.75, b: 0.35, a: 1}
+  icon: {fileID: 0}
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: 71ed07f698598ce42b5b14ed06ca851b, type: 2}
   multiplier: 2

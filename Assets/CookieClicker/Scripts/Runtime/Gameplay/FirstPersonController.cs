@@ -60,6 +60,11 @@ namespace CookieClicker.Gameplay
         public float HeadDepth { get; private set; }
         /// <summary>true면 잠수할 수 없고 수면으로 떠오른다 (산소 부족 등).</summary>
         public bool DiveLocked { get; set; }
+        /// <summary>true면 시점만 돌릴 수 있고 움직이지 않는다 (의자에 앉아 있을 때).</summary>
+        public bool MovementLocked { get; private set; }
+        /// <summary>지금 움직이는 수평 속도 (월드 기준). 3인칭 캐릭터가 가는 방향을 바라보는 데 쓴다.</summary>
+        public Vector3 PlanarVelocity => IsSwimming ? new Vector3(swimVelocity.x, 0f, swimVelocity.z) : planarVelocity;
+        public Transform CameraPivot => cameraPivot;
 
         /// <summary>땅에서 점프한 순간. 소리·연출은 이 이벤트를 구독해서 이동 코드와 분리한다.</summary>
         public event Action Jumped;
@@ -71,6 +76,8 @@ namespace CookieClicker.Gameplay
         private float verticalVelocity;
         private Vector3 swimVelocity;
         private float pitch;
+        /// <summary>앉아 있는 동안 몸 대신 카메라만 좌우로 돈 각도</summary>
+        private float seatedYaw;
 
         private void Awake() => controller = GetComponent<CharacterController>();
 
@@ -87,6 +94,11 @@ namespace CookieClicker.Gameplay
         {
             float dt = Time.deltaTime;
             Look();
+            if (MovementLocked)
+            {
+                MoveRatio = 0f;
+                return;
+            }
 
             bool deepEnough = WaterVolume.TryGetSurface(transform.position, out float surface)
                               && surface - transform.position.y > swimStartDepth;
@@ -101,9 +113,11 @@ namespace CookieClicker.Gameplay
         private void Look()
         {
             LookDelta = lookAction.action.ReadValue<Vector2>() * (lookSensitivity * GameSettings.LookSensitivity);
-            transform.Rotate(0f, LookDelta.x, 0f);
+            // 앉아 있으면 몸은 의자 방향 그대로 두고 카메라만 돈다.
+            if (MovementLocked) seatedYaw += LookDelta.x;
+            else transform.Rotate(0f, LookDelta.x, 0f);
             pitch = Mathf.Clamp(pitch - LookDelta.y, -maxPitch, maxPitch);
-            cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+            cameraPivot.localRotation = Quaternion.Euler(pitch, seatedYaw, 0f);
         }
 
         private void Move(float dt)
@@ -184,6 +198,33 @@ namespace CookieClicker.Gameplay
             MoveRatio = new Vector2(swimVelocity.x, swimVelocity.z).magnitude / walkSpeed;
         }
 
+        /// <summary>
+        /// 의자에 앉는다: 몸 충돌을 끄고 그 자리에 고정한다 (시점은 계속 돌릴 수 있다).
+        /// 몸을 의자 쪽으로 돌리므로 시점도 정면을 보게 된다.
+        /// </summary>
+        public void SitAt(Vector3 position, Quaternion rotation)
+        {
+            MovementLocked = true;
+            controller.enabled = false;
+            // 앉는 순간 카메라가 휙 돌지 않도록, 보던 방향을 카메라 쪽 각도로 넘긴다.
+            seatedYaw = Mathf.DeltaAngle(rotation.eulerAngles.y, transform.eulerAngles.y + seatedYaw);
+            transform.SetPositionAndRotation(position, rotation);
+            planarVelocity = Vector3.zero;
+            swimVelocity = Vector3.zero;
+            verticalVelocity = 0f;
+            MoveRatio = 0f;
+        }
+
+        /// <summary>일어나서 position에 선다.</summary>
+        public void StandUp(Vector3 position)
+        {
+            // 앉아서 보던 방향으로 몸을 돌려 선다.
+            transform.SetPositionAndRotation(position, Quaternion.Euler(0f, transform.eulerAngles.y + seatedYaw, 0f));
+            seatedYaw = 0f;
+            controller.enabled = true;
+            MovementLocked = false;
+        }
+
         /// <summary>구경하기 시작할 때 정해진 위치로 보낸다. CharacterController는 끈 상태에서 옮겨야 순간이동이 적용된다.</summary>
         public void Teleport(Vector3 position, Quaternion rotation)
         {
@@ -192,6 +233,8 @@ namespace CookieClicker.Gameplay
             controller.enabled = false;
             transform.SetPositionAndRotation(position, rotation);
             controller.enabled = true;
+            MovementLocked = false;
+            seatedYaw = 0f;
             planarVelocity = Vector3.zero;
             swimVelocity = Vector3.zero;
             verticalVelocity = 0f;

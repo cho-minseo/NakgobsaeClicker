@@ -21,6 +21,7 @@ MonoBehaviour:
     sea."
   cost: 3300000000
   iconColor: {r: 0.6, g: 0.45, b: 0.9, a: 1}
+  icon: {fileID: 0}
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: 20095a98a7101fc4890dfce6c656c1c6, type: 2}
   multiplier: 2

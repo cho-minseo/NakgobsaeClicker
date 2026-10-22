@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 namespace CookieClicker.View
 {
-    /// <summary>가운데 패널의 통계와 건물별 생산 비중.</summary>
+    /// <summary>통계 창: 왼쪽에 기록, 오른쪽(productionText)에 건물별 생산 비중. productionText가 없으면 한 칸에 이어서 쓴다.</summary>
     public class StatsView : MonoBehaviour
     {
         [SerializeField] private CookieGame game;
         [SerializeField] private Text statsText;
+        [Tooltip("건물별 생산량을 따로 보여 줄 칸 (비워 두면 statsText 아래에 이어서)")]
+        [SerializeField] private Text productionText;
         [SerializeField] private float refreshInterval = 0.5f;
 
         private readonly StringBuilder builder = new StringBuilder(1024);
@@ -39,7 +41,12 @@ namespace CookieClicker.View
             builder.AppendLine($"{Loc.T("한 번 저을 때", "Per stir")}   <b>{NumberFormatter.Format(game.CookiesPerClick, true)}</b>");
             builder.AppendLine($"{Loc.T($"황금 {currency} 획득", $"Golden {currency} caught")}   <b>{state.GoldenClicks}</b>");
             builder.AppendLine($"{Loc.T("플레이 시간", "Play time")}   <b>{NumberFormatter.FormatTime(state.PlayTimeSeconds)}</b>");
-            builder.AppendLine();
+            if (productionText != null)
+            {
+                statsText.text = builder.ToString();
+                builder.Clear();
+            }
+            else builder.AppendLine();
             builder.AppendLine($"<b><size=26>{Loc.T("건물별 생산량", "Production by building")}</size></b>");
 
             bool any = false;
@@ -57,7 +64,7 @@ namespace CookieClicker.View
             }
             if (!any) builder.AppendLine($"<color=#aaaaaa>{Loc.T($"아직 건물이 없어요. 냄비를 저어서 {config.Buildings[0].DisplayName}부터 사 보세요!", $"No buildings yet. Stir the pot and buy an {config.Buildings[0].DisplayName} first!")}</color>");
 
-            statsText.text = builder.ToString();
+            (productionText != null ? productionText : statsText).text = builder.ToString();
         }
     }
 }

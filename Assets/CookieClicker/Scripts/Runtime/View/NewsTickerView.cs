@@ -5,16 +5,22 @@ using UnityEngine.UI;
 
 namespace CookieClicker.View
 {
-    /// <summary>상단 뉴스 한 줄. 기본 문구와 보유 건물에 맞춘 문구를 섞어서 일정 시간마다 바꾼다.</summary>
+    /// <summary>
+    /// 방송 속보 자막처럼 오른쪽에서 왼쪽으로 흘러가는 뉴스 한 줄. 한 문장이 다 지나가면
+    /// 기본 문구와 보유 건물에 맞춘 문구 중 하나를 골라 다음 문장을 흘려보낸다.
+    /// newsText는 마스크(RectMask2D)가 있는 칸 안에 둔다.
+    /// </summary>
     public class NewsTickerView : MonoBehaviour
     {
         [SerializeField] private CookieGame game;
         [SerializeField] private Text newsText;
-        [SerializeField] private float interval = 8f;
-        [SerializeField] private float fadeDuration = 0.5f;
+        [Tooltip("흘러가는 속도 (픽셀/초, 캔버스 기준 해상도)")]
+        [SerializeField] private float scrollSpeed = 120f;
+        [Tooltip("앞 문장이 다 지나가고 다음 문장이 들어오기 전 빈칸 (픽셀)")]
+        [SerializeField] private float gap = 60f;
         [SerializeField, TextArea] private string[] generalNews =
         {
-            "속보) 낙지 회장님, 갯벌 탈출 시도… 3초 만에 체포",
+            "낙지 회장님, 갯벌 탈출 시도… 3초 만에 체포",
             "소 '음메에바', 오늘도 무표정으로 출근",
             "새우 대리, 허리 펴기 도전 실패… \"원래 이랬다\"",
             "전문가: \"낙곱새는 마지막에 밥 볶을 때가 진짜다\"",
@@ -25,7 +31,7 @@ namespace CookieClicker.View
         };
         [SerializeField, TextArea] private string[] generalNewsEn =
         {
-            "Breaking: Chairman Octopus attempts mudflat escape... caught in 3 seconds",
+            "Chairman Octopus attempts mudflat escape... caught in 3 seconds",
             "Cow 'Moomeeba' clocks in with a blank stare, as usual",
             "Assistant Manager Shrimp fails to straighten his back: \"It was always like this\"",
             "Expert: \"The real nakgopsae starts when you fry the rice at the end\"",
@@ -36,34 +42,35 @@ namespace CookieClicker.View
         };
 
         private readonly List<string> candidates = new List<string>();
-        private float timer;
+        private RectTransform textRect;
+        private RectTransform area;
 
         private void Start()
         {
-            // 영어 문장이 길면 뉴스 칸을 넘치지 않게 글자를 줄인다.
-            newsText.resizeTextMaxSize = newsText.fontSize;
-            newsText.resizeTextMinSize = Mathf.Min(14, newsText.fontSize);
-            newsText.resizeTextForBestFit = true;
-            newsText.verticalOverflow = VerticalWrapMode.Truncate;
+            textRect = newsText.rectTransform;
+            area = (RectTransform)textRect.parent;
+            // 한 줄로 길게 늘어나도록 하고, 왼쪽 끝을 기준점으로 삼아 움직인다.
+            newsText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            newsText.resizeTextForBestFit = false;
+            newsText.alignment = TextAnchor.MiddleLeft;
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = new Vector2(0f, 1f);
+            textRect.pivot = new Vector2(0f, 0.5f);
             ShowNext();
         }
 
         private void Update()
         {
-            timer += Time.deltaTime;
-            if (timer >= interval) ShowNext();
+            var position = textRect.anchoredPosition;
+            position.x -= scrollSpeed * Time.unscaledDeltaTime;
+            textRect.anchoredPosition = position;
 
-            // 바뀐 직후 서서히 나타나고, 바뀌기 직전에 서서히 사라진다.
-            float fadeIn = Mathf.Clamp01(timer / fadeDuration);
-            float fadeOut = Mathf.Clamp01((interval - timer) / fadeDuration);
-            var c = newsText.color;
-            c.a = Mathf.Min(fadeIn, fadeOut);
-            newsText.color = c;
+            // 문장 끝이 칸 왼쪽 밖으로 완전히 나가면 다음 문장
+            if (position.x + textRect.sizeDelta.x < -gap) ShowNext();
         }
 
         private void ShowNext()
         {
-            timer = 0f;
             candidates.Clear();
             candidates.AddRange(Loc.English && generalNewsEn.Length > 0 ? generalNewsEn : generalNews);
 
@@ -72,14 +79,17 @@ namespace CookieClicker.View
             {
                 int count = game.State.BuildingCounts[i];
                 if (count > 0)
-                    candidates.Add(Loc.T($"속보: {config.Buildings[i].DisplayName} {count}개가 쉬지 않고 {config.CurrencyName}를 만들고 있습니다.",
-                        $"Breaking: {count} x {config.Buildings[i].DisplayName} making {config.CurrencyName} nonstop."));
+                    candidates.Add(Loc.T($"{config.Buildings[i].DisplayName} {count}개가 쉬지 않고 {config.CurrencyName}를 만들고 있습니다",
+                        $"{count} x {config.Buildings[i].DisplayName} making {config.CurrencyName} nonstop"));
             }
             if (game.State.Cookies >= 1_000_000)
                 candidates.Add(Loc.T($"화제의 맛집, {config.CurrencyName} {NumberFormatter.Format(game.State.Cookies)}인분 보유 중! 줄이 끝이 안 보인다",
                     $"Hot spot holds {NumberFormatter.Format(game.State.Cookies)} servings of {config.CurrencyName}! The line never ends"));
 
             newsText.text = candidates[Random.Range(0, candidates.Count)];
+            textRect.sizeDelta = new Vector2(newsText.preferredWidth, 0f);
+            // 칸 오른쪽 끝 바로 밖에서 출발한다.
+            textRect.anchoredPosition = new Vector2(area.rect.width + gap, 0f);
         }
     }
 }

@@ -26,6 +26,17 @@ namespace CookieClicker.EditorTools
         public static Sprite SoupBubble => GetOrCreate("SoupBubble", 64, 64, SoupBubblePixel, Vector4.zero);
         public static Sprite Sparkle => GetOrCreate("Sparkle", 128, 128, SparklePixel, Vector4.zero);
 
+        /// <summary>"동네 평상" 배경: 하늘, 겹친 언덕 3장, 구름, 평상(나무 탁자).</summary>
+        public static Sprite Sky => GetOrCreate("Sky", 8, 512, SkyPixel, Vector4.zero);
+        public static Sprite HillFar => GetOrCreate("Hill_Far", 1024, 256, (x, y, w, h) => HillPixel(x, y, w, h, 0.62f, 0.16f, 1.3f, 0.4f), Vector4.zero);
+        public static Sprite HillMid => GetOrCreate("Hill_Mid", 1024, 256, (x, y, w, h) => HillPixel(x, y, w, h, 0.6f, 0.14f, 1.9f, 2.1f), Vector4.zero);
+        public static Sprite HillNear => GetOrCreate("Hill_Near", 1024, 256, (x, y, w, h) => HillPixel(x, y, w, h, 0.66f, 0.1f, 1.6f, 4.2f), Vector4.zero);
+        public static Sprite Cloud => GetOrCreate("Cloud", 256, 128, CloudPixel, Vector4.zero);
+        public static Sprite Table => GetOrCreate("Table", 1024, 320, TablePixel, Vector4.zero);
+        /// <summary>속보 띠의 빨간 이름표 (오른쪽 끝이 비스듬히 잘린 모양). 9-slice라 가로로 늘려도 비스듬함이 유지된다.</summary>
+        public static Sprite SlantTag => GetOrCreate("SlantTag", 128, 64, SlantTagPixel, new Vector4(4, 0, 28, 0));
+        public static Sprite Dot => GetOrCreate("Dot", 32, 32, (x, y, w, h) => new Color(1, 1, 1, Mathf.Clamp01((1f - Radius(x, y, w)) * w * 0.5f)), Vector4.zero);
+
         private static Sprite GetOrCreate(string name, int width, int height, Func<int, int, int, int, Color> pixel, Vector4 border)
         {
             string path = $"{ArtFolder}/{name}.png";
@@ -115,6 +126,77 @@ namespace CookieClicker.EditorTools
         private static Color GradientPixel(int x, int y, int w, int h)
         {
             return Color.Lerp(new Color(0.03f, 0.05f, 0.11f), new Color(0.12f, 0.2f, 0.36f), y / (float)(h - 1));
+        }
+
+        /// <summary>위는 맑은 하늘색, 지평선 쪽은 해 질 녘 살구색.</summary>
+        private static Color SkyPixel(int x, int y, int w, int h)
+        {
+            float t = y / (float)(h - 1);
+            var peach = new Color(0.97f, 0.82f, 0.66f);
+            var sand = new Color(0.96f, 0.86f, 0.75f);
+            var pale = new Color(0.725f, 0.863f, 0.937f);
+            var blue = new Color(0.557f, 0.773f, 0.918f);
+            if (t < 0.4f) return Color.Lerp(peach, sand, t / 0.4f);
+            if (t < 0.62f) return Color.Lerp(sand, pale, (t - 0.4f) / 0.22f);
+            return Color.Lerp(pale, blue, (t - 0.62f) / 0.38f);
+        }
+
+        /// <summary>완만한 언덕 실루엣 (흰색, Image 색으로 칠한다). height = 평균 높이, amplitude = 굴곡, phase로 모양을 바꾼다.</summary>
+        private static Color HillPixel(int x, int y, int w, int h, float height, float amplitude, float waves, float phase)
+        {
+            float u = x / (float)w * Mathf.PI * 2f;
+            float top = height + amplitude * (Mathf.Sin(u * waves * 0.5f + phase) * 0.7f + Mathf.Sin(u * waves * 1.3f + phase * 1.7f) * 0.3f);
+            float edge = top * h - y;
+            return new Color(1, 1, 1, Mathf.Clamp01(edge + 0.5f));
+        }
+
+        /// <summary>몽실한 구름: 바닥이 평평한 알약 위에 동그라미 둘.</summary>
+        private static Color CloudPixel(int x, int y, int w, int h)
+        {
+            var p = new Vector2(x + 0.5f, y + 0.5f);
+            float d = float.MaxValue;
+            // 알약 (아래쪽 몸통)
+            float px = Mathf.Clamp(p.x, h * 0.3f, w - h * 0.3f);
+            d = Mathf.Min(d, Vector2.Distance(p, new Vector2(px, h * 0.3f)) - h * 0.26f);
+            d = Mathf.Min(d, Vector2.Distance(p, new Vector2(w * 0.36f, h * 0.5f)) - h * 0.36f);
+            d = Mathf.Min(d, Vector2.Distance(p, new Vector2(w * 0.6f, h * 0.48f)) - h * 0.28f);
+            if (p.y < h * 0.05f) d = Mathf.Max(d, h * 0.05f - p.y);
+            return new Color(1, 1, 1, Mathf.Clamp01(0.5f - d));
+        }
+
+        /// <summary>
+        /// 평상: 위가 좁은 사다리꼴(원근) 나무판. 세로 판자 줄, 앞으로 올수록 진해지는 색, 위 모서리의 밝은 띠.
+        /// </summary>
+        private static Color TablePixel(int x, int y, int w, int h)
+        {
+            float v = y / (float)(h - 1);          // 0 = 앞(아래), 1 = 뒤(위)
+            float inset = 0.07f * w * v;            // 뒤로 갈수록 좁아진다
+            float alpha = Mathf.Clamp01(Mathf.Min(x + 0.5f - inset, w - inset - x - 0.5f) + 0.5f);
+            if (alpha <= 0f) return Color.clear;
+
+            var back = new Color(0.784f, 0.573f, 0.384f);
+            var front = new Color(0.71f, 0.494f, 0.314f);
+            var c = Color.Lerp(front, back, v);
+
+            // 판자 줄: 원근에 맞춰 뒤쪽에서 모이도록 x를 사다리꼴 안의 비율로 바꿔서 나눈다.
+            float u = (x - inset) / (w - inset * 2f);
+            float plank = Mathf.Repeat(u * 6f, 1f);
+            if (plank < 0.006f * 6f || plank > 1f - 0.004f * 6f) c *= 0.86f;
+            // 판자마다 아주 살짝 다른 색
+            int index = Mathf.FloorToInt(u * 6f);
+            c *= 1f + ((index * 37) % 5 - 2) * 0.012f;
+
+            // 위 모서리의 밝은 띠 (탁자 두께)
+            if (h - y < 12) c = new Color(0.863f, 0.682f, 0.498f);
+            c.a = alpha;
+            return c;
+        }
+
+        private static Color SlantTagPixel(int x, int y, int w, int h)
+        {
+            // 오른쪽 끝: 위는 끝까지, 아래로 갈수록 20px 안쪽으로
+            float right = w - 20f * (1f - y / (float)(h - 1));
+            return new Color(1, 1, 1, Mathf.Clamp01(right - (x + 0.5f) + 0.5f));
         }
 
         private static Color CookiePixel(int x, int y, int size, Color dough, Color chip)

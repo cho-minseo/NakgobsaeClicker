@@ -87,6 +87,10 @@ namespace CookieClicker.EditorTools
 
             // 건물을 보고 F를 누르면 뜨는 팝업
             InstallPlotPopup(hud.GetComponent<ExploreHudView>(), player, playerCamera, mode);
+            // 냄비 북쪽 "내 평상 부지"와 꾸미기 모드(B)
+            InstallDecor(world, game, hud.GetComponent<ExploreHudView>(), player, playerCamera, mode);
+            // 3인칭 캐릭터(V로 시점 전환)와 의자에 앉기(F)
+            InstallAvatar(player, playerCamera, hud.GetComponent<ExploreHudView>(), mode);
         }
 
         // ------------------------------------------------------------------ 지형
@@ -361,7 +365,7 @@ namespace CookieClicker.EditorTools
             AddOutline(lookInfo);
 
             AddOutline(AddText(Stretch(CreateRect("Hint", hud), Vector2.zero, new Vector2(1f, 0f), new Vector2(30f, 20f), new Vector2(-30f, 70f)),
-                "WASD 이동 · Shift 달리기(주먹 쥐고 뛰기) · Space 점프 · 클릭 주먹 · Esc 돌아가기", 22, Color.white, TextAnchor.MiddleCenter));
+                "WASD 이동 · Shift 달리기 · Space 점프 · 클릭 주먹 · V 시점 · B 꾸미기 · Esc 돌아가기", 22, Color.white, TextAnchor.MiddleCenter));
 
             Wire(hud.gameObject.AddComponent<ExploreHudView>(),
                 ("game", game), ("playerCamera", playerCamera), ("currencyText", currency), ("lookInfoText", lookInfo));

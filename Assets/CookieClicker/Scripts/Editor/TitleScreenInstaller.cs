@@ -83,7 +83,8 @@ namespace CookieClicker.EditorTools
             var settingsButton = CreateTextOnlyButton(buttons, "Settings", "설정", SettingsButtonRest, new Vector2(220f, 74f), 38);
             var quit = CreateTextOnlyButton(buttons, "Quit", "종료", QuitButtonRest, new Vector2(220f, 74f), 38);
 
-            var settings = CreateSettingsWindow(root);
+            // 설정 창은 타이틀(root) 밖에 둔다: 타이틀이 꺼진 뒤에도 게임 화면의 [설정] 버튼으로 열 수 있게.
+            var settings = CreateSettingsWindow(canvas);
 
             var hud = layout.GetComponent<CanvasGroup>();
             if (hud == null) hud = layout.gameObject.AddComponent<CanvasGroup>();

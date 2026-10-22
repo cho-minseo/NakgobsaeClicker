@@ -11,6 +11,8 @@ namespace CookieClicker.View
         [SerializeField] private Text cookieCountText;
         [SerializeField] private Text cpsText;
         [SerializeField] private Text buffText;
+        [Tooltip("보유량 뒤 화폐 이름(낙곱새)의 글자 크기 비율. 숫자가 간판처럼 크게 보이도록 작게 둔다.")]
+        [SerializeField, Range(0.2f, 1f)] private float currencySizeRatio = 0.42f;
 
         // 영어("3.55 million Nakgopsae")처럼 길어지면 칸을 넘치지 않게 글자를 줄인다 (원래 크기가 최대).
         private void Awake()
@@ -31,7 +33,8 @@ namespace CookieClicker.View
         private void Update()
         {
             // 매 프레임 문자열을 새로 대입하면 UI가 매번 다시 그려지므로, 표시가 바뀔 때만 갱신한다.
-            string cookieLabel = $"{NumberFormatter.Format(game.State.Cookies)} {game.Config.CurrencyName}";
+            int currencySize = Mathf.RoundToInt(cookieCountText.fontSize * currencySizeRatio);
+            string cookieLabel = $"{NumberFormatter.Format(game.State.Cookies)}<size={currencySize}> {game.Config.CurrencyName}</size>";
             if (cookieLabel != lastCookieLabel)
             {
                 cookieCountText.text = cookieLabel;

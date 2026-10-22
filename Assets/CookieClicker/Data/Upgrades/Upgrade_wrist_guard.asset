@@ -19,6 +19,7 @@ MonoBehaviour:
   descriptionEn: "Stirring & Auto Ladle x2 \xB7 Because wrists are precious."
   cost: 500
   iconColor: {r: 0.85, g: 0.85, b: 0.9, a: 1}
+  icon: {fileID: 0}
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: 4682268c44da2484d9fcdd05ac393052, type: 2}
   multiplier: 2

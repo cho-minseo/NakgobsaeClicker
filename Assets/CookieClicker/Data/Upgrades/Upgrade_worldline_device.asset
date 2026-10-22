@@ -21,6 +21,7 @@ MonoBehaviour:
     worldline."
   cost: 140000000000000
   iconColor: {r: 0.35, g: 0.85, b: 0.85, a: 1}
+  icon: {fileID: 0}
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: 0d1183bc6c3329c40ac36886db9504c9, type: 2}
   multiplier: 2

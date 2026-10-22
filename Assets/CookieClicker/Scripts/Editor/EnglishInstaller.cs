@@ -73,6 +73,12 @@ namespace CookieClicker.EditorTools
             ["저장"] = "Save",
             ["구매할 수 있는 업그레이드가 없어요"] = "No upgrades available yet",
             ["건물 구경하기"] = "Explore",
+            ["건물 구경하기 →"] = "Explore →",
+            ["속보"] = "BREAKING",
+            ["동네 소식"] = "Town News",
+            ["1개"] = "x1",
+            ["10개"] = "x10",
+            ["100개"] = "x100",
             ["보글보글"] = "Bubble Bubble",
             ["낙곱새"] = "Nakgopsae",
             ["시작하기"] = "Start",
@@ -83,6 +89,11 @@ namespace CookieClicker.EditorTools
             ["닫기 (F / Esc)"] = "Close (F / Esc)",
             ["본진: 낙곱새 냄비"] = "Home: The Nakgopsae Pot",
             ["산소"] = "Air",
+            ["[B] 꾸미기"] = "[B] Decorate",
+            ["꾸미기 모드"] = "DECORATE",
+            ["내 평상 부지"] = "My Lot",
+            ["구조물"] = "Build",
+            ["가구"] = "Furniture",
         };
 
         private static readonly Dictionary<string, string> ZoneEnglish = new()

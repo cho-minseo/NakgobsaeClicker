@@ -53,7 +53,7 @@ namespace CookieClicker.View
     /// <summary>
     /// 화면이 가로인지 세로인지 보고 패널 배치를 바꾼다.
     /// 배치값은 코드가 아니라 Inspector의 데이터라서, 디자인을 바꿀 때 코드를 고칠 필요가 없다.
-    /// 세로 화면에서는 상점과 통계를 탭으로 전환한다.
+    /// 통계는 평소에 닫혀 있다가 [통계] 버튼으로 여닫는 창이다. 세로 화면에서는 상점과 통계를 탭으로 전환한다.
     /// </summary>
     public class ResponsiveLayout : MonoBehaviour
     {
@@ -73,8 +73,8 @@ namespace CookieClicker.View
         [SerializeField] private Button statsTabButton;
         [SerializeField] private GameObject storePanel;
         [SerializeField] private GameObject statsPanel;
-        [SerializeField] private Color selectedTabColor = new Color(0.95f, 0.75f, 0.35f);
-        [SerializeField] private Color normalTabColor = new Color(0.35f, 0.24f, 0.15f);
+        [SerializeField] private Color selectedTabColor = Color.white;
+        [SerializeField] private Color normalTabColor = new Color(0.95f, 0.9f, 0.8f);
 
         public bool IsPortrait { get; private set; }
 
@@ -131,6 +131,11 @@ namespace CookieClicker.View
             }
         }
 
+        /// <summary>통계 창을 열거나 닫는다 ([통계] 버튼, 창의 [닫기] 버튼).</summary>
+        public void ToggleStats() => SelectTab(!showingStats);
+
+        public void CloseStats() => SelectTab(false);
+
         private void SelectTab(bool stats)
         {
             showingStats = stats;
@@ -139,8 +144,9 @@ namespace CookieClicker.View
 
         private void RefreshTabs()
         {
+            // 가로: 상점은 늘 보이고 통계는 연 동안만. 세로: 둘 중 하나만.
             storePanel.SetActive(!IsPortrait || !showingStats);
-            statsPanel.SetActive(!IsPortrait || showingStats);
+            statsPanel.SetActive(showingStats);
             storeTabButton.image.color = showingStats ? normalTabColor : selectedTabColor;
             statsTabButton.image.color = showingStats ? selectedTabColor : normalTabColor;
         }

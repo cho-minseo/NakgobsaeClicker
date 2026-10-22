@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945d345cfd3778247ade8ae13712c51c, type: 3}
+  m_Name: DecorCatalog
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Decor.DecorCatalog
+  pieces:
+  - {fileID: 11400000, guid: ddd0349ed45b1cf439cee256066d65a0, type: 2}
+  - {fileID: 11400000, guid: 330c3bd2604974b45a89ce6cddeff0c7, type: 2}
+  - {fileID: 11400000, guid: b8840013787116c448baa02ab94ff22c, type: 2}
+  - {fileID: 11400000, guid: bb2cf3e5f28bdef4d9181f756de4529e, type: 2}
+  - {fileID: 11400000, guid: e5f2bb9d85fe1f34b8547754064c375d, type: 2}
+  - {fileID: 11400000, guid: 0c7c433425e4d514ebbd2aea9f4cae32, type: 2}
+  - {fileID: 11400000, guid: 265df519279d16f4e8789cec75dfea23, type: 2}
+  - {fileID: 11400000, guid: d9c1bfd8ee2d0404c9c55b504a85583b, type: 2}
+  - {fileID: 11400000, guid: 15072e1950063dd4485ffc08d54d0581, type: 2}
+  - {fileID: 11400000, guid: 37e336e85fb045448a2116a554960f5b, type: 2}
+  - {fileID: 11400000, guid: dc6402516edb6de49991f052539a7baa, type: 2}
+  - {fileID: 11400000, guid: 93caa295ca4fd7d459558466bb388e66, type: 2}
+  - {fileID: 11400000, guid: 1c84d28d39bed2c4282879e5c98a4561, type: 2}
+  - {fileID: 11400000, guid: d0806359c18754d40990f8a4c069d106, type: 2}
+  - {fileID: 11400000, guid: 7c7e05aa70d138540a2fa86b8802379f, type: 2}
+  - {fileID: 11400000, guid: 350318ee60ee1a948aceaea6e8114dac, type: 2}
+  - {fileID: 11400000, guid: cba1015e3c8e6fd4da910d8dfada9eec, type: 2}
+  - {fileID: 11400000, guid: 818af9b9527bd3645b409352a00b3b86, type: 2}
+  - {fileID: 11400000, guid: b706fdbdcaf4ee44c8e72edc3847b8ff, type: 2}
+  - {fileID: 11400000, guid: 39a7ccf12ce7b5f40baa7bae3f2c625b, type: 2}
+  - {fileID: 11400000, guid: e862fca723243c24aa500a3c2df4f30d, type: 2}
+  - {fileID: 11400000, guid: fa1e4109193d5fe4e824b10a59abaa14, type: 2}
+  - {fileID: 11400000, guid: 586032a2980968643b9dba34fc95bdb4, type: 2}
+  - {fileID: 11400000, guid: 09d6739a88e5b194883ce92165f39324, type: 2}
+  refundRatio: 0.5

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d3e4e804b6b65245a6bb2c70fbf8574, type: 3}
+  m_Name: Decor_flower_pot
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Decor.DecorPiece
+  id: flower_pot
+  displayName: "\uD654\uBD84"
+  displayNameEn: Plant Pot
+  snap: 3
+  category: 1
+  slotGroup: 
+  cost: 100
+  prefab: {fileID: 7415962026404893209, guid: 700e67999467b6b468b8c5f5a2466018, type: 3}
+  icon: {fileID: 21300000, guid: 2c11f13194ebde140885351ed52da25b, type: 3}

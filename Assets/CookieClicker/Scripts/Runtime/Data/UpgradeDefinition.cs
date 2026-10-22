@@ -26,6 +26,8 @@ namespace CookieClicker.Data
         [SerializeField, TextArea] private string descriptionEn;
         [SerializeField] private double cost = 100;
         [SerializeField] private Color iconColor = Color.white;
+        [Tooltip("상점 칸에 보이는 그림. 비워 두면 대상 건물의 그림을 쓴다.")]
+        [SerializeField] private Sprite icon;
 
         [Header("효과")]
         [SerializeField] private UpgradeEffectType effectType;
@@ -44,6 +46,7 @@ namespace CookieClicker.Data
         public string Description => Loc.T(description, descriptionEn);
         public double Cost => cost;
         public Color IconColor => iconColor;
+        public Sprite Icon => icon != null ? icon : targetBuilding != null ? targetBuilding.Icon : null;
         public UpgradeEffectType EffectType => effectType;
         public BuildingDefinition TargetBuilding => targetBuilding;
         public float Multiplier => multiplier;
@@ -54,6 +57,8 @@ namespace CookieClicker.Data
         public double RequiredHandmadeCookies => requiredHandmadeCookies;
 
 #if UNITY_EDITOR
+        public void EditorSetIcon(Sprite sprite) => icon = sprite;
+
         public void EditorSetEnglish(string name, string newDescription)
         {
             displayNameEn = name;

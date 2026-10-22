@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using CookieClicker.Data;
+using UnityEngine;
 
 namespace CookieClicker.Core
 {
@@ -17,11 +19,23 @@ namespace CookieClicker.Core
         public double PlayTimeSeconds;
         public int[] BuildingCounts;
         public bool[] UpgradesBought;
+        /// <summary>꾸미기 모드로 평상 부지에 놓은 물건들</summary>
+        public List<DecorRecord> Decor = new List<DecorRecord>();
 
         public static GameState CreateNew(GameConfig config) => new GameState
         {
             BuildingCounts = new int[config.Buildings.Count],
             UpgradesBought = new bool[config.Upgrades.Count],
         };
+    }
+
+    /// <summary>놓은 물건 하나. 위치는 평상 부지 기준 좌표, slot은 칸 겹침 검사용 이름 (자유 배치 가구는 비어 있음).</summary>
+    [Serializable]
+    public class DecorRecord
+    {
+        public string id;
+        public string slot;
+        public Vector3 position;
+        public float yaw;
     }
 }

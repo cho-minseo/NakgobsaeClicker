@@ -21,3 +21,4 @@ MonoBehaviour:
   baseCost: 1000000000000
   baseCps: 10000000
   iconColor: {r: 0.4, g: 0.85, b: 0.9, a: 1}
+  icon: {fileID: 0}

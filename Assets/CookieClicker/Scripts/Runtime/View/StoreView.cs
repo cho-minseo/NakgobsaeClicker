@@ -17,18 +17,29 @@ namespace CookieClicker.View
         [Header("구매 수량 버튼")]
         [SerializeField] private Button[] buyAmountButtons;
         [SerializeField] private int[] buyAmounts = { 1, 10, 100 };
-        [SerializeField] private Color selectedButtonColor = new Color(0.95f, 0.75f, 0.35f);
-        [SerializeField] private Color normalButtonColor = new Color(0.35f, 0.24f, 0.15f);
+        [SerializeField] private Color selectedButtonColor = Color.white;
+        [SerializeField] private Color normalButtonColor = new Color(1f, 1f, 1f, 0f);
+
+        [Header("업그레이드 말풍선 (마우스를 올린 칸의 이름·설명)")]
+        [SerializeField] private RectTransform tooltip;
+        [SerializeField] private Text tooltipName;
+        [SerializeField] private Text tooltipDescription;
+        [SerializeField] private Text tooltipCost;
+        [SerializeField] private Color affordableCostColor = new Color(0.89f, 0.25f, 0.16f);
+        [SerializeField] private Color expensiveCostColor = new Color(0.54f, 0.42f, 0.32f);
 
         [Tooltip("가격 색상 등 자주 바뀌는 값을 몇 초마다 갱신할지")]
         [SerializeField] private float refreshInterval = 0.1f;
 
         private float refreshTimer;
+        private int hoveredUpgrade = -1;
+        private RectTransform hoveredRect;
 
         private void Start()
         {
             for (int i = 0; i < buildingRows.Length; i++) buildingRows[i].Bind(i, OnBuildingClicked);
-            for (int i = 0; i < upgradeRows.Length; i++) upgradeRows[i].Bind(i, OnUpgradeClicked);
+            for (int i = 0; i < upgradeRows.Length; i++) upgradeRows[i].Bind(i, OnUpgradeClicked, OnUpgradeHovered);
+            if (tooltip != null) tooltip.gameObject.SetActive(false);
             for (int i = 0; i < buyAmountButtons.Length && i < buyAmounts.Length; i++)
             {
                 int amount = buyAmounts[i];
@@ -90,7 +101,7 @@ namespace CookieClicker.View
                 }
                 else if (previousRevealed)
                 {
-                    buildingRows[i].ShowMystery(cost);
+                    buildingRows[i].ShowMystery(config.Buildings[i], cost);
                 }
                 else
                 {
@@ -114,6 +125,35 @@ namespace CookieClicker.View
                 }
             }
             if (noUpgradesLabel != null) noUpgradesLabel.SetActive(!anyUpgrade);
+            RefreshTooltip();
+        }
+
+        private void OnUpgradeHovered(int index, RectTransform rect)
+        {
+            hoveredUpgrade = index;
+            hoveredRect = rect;
+            RefreshTooltip();
+        }
+
+        /// <summary>마우스를 올린 업그레이드 칸 바로 왼쪽(상점 바깥)에 이름·설명·가격 말풍선을 띄운다.</summary>
+        private void RefreshTooltip()
+        {
+            if (tooltip == null) return;
+            bool show = hoveredUpgrade >= 0 && hoveredRect != null && hoveredRect.gameObject.activeInHierarchy;
+            tooltip.gameObject.SetActive(show);
+            if (!show) return;
+
+            var upgrade = game.Config.Upgrades[hoveredUpgrade];
+            tooltipName.text = upgrade.DisplayName;
+            tooltipDescription.text = upgrade.Description;
+            tooltipCost.text = $"{NumberFormatter.Format(upgrade.Cost)} {game.Config.CurrencyName}";
+            tooltipCost.color = game.State.Cookies >= upgrade.Cost ? affordableCostColor : expensiveCostColor;
+
+            // 칸의 세로 위치에 맞춘다 (말풍선은 상점 패널 기준으로 배치되어 있다).
+            var parent = (RectTransform)tooltip.parent;
+            Vector3 world = hoveredRect.TransformPoint(hoveredRect.rect.center);
+            Vector2 local = parent.InverseTransformPoint(world);
+            tooltip.anchoredPosition = new Vector2(tooltip.anchoredPosition.x, local.y - parent.rect.yMax);
         }
     }
 }

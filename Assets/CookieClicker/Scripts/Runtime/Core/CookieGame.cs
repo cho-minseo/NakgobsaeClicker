@@ -107,6 +107,20 @@ namespace CookieClicker.Core
             if (amount > 0) Earn(amount);
         }
 
+        /// <summary>건물·업그레이드가 아닌 곳(꾸미기 물건 등)에 재화를 쓴다. 모자라면 아무것도 하지 않고 false.</summary>
+        public bool TrySpend(double amount)
+        {
+            if (State.Cookies < amount) return false;
+            State.Cookies -= amount;
+            return true;
+        }
+
+        /// <summary>쓴 재화를 돌려준다 (꾸미기 물건 회수). 누적 생산량(TotalBaked)에는 더하지 않는다.</summary>
+        public void Refund(double amount)
+        {
+            if (amount > 0) State.Cookies += amount;
+        }
+
         // ---------- 건물 ----------
 
         public int GetBuildingCount(int index) => State.BuildingCounts[index];

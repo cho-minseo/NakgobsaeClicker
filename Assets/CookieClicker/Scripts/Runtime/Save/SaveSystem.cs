@@ -22,6 +22,7 @@ namespace CookieClicker.Save
         public double playTimeSeconds;
         public List<BuildingEntry> buildings = new List<BuildingEntry>();
         public List<string> upgrades = new List<string>();
+        public List<DecorRecord> decor = new List<DecorRecord>();
     }
 
     [Serializable]
@@ -47,6 +48,7 @@ namespace CookieClicker.Save
                 clicks = state.Clicks,
                 goldenClicks = state.GoldenClicks,
                 playTimeSeconds = state.PlayTimeSeconds,
+                decor = state.Decor,
             };
 
             for (int i = 0; i < config.Buildings.Count; i++)
@@ -87,6 +89,8 @@ namespace CookieClicker.Save
             state.Clicks = data.clicks;
             state.GoldenClicks = data.goldenClicks;
             state.PlayTimeSeconds = data.playTimeSeconds;
+            // 꾸미기가 생기기 전 세이브에는 decor가 없다.
+            if (data.decor != null) state.Decor = data.decor;
 
             foreach (var entry in data.buildings)
             {

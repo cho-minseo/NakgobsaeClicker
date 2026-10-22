@@ -21,3 +21,4 @@ MonoBehaviour:
   baseCost: 12000
   baseCps: 47
   iconColor: {r: 0.6, g: 0.48, b: 0.38, a: 1}
+  icon: {fileID: 21300000, guid: 6bd0727e3566c624680338df0726c9e3, type: 3}

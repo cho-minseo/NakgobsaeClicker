@@ -20,6 +20,7 @@ MonoBehaviour:
   descriptionEn: "Mudflat x2 \xB7 The mud won't steal your shoes anymore."
   cost: 120000
   iconColor: {r: 0.6, g: 0.5, b: 0.4, a: 1}
+  icon: {fileID: 0}
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: d2b458ceace01d640a280f028cdd8a4b, type: 2}
   multiplier: 2

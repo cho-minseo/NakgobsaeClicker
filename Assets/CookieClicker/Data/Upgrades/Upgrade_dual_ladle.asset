@@ -21,6 +21,7 @@ MonoBehaviour:
     perfect."
   cost: 10000
   iconColor: {r: 0.85, g: 0.85, b: 0.9, a: 1}
+  icon: {fileID: 0}
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: 4682268c44da2484d9fcdd05ac393052, type: 2}
   multiplier: 2

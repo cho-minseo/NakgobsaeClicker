@@ -37,6 +37,23 @@ namespace CookieClicker.EditorTools
         private static readonly Color SubText = new Color(0.78f, 0.74f, 0.68f);
         private static readonly Color Wood = new Color(0.42f, 0.27f, 0.14f);
 
+        // "동네 평상" 팔레트: 크림 카드 + 갈색 글씨 + 고추장 빨강(살 수 있는 것에만) + 구경하기 월드의 하늘·풀·주황 집
+        private static readonly Color CardCream = new Color(0.992f, 0.965f, 0.91f);
+        private static readonly Color CreamDeep = new Color(0.953f, 0.902f, 0.8f);
+        private static readonly Color Line = new Color(0.9f, 0.83f, 0.7f);
+        private static readonly Color Ink = new Color(0.23f, 0.14f, 0.094f);
+        private static readonly Color InkSoft = new Color(0.54f, 0.416f, 0.32f);
+        private static readonly Color InkFaint = new Color(0.725f, 0.627f, 0.533f);
+        private static readonly Color ChiliRed = new Color(0.886f, 0.25f, 0.165f);
+        private static readonly Color ChiliDeep = new Color(0.663f, 0.165f, 0.098f);
+        private static readonly Color Terracotta = new Color(0.85f, 0.467f, 0.29f);
+        private static readonly Color TerracottaLight = new Color(0.88f, 0.585f, 0.415f);
+        private static readonly Color TerracottaDeep = new Color(0.66f, 0.32f, 0.17f);
+        private static readonly Color Roof = new Color(0.43f, 0.275f, 0.21f);
+        private static readonly Color HillFar = new Color(0.66f, 0.79f, 0.6f);
+        private static readonly Color HillMid = new Color(0.553f, 0.733f, 0.47f);
+        private static readonly Color HillNear = new Color(0.475f, 0.68f, 0.4f);
+
         private static Font font;
 
         private struct Prefabs
@@ -57,6 +74,14 @@ namespace CookieClicker.EditorTools
                 return;
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
+            BuildSceneWithoutDialogs();
+            EditorUtility.DisplayDialog("Cookie Clicker",
+                $"씬을 만들었습니다.\n{ScenePath}\n\nPlay 버튼을 눌러 실행해 보세요.", "확인");
+        }
+
+        /// <summary>확인 창 없이 씬을 다시 만든다 (배치 모드처럼 창을 띄울 수 없는 곳에서 쓴다).</summary>
+        public static void BuildSceneWithoutDialogs()
+        {
             font = AssetDatabase.LoadAssetAtPath<Font>(FontPath);
             if (font == null)
             {
@@ -70,6 +95,7 @@ namespace CookieClicker.EditorTools
             // 새 씬을 열 때 Unity가 쓰지 않는 에셋을 메모리에서 내리므로, 데이터 에셋은 반드시 새 씬을 연 "뒤에"
             // 불러와야 한다. 먼저 불러 두면 이미 내려간 객체를 참조하게 되어 Config 연결이 비어 버린다.
             var config = CookieContentFactory.CreateOrLoadContent();
+            AssignShopIcons();
             var prefabs = CreatePrefabs();
 
             var game = new GameObject("GameManager").AddComponent<CookieGame>();
@@ -90,15 +116,14 @@ namespace CookieClicker.EditorTools
             var ui = CreateUICanvas(game, cookie, config, prefabs, background);
             CreateExploreWorld(game, config, camera, cookie, background, ui);
             InstallTitleScreen(ui.MainHud.GetComponent<ResponsiveLayout>(), cookie.GetComponentInChildren<StewPotFX>());
+            // 게임 화면의 [설정] 버튼도 타이틀과 같은 설정 창을 연다.
+            Wire(ui.Menu, ("settings", Object.FindAnyObjectByType<SettingsView>(FindObjectsInactive.Include)));
             // 영어판 문구 (건물·업그레이드 에셋, 씬의 고정 글자)
             InstallEnglish();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddSceneToBuildSettings();
             Selection.activeGameObject = game.gameObject;
-
-            EditorUtility.DisplayDialog("Cookie Clicker",
-                $"씬을 만들었습니다.\n{ScenePath}\n\nPlay 버튼을 눌러 실행해 보세요.", "확인");
         }
 
         // ------------------------------------------------------------------ 3D
@@ -275,36 +300,71 @@ namespace CookieClicker.EditorTools
             return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
         }
 
-        // ------------------------------------------------------------------ 배경
+        // ------------------------------------------------------------------ 배경 ("동네 평상": 구경하기 월드와 같은 하늘·언덕·집)
 
         private struct BackgroundParts
         {
             public GameObject Root;
-            public RectTransform Rays;
-            public RectTransform Glow;
+            /// <summary>언덕·집·평상을 담는 칸. 가로는 화면 전체, 세로는 냄비가 있는 위쪽만.</summary>
+            public RectTransform Scenery;
+            public RectTransform Table;
+            /// <summary>냄비 밑 그림자 (냄비 위치를 따라다닌다)</summary>
+            public RectTransform PotShadow;
             public RectTransform RainArea;
         }
 
         private static BackgroundParts CreateBackgroundCanvas(CookieGame game, Camera camera, Prefabs prefabs)
         {
-            // Screen Space - Camera 캔버스를 쿠키보다 멀리(50) 두어서 3D 쿠키 뒤에 그려지게 한다.
+            // Screen Space - Camera 캔버스를 냄비보다 멀리(50) 두어서 3D 냄비 뒤에 그려지게 한다.
             var root = (RectTransform)CreateCanvas("Background Canvas", RenderMode.ScreenSpaceCamera, camera, -100, false).transform;
 
-            AddImage(Stretch(CreateRect("Gradient", root), Vector2.zero, Vector2.one), CookieArtFactory.Background, Color.white);
+            AddImage(Stretch(CreateRect("Sky", root), Vector2.zero, Vector2.one), CookieArtFactory.Sky, Color.white);
+            AddImage(Place(CreateRect("SunGlow", root), new Vector2(0.48f, 0.5f), new Vector2(520f, 520f)), CookieArtFactory.SoftCircle,
+                new Color(1f, 0.93f, 0.78f, 0.9f));
+            CreateCloud(root, "Cloud_A", new Vector2(0.12f, 0.8f), new Vector2(210f, 84f), 0f);
+            CreateCloud(root, "Cloud_B", new Vector2(0.43f, 0.9f), new Vector2(150f, 60f), 0.4f);
+            CreateCloud(root, "Cloud_C", new Vector2(0.86f, 0.84f), new Vector2(180f, 72f), 0.7f);
 
-            var cookieAnchor = new Vector2(0.17f, 0.47f);
-            var rays = Place(CreateRect("Rays", root), cookieAnchor, new Vector2(1100f, 1100f));
-            AddImage(rays, CookieArtFactory.Rays, new Color(1f, 0.95f, 0.8f, 0.12f));
-            rays.gameObject.AddComponent<Spinner>();
-
-            var glow = Place(CreateRect("Glow", root), cookieAnchor, new Vector2(640f, 640f));
-            AddImage(glow, CookieArtFactory.SoftCircle, new Color(1f, 0.85f, 0.55f, 0.35f));
-
-            var rainArea = Stretch(CreateRect("CookieRain", root), Vector2.zero, new Vector2(0.34f, 1f));
+            // 생산량이 많을수록 하늘에서 낙곱새가 내린다 (원작의 쿠키 비). 언덕·평상보다 뒤에 그린다.
+            var rainArea = Stretch(CreateRect("CookieRain", root), Vector2.zero, Vector2.one);
             var rain = rainArea.gameObject.AddComponent<CookieRain>();
             Wire(rain, ("game", game), ("cookiePrefab", prefabs.RainCookie), ("area", rainArea));
 
-            return new BackgroundParts { Root = root.gameObject, Rays = rays, Glow = glow, RainArea = rainArea };
+            var scenery = Stretch(CreateRect("Scenery", root), Vector2.zero, Vector2.one);
+            AddImage(Stretch(CreateRect("Hill_Far", scenery), new Vector2(0f, 0.3f), new Vector2(1f, 0.6f)), CookieArtFactory.HillFar, HillFar);
+            CreateHouse(scenery, "House_1", new Vector2(0.1f, 0.47f), new Vector2(54f, 50f), Terracotta);
+            CreateHouse(scenery, "House_2", new Vector2(0.17f, 0.465f), new Vector2(38f, 36f), TerracottaLight);
+            CreateHouse(scenery, "House_3", new Vector2(0.52f, 0.48f), new Vector2(66f, 60f), TerracottaDeep);
+            CreateHouse(scenery, "House_4", new Vector2(0.58f, 0.47f), new Vector2(42f, 40f), Terracotta);
+            AddImage(Stretch(CreateRect("Hill_Mid", scenery), new Vector2(0f, 0.27f), new Vector2(1f, 0.47f)), CookieArtFactory.HillMid, HillMid);
+            AddImage(Stretch(CreateRect("Hill_Near", scenery), new Vector2(0f, 0.24f), new Vector2(1f, 0.38f)), CookieArtFactory.HillNear, HillNear);
+
+            var table = Stretch(CreateRect("Table", scenery), new Vector2(-0.03f, 0f), new Vector2(1.03f, 0.33f));
+            AddImage(table, CookieArtFactory.Table, Color.white);
+
+            var potShadow = Place(CreateRect("PotShadow", root), new Vector2(0.34f, 0.4f), new Vector2(560f, 90f));
+            potShadow.pivot = new Vector2(0.5f, 2.4f); // 냄비 중심보다 아래(평상 위)에 깔리도록 기준점을 위로 뺀다
+            AddImage(potShadow, CookieArtFactory.SoftCircle, new Color(0.3f, 0.14f, 0.04f, 0.4f));
+
+            return new BackgroundParts { Root = root.gameObject, Scenery = scenery, Table = table, PotShadow = potShadow, RainArea = rainArea };
+        }
+
+        private static void CreateCloud(RectTransform parent, string name, Vector2 anchor, Vector2 size, float phase)
+        {
+            var cloud = Place(CreateRect(name, parent), anchor, size);
+            AddImage(cloud, CookieArtFactory.Cloud, new Color(1f, 1f, 1f, 0.92f));
+            Wire(cloud.gameObject.AddComponent<UIDrift>(), ("phase", phase), ("distance", 50f + size.x * 0.2f));
+        }
+
+        /// <summary>멀리 보이는 집 (구경하기 월드의 주황 박스 건물을 닮게). 아래 가운데가 기준점.</summary>
+        private static void CreateHouse(RectTransform parent, string name, Vector2 anchor, Vector2 size, Color color)
+        {
+            var house = Place(CreateRect(name, parent), anchor, size);
+            house.pivot = new Vector2(0.5f, 0f);
+            AddImage(house, null, color);
+            var roof = Stretch(CreateRect("Roof", house), new Vector2(0f, 1f), Vector2.one,
+                new Vector2(-size.x * 0.12f, -2f), new Vector2(size.x * 0.12f, size.y * 0.22f));
+            AddImage(roof, null, Roof);
         }
 
         // ------------------------------------------------------------------ UI
@@ -315,6 +375,7 @@ namespace CookieClicker.EditorTools
             /// <summary>클리커 화면 UI 전체. 구경하기 중에는 통째로 꺼진다.</summary>
             public GameObject MainHud;
             public Button ExploreButton;
+            public HudMenuView Menu;
         }
 
         private static UiParts CreateUICanvas(CookieGame game, CookieClickTarget cookie, GameConfig config, Prefabs prefabs,
@@ -323,26 +384,15 @@ namespace CookieClicker.EditorTools
             var canvas = (RectTransform)CreateCanvas("UI Canvas", RenderMode.ScreenSpaceOverlay, null, 0, true).transform;
             var root = Stretch(CreateRect("MainHud", canvas), Vector2.zero, Vector2.one);
 
-            // 왼쪽: 쿠키 수 표시
-            var left = Stretch(CreateRect("LeftPanel", root), Vector2.zero, new Vector2(0.34f, 1f));
-            var header = TopBand(CreateRect("Header", left), 0f, 190f);
-            AddImage(header, null, new Color(0f, 0f, 0f, 0.35f));
-            AddText(TopBand(CreateRect("BakeryName", header), 14f, 40f), "야르! 낙곱새 맛집", 30, Cream, TextAnchor.MiddleCenter);
-            var countText = AddText(TopBand(CreateRect("CookieCount", header), 54f, 72f), "0 낙곱새", 56, Color.white,
-                TextAnchor.MiddleCenter, FontStyle.Bold);
-            AddOutline(countText);
-            var cpsText = AddText(TopBand(CreateRect("CookiesPerSecond", header), 128f, 40f), "초당 0", 26, Cream, TextAnchor.MiddleCenter);
-            var buffText = AddText(TopBand(CreateRect("Buff", left), 200f, 44f), "", 28, Gold, TextAnchor.MiddleCenter, FontStyle.Bold);
-            AddOutline(buffText);
-            Wire(left.gameObject.AddComponent<HudView>(),
-                ("game", game), ("cookieCountText", countText), ("cpsText", cpsText), ("buffText", buffText));
-
-            var middle = CreateMiddlePanel(root, game);
+            var counter = CreateCounterCard(root, game);
+            var news = CreateNewsTicker(root, game);
+            var exploreButton = CreateExploreButton(root);
+            var stats = CreateStatsWindow(root, game, out var closeStats);
             var store = CreateStorePanel(root, game, config, prefabs);
-            var news = CreateNewsTicker(root, game, out var exploreButton);
+            var topButtons = CreateTopButtons(root, out var statsButton, out var settingsButton);
             var tabBar = CreateTabBar(root, out var storeTab, out var statsTab);
 
-            // 맨 위: 이펙트 / 황금 쿠키 / 안내 문구 (배경 이미지가 없어서 클릭을 가로막지 않는다)
+            // 맨 위: 이펙트 / 황금 낙곱새 / 안내 문구 (배경 이미지가 없어서 클릭을 가로막지 않는다)
             var effectLayer = Stretch(CreateRect("EffectLayer", root), Vector2.zero, Vector2.one);
 
             var golden = Place(CreateRect("GoldenCookie", effectLayer), new Vector2(0.5f, 0.5f), new Vector2(120f, 120f));
@@ -352,101 +402,179 @@ namespace CookieClicker.EditorTools
             var goldenView = golden.gameObject.AddComponent<GoldenCookieView>();
             Wire(goldenView, ("game", game), ("button", goldenButton), ("canvasGroup", goldenGroup), ("spawnArea", effectLayer));
 
-            var popup = Place(CreateRect("Popup", effectLayer), new Vector2(0.17f, 0.8f), new Vector2(700f, 70f));
-            var popupText = AddText(popup, "", 40, Gold, TextAnchor.MiddleCenter, FontStyle.Bold);
-            AddOutline(popupText);
+            var popup = Place(CreateRect("Popup", effectLayer), new Vector2(0.34f, 0.8f), new Vector2(700f, 70f));
+            var popupText = AddText(popup, "", 40, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
+            AddRedOutline(popupText);
 
             Wire(effectLayer.gameObject.AddComponent<ClickFeedbackView>(),
                 ("game", game), ("cookie", cookie), ("effectLayer", effectLayer),
                 ("floatingTextPrefab", prefabs.FloatingText), ("crumbPrefab", prefabs.Crumb), ("popupText", popupText));
 
-            ConfigureResponsiveLayout(root, cookie, goldenView, background,
-                left, middle, store, news, tabBar, storeTab, statsTab, popup);
+            var layout = ConfigureResponsiveLayout(root, cookie, goldenView, background,
+                counter, stats, store, news, exploreButton, topButtons, tabBar, storeTab, statsTab, popup);
 
-            return new UiParts { Canvas = canvas, MainHud = root.gameObject, ExploreButton = exploreButton };
+            var menu = root.gameObject.AddComponent<HudMenuView>();
+            Wire(menu, ("layout", layout), ("statsButton", statsButton), ("closeStatsButton", closeStats), ("settingsButton", settingsButton));
+
+            return new UiParts
+            {
+                Canvas = canvas, MainHud = root.gameObject,
+                ExploreButton = exploreButton.GetComponent<Button>(), Menu = menu,
+            };
         }
 
         /// <summary>
-        /// 가로: [쿠키 | 통계 | 상점] 3단. 세로: 위에 쿠키, 아래에 상점/통계 탭.
+        /// 가로: 왼쪽 위 숫자 간판, 오른쪽 상점 카드, 아래 속보 띠, 가운데에 평상 위 냄비. 통계는 버튼으로 여는 창.
+        /// 세로: 위에 냄비, 아래에 상점/통계 탭.
         /// 값은 ResponsiveLayout 컴포넌트에 데이터로 저장되므로 이후에는 Inspector에서 조정하면 된다.
         /// </summary>
-        private static void ConfigureResponsiveLayout(RectTransform root, CookieClickTarget cookie, GoldenCookieView golden,
-            BackgroundParts background, RectTransform left, RectTransform middle, RectTransform store, RectTransform news,
-            RectTransform tabBar, Button storeTab, Button statsTab, RectTransform popup)
+        private static ResponsiveLayout ConfigureResponsiveLayout(RectTransform root, CookieClickTarget cookie, GoldenCookieView golden,
+            BackgroundParts background, RectTransform counter, RectTransform stats, RectTransform store, RectTransform news,
+            RectTransform explore, RectTransform topButtons, RectTransform tabBar, Button storeTab, Button statsTab, RectTransform popup)
         {
-            const float split = 0.56f;   // 세로 화면에서 쿠키 영역이 시작되는 높이 비율
+            const float split = 0.56f;   // 세로 화면에서 냄비 영역이 시작되는 높이 비율
             const float tabHeight = 70f;
-            var bottom = new RectLayout(Vector2.zero, new Vector2(1f, split), Vector2.zero, new Vector2(0f, -tabHeight));
+            const float shopWidth = 624f, margin = 24f;
+            const float playRight = shopWidth + margin * 2f; // 가로 화면에서 상점이 차지하는 오른쪽 폭
+            var bottom = new RectLayout(Vector2.zero, new Vector2(1f, split), new Vector2(16f, 16f), new Vector2(-16f, -tabHeight - 8f));
 
             PanelLayout Panel(RectTransform target, RectLayout landscape, RectLayout portrait) =>
                 new PanelLayout { target = target, landscape = landscape, portrait = portrait };
+            RectLayout Box(Vector2 anchor, Vector2 pivotOffset, Vector2 size) =>
+                new RectLayout(anchor, anchor, pivotOffset, pivotOffset + size);
 
             var panels = new[]
             {
-                Panel(left,
-                    new RectLayout(Vector2.zero, new Vector2(0.34f, 1f)),
-                    new RectLayout(new Vector2(0f, split), Vector2.one)),
-                Panel(middle,
-                    new RectLayout(new Vector2(0.34f, 0f), new Vector2(0.68f, 1f)),
-                    bottom),
+                Panel(counter,
+                    Box(new Vector2(0f, 1f), new Vector2(58f, -48f - 236f), new Vector2(470f, 236f)),
+                    Box(new Vector2(0.5f, 1f), new Vector2(-235f, -24f - 236f), new Vector2(470f, 236f))),
+                Panel(topButtons,
+                    Box(new Vector2(1f, 1f), new Vector2(-playRight - 16f - 250f, -48f - 54f), new Vector2(250f, 54f)),
+                    Box(new Vector2(1f, 1f), new Vector2(-16f - 250f, -24f - 54f), new Vector2(250f, 54f))),
                 Panel(store,
-                    new RectLayout(new Vector2(0.68f, 0f), Vector2.one),
+                    new RectLayout(new Vector2(1f, 0f), Vector2.one, new Vector2(-shopWidth - margin, margin), new Vector2(-margin, -margin)),
+                    bottom),
+                Panel(stats,
+                    new RectLayout(Vector2.zero, Vector2.one, new Vector2(80f, 200f), new Vector2(-playRight - 80f, -310f)),
                     bottom),
                 Panel(news,
-                    new RectLayout(new Vector2(0.34f, 1f), new Vector2(0.68f, 1f), new Vector2(5f, -70f), new Vector2(-5f, 0f)),
+                    new RectLayout(Vector2.zero, new Vector2(1f, 0f), Vector2.zero, new Vector2(-playRight + margin, 64f)),
                     new RectLayout(new Vector2(0f, split), new Vector2(1f, split), Vector2.zero, new Vector2(0f, 56f))),
+                Panel(explore,
+                    Box(Vector2.zero, new Vector2(58f, 100f), new Vector2(270f, 76f)),
+                    Box(new Vector2(0f, split), new Vector2(16f, 72f), new Vector2(250f, 68f))),
                 Panel(tabBar,
                     new RectLayout(new Vector2(0f, split), new Vector2(1f, split), new Vector2(0f, -tabHeight), Vector2.zero),
                     new RectLayout(new Vector2(0f, split), new Vector2(1f, split), new Vector2(0f, -tabHeight), Vector2.zero)),
-                Panel(background.RainArea,
-                    new RectLayout(Vector2.zero, new Vector2(0.34f, 1f)),
+                Panel(background.Scenery,
+                    new RectLayout(Vector2.zero, Vector2.one),
                     new RectLayout(new Vector2(0f, split), Vector2.one)),
+                Panel(background.Table,
+                    new RectLayout(new Vector2(-0.03f, 0f), new Vector2(1.03f, 0.33f)),
+                    new RectLayout(new Vector2(-0.06f, 0f), new Vector2(1.06f, 0.4f))),
                 Panel(popup,
-                    new RectLayout(new Vector2(0.17f, 0.8f), new Vector2(0.17f, 0.8f), new Vector2(-350f, -35f), new Vector2(350f, 35f)),
+                    new RectLayout(new Vector2(0.34f, 0.8f), new Vector2(0.34f, 0.8f), new Vector2(-350f, -35f), new Vector2(350f, 35f)),
                     new RectLayout(new Vector2(0.5f, 0.64f), new Vector2(0.5f, 0.64f), new Vector2(-350f, -35f), new Vector2(350f, 35f))),
             };
 
             var landscapeCookie = new CookieLayout
             {
-                viewportPosition = new Vector2(0.17f, 0.47f),
-                heightRatio = 0.42f,
-                maxWidthRatio = 0.28f,
-                goldenSpawnRect = new Rect(0.04f, 0.1f, 0.6f, 0.75f),
+                viewportPosition = new Vector2(0.34f, 0.4f),
+                heightRatio = 0.5f,
+                maxWidthRatio = 0.36f,
+                goldenSpawnRect = new Rect(0.04f, 0.15f, 0.58f, 0.6f),
             };
             var portraitCookie = new CookieLayout
             {
-                viewportPosition = new Vector2(0.5f, 0.745f),
-                heightRatio = 0.25f,
-                maxWidthRatio = 0.7f,
+                viewportPosition = new Vector2(0.5f, 0.74f),
+                heightRatio = 0.3f,
+                maxWidthRatio = 0.8f,
                 goldenSpawnRect = new Rect(0.06f, 0.6f, 0.88f, 0.28f),
             };
 
             var layout = root.gameObject.AddComponent<ResponsiveLayout>();
-            layout.EditorConfigure(panels, cookie, golden, new[] { background.Rays, background.Glow },
-                landscapeCookie, portraitCookie, tabBar.gameObject, storeTab, statsTab, store.gameObject, middle.gameObject);
+            layout.EditorConfigure(panels, cookie, golden, new[] { background.PotShadow },
+                landscapeCookie, portraitCookie, tabBar.gameObject, storeTab, statsTab, store.gameObject, stats.gameObject);
+            return layout;
         }
 
-        private static RectTransform CreateNewsTicker(RectTransform root, CookieGame game, out Button exploreButton)
+        /// <summary>왼쪽 위 크림색 간판: 가게 이름, 보유량(크게), 초당 생산량. 아래에 버프 문구.</summary>
+        private static RectTransform CreateCounterCard(RectTransform root, CookieGame game)
         {
-            var news = TopBand(CreateRect("NewsTicker", root), 0f, 70f, 5f, 5f);
-            AddImage(news, null, new Color(0f, 0f, 0f, 0.45f));
+            var card = CreateRect("CounterCard", root);
+            AddCard(card, CardCream, CreamDeep, 0.6f, false);
+            AddText(TopBand(CreateRect("BakeryName", card), 24f, 38f, 34f, 24f), "야르! 낙곱새 맛집", 28, ChiliRed, TextAnchor.MiddleLeft);
+            var countText = AddText(TopBand(CreateRect("CookieCount", card), 64f, 104f, 30f, 24f), "0 낙곱새", 76, Ink, TextAnchor.MiddleLeft, FontStyle.Bold);
+            var cpsText = AddText(TopBand(CreateRect("CookiesPerSecond", card), 170f, 40f, 34f, 24f), "초당 0", 26, InkSoft, TextAnchor.MiddleLeft);
+            var buffRect = Stretch(CreateRect("Buff", card), Vector2.zero, new Vector2(1f, 0f), new Vector2(0f, -64f), new Vector2(240f, -12f));
+            var buffText = AddText(buffRect, "", 30, Color.white, TextAnchor.MiddleLeft, FontStyle.Bold);
+            AddRedOutline(buffText);
+            Wire(card.gameObject.AddComponent<HudView>(),
+                ("game", game), ("cookieCountText", countText), ("cpsText", cpsText), ("buffText", buffText));
+            return card;
+        }
 
-            var buttonRect = Stretch(CreateRect("ExploreButton", news), new Vector2(1f, 0f), Vector2.one, new Vector2(-196f, 10f), new Vector2(-10f, -10f));
-            var buttonImage = AddImage(buttonRect, CookieArtFactory.RoundedRect, Gold, true);
-            exploreButton = AddButton(buttonRect, buttonImage);
-            AddText(Stretch(CreateRect("Label", buttonRect), Vector2.zero, Vector2.one), "건물 구경하기", 20, new Color(0.25f, 0.13f, 0.05f),
-                TextAnchor.MiddleCenter, FontStyle.Bold);
+        /// <summary>오른쪽 위 [통계] [설정] 알약 버튼.</summary>
+        private static RectTransform CreateTopButtons(RectTransform root, out Button stats, out Button settings)
+        {
+            var bar = CreateRect("TopButtons", root);
+            stats = CreatePill(bar, "StatsButton", "통계", new Vector2(0f, 0f), new Vector2(0.48f, 1f));
+            settings = CreatePill(bar, "SettingsButton", "설정", new Vector2(0.52f, 0f), Vector2.one);
+            return bar;
+        }
 
-            var newsText = AddText(Stretch(CreateRect("Text", news), Vector2.zero, Vector2.one, new Vector2(20f, 0f), new Vector2(-210f, 0f)),
-                "뉴스", 22, Cream, TextAnchor.MiddleCenter, FontStyle.Italic);
+        private static Button CreatePill(RectTransform parent, string name, string label, Vector2 anchorMin, Vector2 anchorMax)
+        {
+            var rt = Stretch(CreateRect(name, parent), anchorMin, anchorMax);
+            var image = AddImage(rt, CookieArtFactory.RoundedRect, new Color(CardCream.r, CardCream.g, CardCream.b, 0.92f), true);
+            image.pixelsPerUnitMultiplier = 0.5f;
+            var button = AddButton(rt, image);
+            AddText(Stretch(CreateRect("Label", rt), Vector2.zero, Vector2.one), label, 24, Ink, TextAnchor.MiddleCenter);
+            return button;
+        }
+
+        /// <summary>방송 속보 자막 띠: [● 속보] [동네 소식] | 흘러가는 문장</summary>
+        private static RectTransform CreateNewsTicker(RectTransform root, CookieGame game)
+        {
+            var news = CreateRect("NewsTicker", root);
+            AddImage(news, null, Color.white, true);
+            AddImage(Stretch(CreateRect("TopLine", news), new Vector2(0f, 1f), Vector2.one, Vector2.zero, new Vector2(0f, 5f)), null, ChiliRed);
+
+            var tag = Stretch(CreateRect("Tag", news), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(176f, 0f));
+            AddImage(tag, CookieArtFactory.SlantTag, ChiliRed);
+            var dot = Place(CreateRect("LiveDot", tag), new Vector2(0f, 0.5f), new Vector2(12f, 12f));
+            dot.anchoredPosition = new Vector2(34f, 0f);
+            AddImage(dot, CookieArtFactory.Dot, Color.white);
+            dot.gameObject.AddComponent<Blink>();
+            AddText(Stretch(CreateRect("Label", tag), Vector2.zero, Vector2.one, new Vector2(50f, 0f), new Vector2(-24f, 0f)),
+                "속보", 30, Color.white, TextAnchor.MiddleLeft);
+
+            AddText(Stretch(CreateRect("Section", news), Vector2.zero, new Vector2(0f, 1f), new Vector2(186f, 0f), new Vector2(316f, 0f)),
+                "동네 소식", 22, ChiliDeep, TextAnchor.MiddleCenter);
+            AddImage(Stretch(CreateRect("Divider", news), Vector2.zero, new Vector2(0f, 1f), new Vector2(324f, 12f), new Vector2(326f, -12f)), null, Line);
+
+            var clip = Stretch(CreateRect("Clip", news), Vector2.zero, Vector2.one, new Vector2(340f, 0f), Vector2.zero);
+            clip.gameObject.AddComponent<RectMask2D>();
+            var newsText = AddText(Stretch(CreateRect("Text", clip), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(600f, 0f)),
+                "뉴스", 26, Ink, TextAnchor.MiddleLeft);
+            newsText.horizontalOverflow = HorizontalWrapMode.Overflow;
             Wire(news.gameObject.AddComponent<NewsTickerView>(), ("game", game), ("newsText", newsText));
             return news;
+        }
+
+        private static RectTransform CreateExploreButton(RectTransform root)
+        {
+            var rt = CreateRect("ExploreButton", root);
+            var image = AddCard(rt, Terracotta, TerracottaDeep, 0.7f, true);
+            AddButton(rt, image);
+            AddText(Stretch(CreateRect("Label", rt), Vector2.zero, Vector2.one), "건물 구경하기 →", 30, Color.white, TextAnchor.MiddleCenter);
+            return rt;
         }
 
         private static RectTransform CreateTabBar(RectTransform root, out Button storeTab, out Button statsTab)
         {
             var bar = CreateRect("TabBar", root);
-            AddImage(bar, null, new Color(0.1f, 0.06f, 0.03f, 0.95f));
+            AddImage(bar, null, CreamDeep);
             storeTab = CreateTab(bar, "StoreTab", "상점", Vector2.zero, new Vector2(0.5f, 1f), new Vector2(8f, 8f), new Vector2(-4f, -8f));
             statsTab = CreateTab(bar, "StatsTab", "통계", new Vector2(0.5f, 0f), Vector2.one, new Vector2(4f, 8f), new Vector2(-8f, -8f));
             bar.gameObject.SetActive(false);
@@ -457,74 +585,86 @@ namespace CookieClicker.EditorTools
             Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
         {
             var rt = Stretch(CreateRect(name, parent), anchorMin, anchorMax, offsetMin, offsetMax);
-            var image = AddImage(rt, CookieArtFactory.RoundedRect, Wood, true);
+            var image = AddImage(rt, CookieArtFactory.RoundedRect, Color.white, true);
             var button = AddButton(rt, image);
-            AddText(Stretch(CreateRect("Label", rt), Vector2.zero, Vector2.one), label, 26, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
+            AddText(Stretch(CreateRect("Label", rt), Vector2.zero, Vector2.one), label, 26, Ink, TextAnchor.MiddleCenter);
             return button;
         }
 
-        private static RectTransform CreateMiddlePanel(RectTransform root, CookieGame game)
+        /// <summary>[통계] 버튼으로 여는 창: 통계 글, 저장·초기화 버튼, 닫기.</summary>
+        private static RectTransform CreateStatsWindow(RectTransform root, CookieGame game, out Button close)
         {
-            var middle = Stretch(CreateRect("MiddlePanel", root), new Vector2(0.34f, 0f), new Vector2(0.68f, 1f));
-            AddImage(middle, null, new Color(0.04f, 0.06f, 0.1f, 0.55f));
-            AddImage(Stretch(CreateRect("LeftBorder", middle), Vector2.zero, new Vector2(0f, 1f), new Vector2(-5f, 0f), new Vector2(5f, 0f)), null, Wood);
-            AddImage(Stretch(CreateRect("RightBorder", middle), new Vector2(1f, 0f), Vector2.one, new Vector2(-5f, 0f), new Vector2(5f, 0f)), null, Wood);
+            var window = CreateRect("StatsPanel", root);
+            AddCard(window, CardCream, CreamDeep, 0.6f, true);
 
-            AddText(TopBand(CreateRect("StatsTitle", middle), 90f, 44f, 30f, 30f), "통계", 32, Cream, TextAnchor.MiddleLeft, FontStyle.Bold);
-            var statsBody = Stretch(CreateRect("StatsBody", middle), Vector2.zero, Vector2.one, new Vector2(30f, 100f), new Vector2(-30f, -145f));
-            var statsText = AddText(statsBody, "", 21, Color.white, TextAnchor.UpperLeft);
+            AddText(TopBand(CreateRect("StatsTitle", window), 26f, 48f, 36f, 140f), "통계", 38, Ink, TextAnchor.MiddleLeft);
+            var closeRect = CreateRect("CloseButton", window);
+            closeRect.anchorMin = closeRect.anchorMax = closeRect.pivot = Vector2.one;
+            closeRect.anchoredPosition = new Vector2(-20f, -22f);
+            closeRect.sizeDelta = new Vector2(120f, 56f);
+            close = AddButton(closeRect, AddImage(closeRect, null, new Color(1f, 1f, 1f, 0f), true));
+            AddText(Stretch(CreateRect("Label", closeRect), Vector2.zero, Vector2.one), "닫기", 26, InkSoft, TextAnchor.MiddleCenter);
+
+            // 왼쪽: 기록, 오른쪽: 건물별 생산량
+            var statsBody = Stretch(CreateRect("StatsBody", window), Vector2.zero, Vector2.one, new Vector2(36f, 100f), new Vector2(-36f, -92f));
+            var statsText = AddText(Stretch(CreateRect("Records", statsBody), Vector2.zero, new Vector2(0.45f, 1f)), "", 22, Ink, TextAnchor.UpperLeft);
             statsText.lineSpacing = 1.2f;
-            Wire(statsBody.gameObject.AddComponent<StatsView>(), ("game", game), ("statsText", statsText));
+            var productionText = AddText(Stretch(CreateRect("Production", statsBody), new Vector2(0.47f, 0f), Vector2.one), "", 20, Ink, TextAnchor.UpperLeft);
+            productionText.lineSpacing = 1.15f;
+            Wire(statsBody.gameObject.AddComponent<StatsView>(), ("game", game), ("statsText", statsText), ("productionText", productionText));
 
-            var menu = Stretch(CreateRect("Menu", middle), Vector2.zero, new Vector2(1f, 0f), new Vector2(30f, 20f), new Vector2(-30f, 80f));
+            var menu = Stretch(CreateRect("Menu", window), Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 22f), new Vector2(-36f, 80f));
             var saveButton = CreateTextButton(menu, "SaveButton", "저장", new Vector2(0f, 0f), new Vector2(150f, 56f), out _);
             var resetButton = CreateTextButton(menu, "ResetButton", "초기화", new Vector2(166f, 0f), new Vector2(150f, 56f), out var resetLabel);
             var notice = AddText(Stretch(CreateRect("Notice", menu), Vector2.zero, Vector2.one, new Vector2(336f, 0f), Vector2.zero),
-                "", 20, SubText, TextAnchor.MiddleLeft);
+                "", 20, InkSoft, TextAnchor.MiddleLeft);
             Wire(menu.gameObject.AddComponent<MenuView>(),
                 ("game", game), ("saveButton", saveButton), ("resetButton", resetButton),
                 ("resetButtonLabel", resetLabel), ("noticeText", notice));
-            return middle;
+            window.gameObject.SetActive(false);
+            return window;
         }
 
         private static RectTransform CreateStorePanel(RectTransform root, CookieGame game, GameConfig config, Prefabs prefabs)
         {
-            var store = Stretch(CreateRect("StorePanel", root), new Vector2(0.68f, 0f), Vector2.one);
-            AddImage(store, null, new Color(0.17f, 0.1f, 0.05f, 0.88f));
-            AddOutline(AddText(TopBand(CreateRect("StoreTitle", store), 8f, 56f), "상점", 38, Cream, TextAnchor.MiddleCenter, FontStyle.Bold));
+            var store = CreateRect("StorePanel", root);
+            AddCard(store, CardCream, CreamDeep, 0.45f, false);
+            AddText(TopBand(CreateRect("StoreTitle", store), 26f, 56f, 36f, 36f), "상점", 42, Ink, TextAnchor.MiddleLeft);
 
-            // 업그레이드 목록
-            AddText(TopBand(CreateRect("UpgradesLabel", store), 68f, 34f, 20f, 20f), "업그레이드", 22, Gold, TextAnchor.MiddleLeft, FontStyle.Bold);
-            var upgradeScroll = TopBand(CreateScroll("UpgradeList", store, out var upgradeContent), 104f, 240f, 10f, 10f);
+            // 업그레이드: 그림 칸 (이름·설명은 마우스를 올리면 말풍선으로)
+            AddText(TopBand(CreateRect("UpgradesLabel", store), 92f, 32f, 38f, 36f), "업그레이드", 22, InkSoft, TextAnchor.MiddleLeft);
+            var upgradeScroll = TopBand(CreateScroll("UpgradeList", store, out var upgradeContent), 126f, 236f, 26f, 26f);
+            UseGrid(upgradeContent, new Vector2(100f, 104f), new Vector2(12f, 14f));
             var noUpgrades = AddText(Stretch(CreateRect("EmptyLabel", upgradeScroll), Vector2.zero, Vector2.one),
-                "구매할 수 있는 업그레이드가 없어요", 18, SubText, TextAnchor.MiddleCenter);
+                "구매할 수 있는 업그레이드가 없어요", 20, InkFaint, TextAnchor.MiddleCenter);
 
             var upgradeRows = new UpgradeRowView[config.Upgrades.Count];
             for (int i = 0; i < upgradeRows.Length; i++)
-            {
                 upgradeRows[i] = InstantiateRow(prefabs.UpgradeRow, upgradeContent, $"UpgradeRow_{config.Upgrades[i].Id}");
-                PreviewText(upgradeRows[i], "nameText", config.Upgrades[i].DisplayName);
-                PreviewText(upgradeRows[i], "descriptionText", config.Upgrades[i].Description);
-            }
 
             // 건물 목록 + 구매 수량
-            var buildingHeader = TopBand(CreateRect("BuildingsHeader", store), 354f, 50f, 20f, 20f);
-            AddText(Stretch(CreateRect("Label", buildingHeader), Vector2.zero, Vector2.one), "건물", 22, Gold, TextAnchor.MiddleLeft, FontStyle.Bold);
+            var buildingHeader = TopBand(CreateRect("BuildingsHeader", store), 374f, 48f, 38f, 36f);
+            AddText(Stretch(CreateRect("Label", buildingHeader), Vector2.zero, Vector2.one), "건물", 22, InkSoft, TextAnchor.MiddleLeft);
+            var segment = CreateRect("BuyAmount", buildingHeader);
+            segment.anchorMin = segment.anchorMax = segment.pivot = new Vector2(1f, 0.5f);
+            segment.sizeDelta = new Vector2(270f, 46f);
+            var segmentImage = AddImage(segment, CookieArtFactory.RoundedRect, CreamDeep);
+            segmentImage.pixelsPerUnitMultiplier = 0.5f;
             int[] amounts = { 1, 10, 100 };
             var amountButtons = new Button[amounts.Length];
             for (int i = 0; i < amounts.Length; i++)
             {
-                var rt = CreateRect($"Buy{amounts[i]}", buildingHeader);
-                rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 0.5f);
-                rt.anchoredPosition = new Vector2(-(amounts.Length - 1 - i) * 86f, 0f);
-                rt.sizeDelta = new Vector2(80f, 42f);
+                var rt = Stretch(CreateRect($"Buy{amounts[i]}", segment), new Vector2(i / 3f, 0f), new Vector2((i + 1) / 3f, 1f),
+                    new Vector2(4f, 4f), new Vector2(-4f, -4f));
                 var image = AddImage(rt, CookieArtFactory.RoundedRect, Color.white, true);
+                image.pixelsPerUnitMultiplier = 0.5f;
                 amountButtons[i] = AddButton(rt, image);
-                AddText(Stretch(CreateRect("Label", rt), Vector2.zero, Vector2.one), $"x{amounts[i]}", 20, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
+                amountButtons[i].colors = PlainColors();
+                AddText(Stretch(CreateRect("Label", rt), Vector2.zero, Vector2.one), $"{amounts[i]}개", 20, Ink, TextAnchor.MiddleCenter);
             }
 
             var buildingScroll = Stretch(CreateScroll("BuildingList", store, out var buildingContent),
-                Vector2.zero, Vector2.one, new Vector2(10f, 10f), new Vector2(-10f, -414f));
+                Vector2.zero, Vector2.one, new Vector2(26f, 22f), new Vector2(-26f, -428f));
             var buildingRows = new BuildingRowView[config.Buildings.Count];
             for (int i = 0; i < buildingRows.Length; i++)
             {
@@ -532,10 +672,33 @@ namespace CookieClicker.EditorTools
                 PreviewText(buildingRows[i], "nameText", config.Buildings[i].DisplayName);
             }
 
+            // 업그레이드 말풍선: 상점 카드 바로 왼쪽에 뜬다.
+            var tooltip = CreateRect("UpgradeTooltip", store);
+            tooltip.anchorMin = tooltip.anchorMax = new Vector2(0f, 1f);
+            tooltip.pivot = new Vector2(1f, 0.5f);
+            tooltip.anchoredPosition = new Vector2(-14f, -200f);
+            tooltip.sizeDelta = new Vector2(420f, 130f);
+            AddCard(tooltip, Color.white, CreamDeep, 0.6f, false);
+            var tipName = AddText(TopBand(CreateRect("Name", tooltip), 18f, 38f, 24f, 24f), "", 28, Ink, TextAnchor.MiddleLeft);
+            var tipCost = AddText(TopBand(CreateRect("Cost", tooltip), 18f, 38f, 24f, 24f), "", 22, ChiliRed, TextAnchor.MiddleRight);
+            var tipDescription = AddText(Stretch(CreateRect("Description", tooltip), Vector2.zero, Vector2.one, new Vector2(24f, 16f), new Vector2(-24f, -62f)),
+                "", 20, InkSoft, TextAnchor.UpperLeft);
+            tipDescription.lineSpacing = 1.15f;
+
             Wire(store.gameObject.AddComponent<StoreView>(),
                 ("game", game), ("buildingRows", buildingRows), ("upgradeRows", upgradeRows),
-                ("noUpgradesLabel", noUpgrades.gameObject), ("buyAmountButtons", amountButtons));
+                ("noUpgradesLabel", noUpgrades.gameObject), ("buyAmountButtons", amountButtons),
+                ("tooltip", tooltip), ("tooltipName", tipName), ("tooltipDescription", tipDescription), ("tooltipCost", tipCost));
             return store;
+        }
+
+        private static void UseGrid(RectTransform content, Vector2 cell, Vector2 spacing)
+        {
+            Object.DestroyImmediate(content.GetComponent<VerticalLayoutGroup>());
+            var grid = content.gameObject.AddComponent<GridLayoutGroup>();
+            grid.cellSize = cell;
+            grid.spacing = spacing;
+            grid.padding = new RectOffset(6, 6, 6, 12); // 빨간 테두리·두께가 잘리지 않게 여유를 둔다
         }
 
         // ------------------------------------------------------------------ 프리팹
@@ -555,55 +718,56 @@ namespace CookieClicker.EditorTools
         private static BuildingRowView CreateBuildingRowPrefab()
         {
             var root = CreateRect("BuildingRow", null);
-            root.sizeDelta = new Vector2(560f, 88f);
-            var background = AddImage(root, CookieArtFactory.RoundedRect, new Color(0.36f, 0.24f, 0.14f), true);
+            root.sizeDelta = new Vector2(560f, 100f);
+            var background = AddCard(root, Color.white, CreamDeep, 0.7f, true);
             var button = AddButton(root, background);
+            button.colors = PlainColors();
             var group = root.gameObject.AddComponent<CanvasGroup>();
-            AddLayoutHeight(root, 88f);
+            AddLayoutHeight(root, 100f);
+            var highlight = AddHighlight(background);
 
-            var icon = CreateRect("Icon", root);
-            icon.anchorMin = icon.anchorMax = icon.pivot = new Vector2(0f, 0.5f);
-            icon.anchoredPosition = new Vector2(10f, 0f);
-            icon.sizeDelta = new Vector2(68f, 68f);
+            var tile = CreateRect("IconTile", root);
+            tile.anchorMin = tile.anchorMax = tile.pivot = new Vector2(0f, 0.5f);
+            tile.anchoredPosition = new Vector2(12f, 0f);
+            tile.sizeDelta = new Vector2(76f, 76f);
+            AddImage(tile, CookieArtFactory.RoundedRect, CreamDeep).pixelsPerUnitMultiplier = 0.8f;
+            var icon = Stretch(CreateRect("Icon", tile), Vector2.zero, Vector2.one, new Vector2(5f, 5f), new Vector2(-5f, -5f));
             var iconImage = AddImage(icon, CookieArtFactory.RoundedRect, Color.white);
-            var iconLabel = AddText(Stretch(CreateRect("Label", icon), Vector2.zero, Vector2.one), "?", 34, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
-            AddOutline(iconLabel);
+            var iconLabel = AddText(Stretch(CreateRect("Label", icon), Vector2.zero, Vector2.one), "?", 36, Color.white, TextAnchor.MiddleCenter);
 
-            var nameText = AddText(TopBand(CreateRect("Name", root), 6f, 32f, 92f, 100f), "건물", 26, Cream, TextAnchor.MiddleLeft, FontStyle.Bold);
-            var costText = AddText(TopBand(CreateRect("Cost", root), 38f, 24f, 92f, 100f), "가격 0", 20, Color.white, TextAnchor.MiddleLeft);
-            var infoText = AddText(TopBand(CreateRect("Info", root), 62f, 22f, 92f, 100f), "", 16, SubText, TextAnchor.MiddleLeft);
-            var countText = AddText(Stretch(CreateRect("Count", root), new Vector2(1f, 0f), Vector2.one, new Vector2(-110f, 0f), new Vector2(-14f, 0f)),
-                "", 46, new Color(1f, 1f, 1f, 0.35f), TextAnchor.MiddleRight, FontStyle.Bold);
+            var nameText = AddText(TopBand(CreateRect("Name", root), 12f, 36f, 104f, 100f), "건물", 28, Ink, TextAnchor.MiddleLeft);
+            var costText = AddText(TopBand(CreateRect("Cost", root), 48f, 26f, 104f, 100f), "0", 22, InkSoft, TextAnchor.MiddleLeft, FontStyle.Bold);
+            var infoText = AddText(TopBand(CreateRect("Info", root), 73f, 22f, 104f, 100f), "", 17, InkFaint, TextAnchor.MiddleLeft);
+            var countText = AddText(Stretch(CreateRect("Count", root), new Vector2(1f, 0f), Vector2.one, new Vector2(-110f, 0f), new Vector2(-20f, 0f)),
+                "", 48, InkFaint, TextAnchor.MiddleRight, FontStyle.Bold);
 
             var view = root.gameObject.AddComponent<BuildingRowView>();
-            Wire(view, ("button", button), ("canvasGroup", group), ("icon", iconImage), ("iconLabel", iconLabel),
-                ("nameText", nameText), ("costText", costText), ("infoText", infoText), ("countText", countText));
+            Wire(view, ("button", button), ("canvasGroup", group), ("background", background), ("highlight", highlight),
+                ("depth", background.GetComponent<Shadow>()), ("icon", iconImage), ("fallbackIcon", CookieArtFactory.RoundedRect),
+                ("iconLabel", iconLabel), ("nameText", nameText), ("costText", costText), ("infoText", infoText), ("countText", countText));
             return SavePrefab<BuildingRowView>(root.gameObject, "BuildingRow");
         }
 
         private static UpgradeRowView CreateUpgradeRowPrefab()
         {
             var root = CreateRect("UpgradeRow", null);
-            root.sizeDelta = new Vector2(560f, 66f);
-            var background = AddImage(root, CookieArtFactory.RoundedRect, new Color(0.3f, 0.2f, 0.28f), true);
+            root.sizeDelta = new Vector2(100f, 104f);
+            var background = AddCard(root, Color.white, CreamDeep, 0.8f, true);
             var button = AddButton(root, background);
+            button.colors = PlainColors();
             var group = root.gameObject.AddComponent<CanvasGroup>();
-            AddLayoutHeight(root, 66f);
+            var highlight = AddHighlight(background);
 
-            var icon = CreateRect("Icon", root);
-            icon.anchorMin = icon.anchorMax = icon.pivot = new Vector2(0f, 0.5f);
-            icon.anchoredPosition = new Vector2(10f, 0f);
-            icon.sizeDelta = new Vector2(46f, 46f);
+            var icon = Stretch(CreateRect("Icon", root), Vector2.zero, Vector2.one, new Vector2(14f, 30f), new Vector2(-14f, -8f));
             var iconImage = AddImage(icon, CookieArtFactory.RoundedRect, Color.white);
-
-            var nameText = AddText(TopBand(CreateRect("Name", root), 6f, 30f, 68f, 150f), "업그레이드", 22, Cream, TextAnchor.MiddleLeft, FontStyle.Bold);
-            var descriptionText = AddText(TopBand(CreateRect("Description", root), 34f, 26f, 68f, 150f), "", 16, SubText, TextAnchor.MiddleLeft);
-            var costText = AddText(Stretch(CreateRect("Cost", root), new Vector2(1f, 0f), Vector2.one, new Vector2(-150f, 0f), new Vector2(-14f, 0f)),
-                "0", 20, Color.white, TextAnchor.MiddleRight, FontStyle.Bold);
+            var iconLabel = AddText(Stretch(CreateRect("Label", icon), Vector2.zero, Vector2.one), "", 32, Color.white, TextAnchor.MiddleCenter);
+            var costText = AddText(Stretch(CreateRect("Cost", root), Vector2.zero, new Vector2(1f, 0f), new Vector2(4f, 4f), new Vector2(-4f, 30f)),
+                "0", 17, InkSoft, TextAnchor.MiddleCenter, FontStyle.Bold);
 
             var view = root.gameObject.AddComponent<UpgradeRowView>();
-            Wire(view, ("button", button), ("canvasGroup", group), ("icon", iconImage),
-                ("nameText", nameText), ("descriptionText", descriptionText), ("costText", costText));
+            Wire(view, ("button", button), ("canvasGroup", group), ("background", background), ("highlight", highlight),
+                ("depth", background.GetComponent<Shadow>()), ("icon", iconImage), ("fallbackIcon", CookieArtFactory.RoundedRect),
+                ("iconLabel", iconLabel), ("costText", costText));
             return SavePrefab<UpgradeRowView>(root.gameObject, "UpgradeRow");
         }
 
@@ -611,11 +775,64 @@ namespace CookieClicker.EditorTools
         {
             var root = CreateRect("FloatingText", null);
             root.sizeDelta = new Vector2(320f, 60f);
-            var text = AddText(root, "+1", 36, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
-            AddOutline(text);
+            var text = AddText(root, "+1", 40, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
+            AddRedOutline(text);
             var particle = root.gameObject.AddComponent<UIParticle>();
             Wire(particle, ("graphic", text));
             return SavePrefab<UIParticle>(root.gameObject, "FloatingText");
+        }
+
+        // ------------------------------------------------------------------ "동네 평상" 스타일 헬퍼
+
+        /// <summary>
+        /// 둥근 카드 + 아래쪽 두께(Shadow). 두께가 있으면 "눌리는 장난감 버튼"처럼 보인다.
+        /// pixelsPerUnitMultiplier가 작을수록 모서리가 더 둥글다.
+        /// </summary>
+        private static Image AddCard(RectTransform rt, Color face, Color depthColor, float roundness, bool raycastTarget)
+        {
+            var image = AddImage(rt, CookieArtFactory.RoundedRect, face, raycastTarget);
+            image.pixelsPerUnitMultiplier = roundness;
+            var depth = rt.gameObject.AddComponent<Shadow>();
+            depth.effectColor = depthColor;
+            depth.effectDistance = new Vector2(0f, -6f);
+            return image;
+        }
+
+        /// <summary>살 수 있을 때 켜는 빨간 테두리 (처음엔 꺼 둔다. 상점 줄이 상태에 따라 켠다).</summary>
+        private static Outline AddHighlight(Image image)
+        {
+            var outline = image.gameObject.AddComponent<Outline>();
+            outline.effectColor = ChiliRed;
+            outline.effectDistance = new Vector2(3f, -3f);
+            outline.enabled = false;
+            return outline;
+        }
+
+        /// <summary>흰 글씨 둘레를 고추장 빨강으로 두껍게 (+1 숫자, 버프 문구).</summary>
+        private static void AddRedOutline(Graphic graphic)
+        {
+            foreach (var d in new[] { new Vector2(3f, -3f), new Vector2(-3f, 3f) })
+            {
+                var outline = graphic.gameObject.AddComponent<Outline>();
+                outline.effectColor = ChiliRed;
+                outline.effectDistance = d;
+            }
+            var shadow = graphic.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = ChiliDeep;
+            shadow.effectDistance = new Vector2(0f, -5f);
+        }
+
+        /// <summary>색이 코드(상점 상태)로 정해지는 버튼: 마우스 반응은 밝기만 살짝 바꾼다.</summary>
+        private static ColorBlock PlainColors()
+        {
+            var colors = ColorBlock.defaultColorBlock;
+            colors.normalColor = Color.white;
+            colors.highlightedColor = new Color(1f, 0.97f, 0.92f);
+            colors.pressedColor = new Color(0.9f, 0.85f, 0.78f);
+            colors.selectedColor = Color.white;
+            colors.disabledColor = Color.white;
+            colors.fadeDuration = 0.06f;
+            return colors;
         }
 
         private static UIParticle CreateImageParticlePrefab(string name, float size, Color color, float fadeStart)
@@ -803,7 +1020,7 @@ namespace CookieClicker.EditorTools
         private static RectTransform CreateScroll(string name, RectTransform parent, out RectTransform content)
         {
             var root = CreateRect(name, parent);
-            AddImage(root, null, new Color(0f, 0f, 0f, 0.2f), true);
+            AddImage(root, null, new Color(0f, 0f, 0f, 0f), true); // 투명하지만 휠·드래그를 받는다
             var scroll = root.gameObject.AddComponent<ScrollRect>();
 
             var viewport = Stretch(CreateRect("Viewport", root), Vector2.zero, Vector2.one, new Vector2(4f, 4f), new Vector2(-4f, -4f));
