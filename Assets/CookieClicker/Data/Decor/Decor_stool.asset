@@ -19,5 +19,7 @@ MonoBehaviour:
   category: 1
   slotGroup: 
   cost: 120
+  flat: 0
+  paintMaterial: carpet
   prefab: {fileID: 4358753218553599015, guid: 72bb548537fbfdf4f8aefec6d2d438a6, type: 3}
   icon: {fileID: 21300000, guid: c3a4a102dc6721446b696137dcc47240, type: 3}

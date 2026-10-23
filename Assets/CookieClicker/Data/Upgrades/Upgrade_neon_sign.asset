@@ -21,6 +21,7 @@ MonoBehaviour:
   cost: 70000000
   iconColor: {r: 0.95, g: 0.8, b: 0.3, a: 1}
   icon: {fileID: 0}
+  rarity: 3
   effectType: 0
   targetBuilding: {fileID: 11400000, guid: e0996f0d672c74c4fbf9880465118a88, type: 2}
   multiplier: 2

@@ -19,5 +19,7 @@ MonoBehaviour:
   category: 0
   slotGroup: 
   cost: 100
+  flat: 0
+  paintMaterial: Decor_TentOrange
   prefab: {fileID: 6809896896586057092, guid: f8e719ef34fbaed4bb44eeb7d3115e7b, type: 3}
   icon: {fileID: 21300000, guid: bdd4c8552f9f4a94e86a4d02886e873b, type: 3}

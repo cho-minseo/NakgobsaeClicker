@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uD30C\uB77C\uC194"
   displayNameEn: Parasol
   snap: 3
-  category: 1
+  category: 3
   slotGroup: 
   cost: 400
+  flat: 0
+  paintMaterial: Decor_PlasticRed
   prefab: {fileID: 933480345688151337, guid: 0c9b9db4963aad74095e1f4dd140f538, type: 3}
   icon: {fileID: 21300000, guid: 390c0434b29bf12469edacba8e6d8637, type: 3}

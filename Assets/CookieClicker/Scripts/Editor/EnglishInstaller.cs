@@ -93,7 +93,11 @@ namespace CookieClicker.EditorTools
             ["꾸미기 모드"] = "DECORATE",
             ["내 평상 부지"] = "My Lot",
             ["구조물"] = "Build",
-            ["가구"] = "Furniture",
+            ["의자·테이블"] = "Seating",
+            ["가전"] = "Appliances",
+            ["소품"] = "Props",
+            ["[C] 색"] = "[C] Color",
+            ["원래"] = "Orig.",
         };
 
         private static readonly Dictionary<string, string> ZoneEnglish = new()

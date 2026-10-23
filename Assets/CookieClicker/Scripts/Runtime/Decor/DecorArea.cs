@@ -196,6 +196,8 @@ namespace CookieClicker.Decor
         private bool Overlaps(DecorPiece piece, Vector3 localPosition, float yaw, out bool hitPlayer)
         {
             hitPlayer = false;
+            // 러그처럼 바닥에 까는 것은 겹쳐도 된다 (가구 밑에 깔기, 러그 여러 장 겹치기).
+            if (piece.Flat) return false;
             var rotation = transform.rotation * Quaternion.Euler(0f, yaw, 0f);
             Vector3 origin = transform.TransformPoint(localPosition);
 
@@ -209,6 +211,7 @@ namespace CookieClicker.Decor
                 for (int k = 0; k < count; k++)
                 {
                     var other = overlapBuffer[k].GetComponentInParent<PlacedDecor>();
+                    if (other != null && other.Piece.Flat) continue;
                     if (other != null && piece.Snap != DecorSnap.Free && other.Piece.Snap != DecorSnap.Free) continue;
                     hitPlayer = overlapBuffer[k] is CharacterController;
                     return true;
@@ -248,13 +251,22 @@ namespace CookieClicker.Decor
 
         // ------------------------------------------------------------------ 놓기·회수
 
-        public PlacedDecor Place(DecorPiece piece, DecorPlacement placement)
+        /// <param name="color">칠할 색 번호 (catalog 팔레트, -1이면 원래 색)</param>
+        public PlacedDecor Place(DecorPiece piece, DecorPlacement placement, int color = -1)
         {
-            var record = new DecorRecord { id = piece.Id, slot = placement.Slot, position = placement.LocalPosition, yaw = placement.Yaw };
+            var record = new DecorRecord { id = piece.Id, slot = placement.Slot, position = placement.LocalPosition, yaw = placement.Yaw, color = color };
             game.State.Decor.Add(record);
             var placed = Spawn(piece, record, true);
             PlayDust(placed.transform.position);
             return placed;
+        }
+
+        /// <summary>이미 놓인 물건의 색을 바꾼다 (세이브에도 기록).</summary>
+        public void Paint(PlacedDecor placed, int color)
+        {
+            placed.Record.color = color;
+            placed.ApplyColor(catalog.PaintColor(color));
+            PlayDust(placed.transform.position);
         }
 
         public void Remove(PlacedDecor placed)
@@ -290,6 +302,7 @@ namespace CookieClicker.Decor
             var placed = go.GetComponent<PlacedDecor>();
             if (placed == null) placed = go.AddComponent<PlacedDecor>();
             placed.Init(piece, record, animate);
+            placed.ApplyColor(catalog.PaintColor(record.color));
             if (!string.IsNullOrEmpty(record.slot)) slots[record.slot] = placed;
             return placed;
         }

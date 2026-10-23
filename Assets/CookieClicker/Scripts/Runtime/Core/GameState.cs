@@ -37,5 +37,7 @@ namespace CookieClicker.Core
         public string slot;
         public Vector3 position;
         public float yaw;
+        /// <summary>칠한 색 번호 (DecorCatalog 팔레트). -1이면 원래 색</summary>
+        public int color = -1;
     }
 }

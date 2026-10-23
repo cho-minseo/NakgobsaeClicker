@@ -207,14 +207,14 @@ namespace CookieClicker.EditorTools
             shape.scale = new Vector3(1f, 1.1f, 1f); // 화면에서 국물 타원에 맞춘 비율
 
             // 볼록하게 부풀고(ease-out) 조금 출렁이다가, 마지막에 팽창하며 터진다.
-            // 국물 면이 기울어져 있어서 세로를 납작하게(0.65) 해야 면 위에 붙은 돔처럼 보인다.
+            // 거품은 화면을 바라보는 정원(가로·세로 같은 크기)으로 그린다.
             var grow = new AnimationCurve(new Keyframe(0f, 0f, 0f, 4f), new Keyframe(0.3f, 0.9f), new Keyframe(0.6f, 0.85f),
                 new Keyframe(0.88f, 1f), new Keyframe(0.96f, 1.2f), new Keyframe(1f, 0f));
             var size = ps.sizeOverLifetime;
             size.enabled = true;
             size.separateAxes = true;
             size.x = new ParticleSystem.MinMaxCurve(1f, grow);
-            size.y = new ParticleSystem.MinMaxCurve(0.65f, grow);
+            size.y = new ParticleSystem.MinMaxCurve(1f, grow);
             size.z = new ParticleSystem.MinMaxCurve(1f, grow);
 
             var pop = CreatePopSplash(ps.transform);

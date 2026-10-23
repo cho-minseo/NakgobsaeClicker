@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uBC84\uB108\uC640 \uB0C4\uBE44"
   displayNameEn: Burner & Pot
   snap: 3
-  category: 1
+  category: 2
   slotGroup: 
   cost: 1000
+  flat: 0
+  paintMaterial: Decor_BurnerBody
   prefab: {fileID: 2942326305365975766, guid: 9dfa2fb788af19c4bb693cd656448b96, type: 3}
   icon: {fileID: 21300000, guid: 59af411688e64ac4488dcad50cd180b0, type: 3}

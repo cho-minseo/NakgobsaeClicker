@@ -16,7 +16,7 @@ namespace CookieClicker.View
         [SerializeField] private Button button;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private Image background;
-        [Tooltip("살 수 있을 때만 켜지는 빨간 테두리")]
+        [Tooltip("등급 색 테두리 (일반 베이지 → 전설 금색). 좋은 업그레이드일수록 테두리 색이 화려해진다")]
         [SerializeField] private Outline highlight;
         [SerializeField] private Shadow depth;
         [SerializeField] private Image icon;
@@ -60,7 +60,8 @@ namespace CookieClicker.View
             gameObject.SetActive(true);
             canvasGroup.alpha = canAfford ? 1f : 0.6f;
             background.color = canAfford ? cardColor : flatCardColor;
-            if (highlight != null) highlight.enabled = canAfford;
+            // 테두리는 늘 켜 두고 색은 SetRarity가 등급 색으로 칠한다 (살 수 있는지는 밝기·두께·가격 색으로 구분).
+            if (highlight != null) highlight.enabled = true;
             if (depth != null)
             {
                 depth.enabled = canAfford;
@@ -77,10 +78,13 @@ namespace CookieClicker.View
             costText.color = canAfford ? affordableCostColor : expensiveCostColor;
         }
 
-        /// <summary>그림 뒤 칸을 등급 색으로 칠하고, 높은 등급이면 뒤에서 빛나게 한다.</summary>
+        /// <summary>테두리와 그림 뒤 칸을 등급 색으로 칠하고, 높은 등급이면 뒤에서 빛나게 한다.</summary>
         public void SetRarity(Color color, bool shine)
         {
             if (rarityTile != null) rarityTile.color = color;
+            if (highlight != null) highlight.effectColor = color;
+            // 살 수 있어서 두께가 보일 때는 두께도 같은 색 계열(조금 어둡게)로
+            if (depth != null && depth.enabled) depth.effectColor = new Color(color.r * 0.7f, color.g * 0.7f, color.b * 0.7f, 1f);
             if (rarityGlow == null) return;
             rarityGlow.gameObject.SetActive(shine);
             if (shine) rarityGlow.SetColor(color);

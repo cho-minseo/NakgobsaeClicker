@@ -19,5 +19,7 @@ MonoBehaviour:
   category: 0
   slotGroup: Stair
   cost: 200
+  flat: 0
+  paintMaterial: Decor_Wood
   prefab: {fileID: 2730161305427957658, guid: 2a9709dd5a4757142b5acdb309a50e19, type: 3}
   icon: {fileID: 21300000, guid: dbf5c87ada2762448803a41f7c13ec00, type: 3}

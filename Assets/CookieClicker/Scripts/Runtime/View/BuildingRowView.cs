@@ -16,7 +16,7 @@ namespace CookieClicker.View
         [SerializeField] private Button button;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private Image background;
-        [Tooltip("살 수 있을 때만 켜지는 빨간 테두리")]
+        [Tooltip("카드 테두리. 모든 줄이 같은 색이다 (살 수 있는지는 밝기·가격 색으로 구분)")]
         [SerializeField] private Outline highlight;
         [Tooltip("카드 아래 두께(그림자)")]
         [SerializeField] private Shadow depth;
@@ -39,7 +39,6 @@ namespace CookieClicker.View
         [SerializeField] private Color cardColor = Color.white;
         [SerializeField] private Color flatCardColor = new Color(0.95f, 0.9f, 0.8f);
         [SerializeField] private Color mysteryCardColor = new Color(0.95f, 0.9f, 0.8f, 0f);
-        [SerializeField] private Color cardDepthColor = new Color(0.9f, 0.83f, 0.7f);
         [SerializeField] private Color affordableDepthColor = new Color(0.66f, 0.16f, 0.1f);
         [SerializeField] private Color affordableCostColor = new Color(0.89f, 0.25f, 0.16f);
         [SerializeField] private Color expensiveCostColor = new Color(0.54f, 0.42f, 0.32f);
@@ -65,7 +64,7 @@ namespace CookieClicker.View
             gameObject.SetActive(true);
             button.interactable = true;
             canvasGroup.alpha = canAfford ? 1f : 0.6f;
-            SetCard(canAfford ? cardColor : flatCardColor, canAfford, !canAfford);
+            SetCard(canAfford ? cardColor : flatCardColor);
 
             SetIcon(building.Icon, building.IconColor, building.DisplayName, false);
             nameText.text = buyAmount > 1 ? $"{building.DisplayName} x{buyAmount}" : building.DisplayName;
@@ -85,7 +84,7 @@ namespace CookieClicker.View
             gameObject.SetActive(true);
             button.interactable = false;
             canvasGroup.alpha = 1f;
-            SetCard(mysteryCardColor, false, false);
+            SetCard(mysteryCardColor);
 
             SetIcon(building.Icon, building.IconColor, "?", true);
             if (rarityTile != null) SetRarity(mysteryTileColor, false);
@@ -117,14 +116,19 @@ namespace CookieClicker.View
             iconLabel.color = silhouette ? mysteryIconColor : Color.white;
         }
 
-        private void SetCard(Color color, bool raised, bool flat)
+        /// <summary>
+        /// 카드 색. 테두리·두께는 모든 줄이 같은 모양으로 통일하고(아직 안 열린 ??? 줄만 빼고),
+        /// 살 수 있는지는 카드 밝기·흐림·가격 색으로만 구분한다.
+        /// </summary>
+        private void SetCard(Color color)
         {
             background.color = color;
-            if (highlight != null) highlight.enabled = raised;
+            bool visible = color.a > 0f;
+            if (highlight != null) highlight.enabled = visible;
             if (depth != null)
             {
-                depth.enabled = !flat && color.a > 0f;
-                depth.effectColor = raised ? affordableDepthColor : cardDepthColor;
+                depth.enabled = visible;
+                depth.effectColor = affordableDepthColor;
             }
         }
     }

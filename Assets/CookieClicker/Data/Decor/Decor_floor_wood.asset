@@ -19,5 +19,7 @@ MonoBehaviour:
   category: 0
   slotGroup: 
   cost: 50
+  flat: 0
+  paintMaterial: Decor_Wood
   prefab: {fileID: 1183048680962399078, guid: ae77630d061e920459e975034bdde65c, type: 3}
   icon: {fileID: 21300000, guid: de8f9d51555a5134bbf4dd896f8a4c2b, type: 3}

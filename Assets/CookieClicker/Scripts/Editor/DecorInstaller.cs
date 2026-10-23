@@ -48,39 +48,63 @@ namespace CookieClicker.EditorTools
             /// <summary>앉을 수 있는 물건이면 true. SeatZ는 앉는 자리의 앞뒤 위치 (평상은 앞쪽 끝에 걸터앉는다).</summary>
             public bool Seat;
             public float SeatZ;
+            /// <summary>러그처럼 바닥에 까는 물건 (겹쳐 놓을 수 있음)</summary>
+            public bool Flat;
+            /// <summary>색 바꾸기로 칠할 재질 이름 (비우면 가장 많이 쓰인 재질)</summary>
+            public string Paint;
             public Action<Transform> Build;
         }
 
         /// <summary>기본 물건 목록 (핫바 순서). 가격·이름은 만들어진 에셋에서 고치면 되고, 새 물건은 여기에 한 줄 추가하면 된다.</summary>
         private static readonly DecorSpec[] DecorSpecs =
         {
-            new DecorSpec { Id = "floor_wood", Name = "나무 바닥", NameEn = "Wood Floor", Snap = DecorSnap.Floor, Cost = 50, Build = BuildWoodFloor },
-            new DecorSpec { Id = "floor_jangpan", Name = "장판 바닥", NameEn = "Vinyl Floor", Snap = DecorSnap.Floor, Cost = 60, Build = BuildJangpanFloor },
-            new DecorSpec { Id = "pillar", Name = "기둥", NameEn = "Pillar", Snap = DecorSnap.Pillar, Cost = 30, Build = BuildPillar },
-            new DecorSpec { Id = "wall", Name = "나무 벽", NameEn = "Wood Wall", Snap = DecorSnap.Wall, Cost = 80, Build = BuildWall },
-            new DecorSpec { Id = "wall_window", Name = "창문 벽", NameEn = "Window Wall", Snap = DecorSnap.Wall, Cost = 120, Build = BuildWindowWall },
-            new DecorSpec { Id = "wall_door", Name = "문 벽", NameEn = "Door Wall", Snap = DecorSnap.Wall, Cost = 120, Build = BuildDoorWall },
-            new DecorSpec { Id = "stairs", Name = "계단", NameEn = "Stairs", Snap = DecorSnap.Floor, Group = "Stair", Cost = 200, Build = BuildStairs },
-            new DecorSpec { Id = "roof_tent", Name = "천막 지붕", NameEn = "Tent Roof", Snap = DecorSnap.Floor, Cost = 100, Build = BuildTentRoof },
-            // 가구: 포장마차 느낌이 나는 것은 직접 만들고(평상·버너·파라솔·아이스박스), 나머지는 Kenney Furniture Kit (CC0)
+            // 구조물: 직접 만든 블록 모델. Paint는 색 바꾸기(C)로 칠할 재질 이름.
+            new DecorSpec { Id = "floor_wood", Name = "나무 바닥", NameEn = "Wood Floor", Snap = DecorSnap.Floor, Cost = 50, Paint = "Decor_Wood", Build = BuildWoodFloor },
+            new DecorSpec { Id = "floor_jangpan", Name = "장판 바닥", NameEn = "Vinyl Floor", Snap = DecorSnap.Floor, Cost = 60, Paint = "Decor_Jangpan", Build = BuildJangpanFloor },
+            new DecorSpec { Id = "pillar", Name = "기둥", NameEn = "Pillar", Snap = DecorSnap.Pillar, Cost = 30, Paint = "Decor_Wood", Build = BuildPillar },
+            new DecorSpec { Id = "wall", Name = "나무 벽", NameEn = "Wood Wall", Snap = DecorSnap.Wall, Cost = 80, Paint = "Decor_Wood", Build = BuildWall },
+            new DecorSpec { Id = "wall_window", Name = "창문 벽", NameEn = "Window Wall", Snap = DecorSnap.Wall, Cost = 120, Paint = "Decor_Wood", Build = BuildWindowWall },
+            new DecorSpec { Id = "wall_door", Name = "문 벽", NameEn = "Door Wall", Snap = DecorSnap.Wall, Cost = 120, Paint = "Decor_Wood", Build = BuildDoorWall },
+            new DecorSpec { Id = "stairs", Name = "계단", NameEn = "Stairs", Snap = DecorSnap.Floor, Group = "Stair", Cost = 200, Paint = "Decor_Wood", Build = BuildStairs },
+            new DecorSpec { Id = "roof_tent", Name = "천막 지붕", NameEn = "Tent Roof", Snap = DecorSnap.Floor, Cost = 100, Paint = "Decor_TentOrange", Build = BuildTentRoof },
+
+            // 의자·테이블: 포장마차 느낌이 나는 평상은 직접 만들고, 나머지는 Kenney Furniture Kit (CC0)
             new DecorSpec { Id = "chair_red", Name = "빨간 의자", NameEn = "Red Chair", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 150, Seat = true,
-                Build = Kenney("chair", 0.9f, ("wood", "PlasticRed", new Color(0.88f, 0.2f, 0.16f))) },
+                Paint = "Decor_PlasticRed", Build = Kenney("chair", 0.9f, ("wood", "PlasticRed", new Color(0.88f, 0.2f, 0.16f))) },
             new DecorSpec { Id = "table_round", Name = "원형 테이블", NameEn = "Round Table", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 300,
-                Build = Kenney("tableRound", 0.75f, ("wood", "Steel", new Color(0.78f, 0.8f, 0.83f))) },
-            new DecorSpec { Id = "pyeongsang", Name = "평상", NameEn = "Pyeongsang", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 500, Seat = true, SeatZ = 0.3f, Build = BuildPyeongsang },
-            new DecorSpec { Id = "burner_pot", Name = "버너와 냄비", NameEn = "Burner & Pot", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 1000, Build = BuildBurnerPot },
-            new DecorSpec { Id = "parasol", Name = "파라솔", NameEn = "Parasol", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 400, Build = BuildParasol },
-            new DecorSpec { Id = "icebox", Name = "아이스박스", NameEn = "Ice Box", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 200, Build = BuildIcebox },
-            new DecorSpec { Id = "stool", Name = "바 의자", NameEn = "Bar Stool", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 120, Seat = true, Build = Kenney("stoolBar", 0.8f) },
-            new DecorSpec { Id = "bench", Name = "나무 벤치", NameEn = "Bench", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 250, Seat = true, Build = Kenney("bench", 0.9f) },
-            new DecorSpec { Id = "flower_pot", Name = "화분", NameEn = "Plant Pot", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 100, Build = Kenney("pottedPlant", 1f) },
-            new DecorSpec { Id = "tv_vintage", Name = "옛날 TV", NameEn = "Retro TV", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 800, Build = Kenney("televisionVintage", 0.55f) },
-            new DecorSpec { Id = "radio", Name = "라디오", NameEn = "Radio", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 300, Build = Kenney("radio", 0.3f) },
-            new DecorSpec { Id = "lamp", Name = "스탠드 조명", NameEn = "Floor Lamp", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 350, Build = Kenney("lampRoundFloor", 1.6f) },
-            new DecorSpec { Id = "rug", Name = "둥근 러그", NameEn = "Round Rug", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 200, Build = Kenney("rugRound", 0f, 1.8f) },
-            new DecorSpec { Id = "box", Name = "택배 상자", NameEn = "Parcel Box", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 50, Build = Kenney("cardboardBoxClosed", 0.45f) },
-            new DecorSpec { Id = "fridge", Name = "작은 냉장고", NameEn = "Mini Fridge", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 600, Build = Kenney("kitchenFridgeSmall", 0.85f) },
-            new DecorSpec { Id = "trashcan", Name = "쓰레기통", NameEn = "Trash Can", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 80, Build = Kenney("trashcan", 0.8f) },
+                Paint = "Decor_Steel", Build = Kenney("tableRound", 0.75f, ("wood", "Steel", new Color(0.78f, 0.8f, 0.83f))) },
+            new DecorSpec { Id = "pyeongsang", Name = "평상", NameEn = "Pyeongsang", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 500, Seat = true, SeatZ = 0.3f,
+                Paint = "Decor_Jangpan", Build = BuildPyeongsang },
+            new DecorSpec { Id = "stool", Name = "바 의자", NameEn = "Bar Stool", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 120, Seat = true,
+                Paint = "carpet", Build = Kenney("stoolBar", 0.8f) },
+            new DecorSpec { Id = "bench", Name = "나무 벤치", NameEn = "Bench", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 250, Seat = true,
+                Paint = "wood", Build = Kenney("bench", 0.9f) },
+
+            // 가전
+            new DecorSpec { Id = "burner_pot", Name = "버너와 냄비", NameEn = "Burner & Pot", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 1000,
+                Paint = "Decor_BurnerBody", Build = BuildBurnerPot },
+            new DecorSpec { Id = "tv_vintage", Name = "옛날 TV", NameEn = "Retro TV", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 800,
+                Paint = "wood", Build = Kenney("televisionVintage", 0.55f) },
+            new DecorSpec { Id = "radio", Name = "라디오", NameEn = "Radio", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 300,
+                Paint = "wood", Build = Kenney("radio", 0.3f) },
+            new DecorSpec { Id = "lamp", Name = "스탠드 조명", NameEn = "Floor Lamp", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 350,
+                Paint = "lamp", Build = Kenney("lampRoundFloor", 1.6f) },
+            new DecorSpec { Id = "fridge", Name = "냉장고", NameEn = "Fridge", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 600,
+                Build = Kenney("kitchenFridgeLarge", 1.4f) },
+
+            // 소품
+            new DecorSpec { Id = "parasol", Name = "파라솔", NameEn = "Parasol", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 400,
+                Paint = "Decor_PlasticRed", Build = BuildParasol },
+            new DecorSpec { Id = "icebox", Name = "아이스박스", NameEn = "Ice Box", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 200,
+                Paint = "Decor_IceBlue", Build = BuildIcebox },
+            new DecorSpec { Id = "flower_pot", Name = "화분", NameEn = "Plant Pot", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 100,
+                Paint = "wood", Build = Kenney("pottedPlant", 1f) },
+            new DecorSpec { Id = "rug", Name = "둥근 러그", NameEn = "Round Rug", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 200, Flat = true,
+                Paint = "carpet", Build = Kenney("rugRound", 0f, 1.8f) },
+            new DecorSpec { Id = "box", Name = "택배 상자", NameEn = "Parcel Box", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 50,
+                Build = Kenney("cardboardBoxClosed", 0.45f) },
+            new DecorSpec { Id = "trashcan", Name = "쓰레기통", NameEn = "Trash Can", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 80,
+                Paint = "metal", Build = Kenney("trashcan", 0.55f) },
         };
 
         [MenuItem("Tools/Cookie Clicker/Install Decor Mode (꾸미기 모드 설치)")]
@@ -244,18 +268,19 @@ namespace CookieClicker.EditorTools
             AddText(Stretch(CreateRect("Label", tag), Vector2.zero, Vector2.one, new Vector2(10f, 0f), new Vector2(-24f, 0f)),
                 "꾸미기 모드", 26, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
 
-            // 꼬리표 아래: "구조물 / 가구" 탭 (Tab 키로 바꾼다. 색은 DecorHudView가 칠한다)
+            // 꼬리표 아래: 분류 탭 (Tab / Shift+Tab으로 바꾼다. 색은 DecorHudView가 칠한다). DecorCategory 순서와 같다.
             var tabs = CreateRect("Tabs", build);
             tabs.anchorMin = tabs.anchorMax = new Vector2(0.5f, 1f);
             tabs.pivot = new Vector2(0.5f, 1f);
             tabs.anchoredPosition = new Vector2(0f, -90f);
-            tabs.sizeDelta = new Vector2(320f, 46f);
-            string[] tabNames = { "구조물", "가구" };
+            string[] tabNames = { "구조물", "의자·테이블", "가전", "소품" };
+            tabs.sizeDelta = new Vector2(tabNames.Length * 160f, 46f);
             var tabBackgrounds = new Image[tabNames.Length];
             var tabLabels = new Text[tabNames.Length];
             for (int t = 0; t < tabNames.Length; t++)
             {
-                var tab = Stretch(CreateRect($"Tab_{(DecorCategory)t}", tabs), new Vector2(t * 0.5f, 0f), new Vector2(t * 0.5f + 0.5f, 1f),
+                float w = 1f / tabNames.Length;
+                var tab = Stretch(CreateRect($"Tab_{(DecorCategory)t}", tabs), new Vector2(t * w, 0f), new Vector2((t + 1) * w, 1f),
                     new Vector2(4f, 0f), new Vector2(-4f, 0f));
                 tabBackgrounds[t] = AddImage(tab, CookieArtFactory.RoundedRect, Color.white);
                 tabBackgrounds[t].pixelsPerUnitMultiplier = 0.8f;
@@ -269,21 +294,47 @@ namespace CookieClicker.EditorTools
             var status = AddText(Stretch(CreateRect("Text", statusCard), Vector2.zero, Vector2.one, new Vector2(20f, 0f), new Vector2(-20f, 0f)),
                 "", 22, Ink, TextAnchor.MiddleCenter, FontStyle.Bold);
 
-            // 맨 아래: 물건 칸 (목록 개수만큼 미리 만들어 둔다)
-            const float slotWidth = 104f, slotHeight = 132f, spacing = 8f;
-            int count = catalog.Pieces.Count;
-            // 핫바 폭은 물건이 가장 많은 탭에 맞춘다 (다른 탭 칸은 꺼져서 가운데로 모인다).
-            int widest = 0;
-            foreach (DecorCategory c in Enum.GetValues(typeof(DecorCategory)))
+            // 상태 문구 위: 칠할 색 팔레트 (C로 고르기). 첫 칸은 원래 색.
+            var palette = BottomCenter(CreateRect("Palette", build), 296f, new Vector2(700f, 40f));
+            var paletteLayout = palette.gameObject.AddComponent<HorizontalLayoutGroup>();
+            paletteLayout.spacing = 10f;
+            paletteLayout.childAlignment = TextAnchor.MiddleCenter;
+            paletteLayout.childControlWidth = paletteLayout.childControlHeight = false;
+            paletteLayout.childForceExpandWidth = paletteLayout.childForceExpandHeight = false;
+            var paletteLabel = AddText(CreateRect("Label", palette), "[C] 색", 20, Color.white, TextAnchor.MiddleRight, FontStyle.Bold);
+            paletteLabel.rectTransform.sizeDelta = new Vector2(70f, 36f);
+            AddOutline(paletteLabel);
+            int swatchCount = catalog.PaintColors.Count + 1;
+            var swatches = new Image[swatchCount];
+            var swatchHighlights = new Outline[swatchCount];
+            for (int s = 0; s < swatchCount; s++)
             {
-                int n = 0;
-                foreach (var p in catalog.Pieces) if (p.Category == c) n++;
-                widest = Mathf.Max(widest, n);
+                var swatch = CreateRect(s == 0 ? "Swatch_Original" : $"Swatch_{s - 1}", palette);
+                swatch.sizeDelta = new Vector2(30f, 30f);
+                swatches[s] = AddImage(swatch, CookieArtFactory.Dot, s == 0 ? CardCream : catalog.PaintColors[s - 1]);
+                var rim = swatches[s].gameObject.AddComponent<Outline>();
+                rim.effectColor = Ink;
+                rim.effectDistance = new Vector2(3f, -3f);
+                rim.enabled = false;
+                swatchHighlights[s] = rim;
+                if (s == 0)
+                    AddText(Stretch(CreateRect("Label", swatch), Vector2.zero, Vector2.one), "원래", 11, InkSoft, TextAnchor.MiddleCenter, FontStyle.Bold);
             }
-            var bar = BottomCenter(CreateRect("Hotbar", build), 84f, new Vector2(widest * (slotWidth + spacing), slotHeight));
+
+            // 맨 아래: 물건 줄. 창(Viewport) 안에서 줄(Strip)이 옆으로 미끄러져 고른 칸이 가운데 온다.
+            const float slotWidth = 104f, slotHeight = 132f, spacing = 8f, visibleSlots = 9f;
+            int count = catalog.Pieces.Count;
+            var viewport = BottomCenter(CreateRect("Hotbar", build), 80f, new Vector2(visibleSlots * (slotWidth + spacing) + 16f, slotHeight + 16f));
+            AddImage(viewport, CookieArtFactory.RoundedRect, new Color(1f, 1f, 1f, 0.22f));
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var bar = CreateRect("Strip", viewport);
+            bar.anchorMin = bar.anchorMax = new Vector2(0f, 0.5f);
+            bar.pivot = new Vector2(0f, 0.5f);
+            bar.sizeDelta = new Vector2(count * (slotWidth + spacing), slotHeight);
             var layout = bar.gameObject.AddComponent<HorizontalLayoutGroup>();
             layout.spacing = spacing;
-            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.padding = new RectOffset((int)(spacing * 0.5f), 0, 0, 0);
+            layout.childAlignment = TextAnchor.MiddleLeft;
             layout.childControlWidth = layout.childControlHeight = false;
             layout.childForceExpandWidth = layout.childForceExpandHeight = false;
 
@@ -318,7 +369,8 @@ namespace CookieClicker.EditorTools
 
             var view = root.gameObject.AddComponent<DecorHudView>();
             Wire(view, ("game", game), ("buildRoot", build.gameObject), ("slots", slots), ("statusText", status), ("prompt", prompt.gameObject),
-                ("tabBackgrounds", tabBackgrounds), ("tabLabels", tabLabels));
+                ("tabBackgrounds", tabBackgrounds), ("tabLabels", tabLabels), ("slotStrip", bar), ("slotViewport", viewport),
+                ("slotPitch", slotWidth + spacing), ("paintSwatches", swatches), ("paintHighlights", swatchHighlights));
             return view;
         }
 
@@ -373,6 +425,7 @@ namespace CookieClicker.EditorTools
                 string iconPath = $"{DecorIconFolder}/{spec.Id}.png";
                 if (newPrefab || !File.Exists(iconPath)) RenderDecorIcon(prefab, iconPath);
                 if (piece.Icon == null || newPrefab) piece.EditorSetIcon(AssetDatabase.LoadAssetAtPath<Sprite>(iconPath));
+                piece.EditorSetKind(spec.Category, spec.Flat, spec.Paint);
                 EditorUtility.SetDirty(piece);
 
                 // 목록에 없는 기본 물건만 뒤에 붙인다 (직접 추가·정렬한 순서는 유지).
@@ -470,7 +523,9 @@ namespace CookieClicker.EditorTools
             model.transform.SetParent(stage.transform, false);
 
             var bounds = new Bounds(model.transform.position, Vector3.zero);
-            foreach (var r in model.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(r.bounds);
+            // 김 같은 파티클은 크기 계산에서 뺀다 (넣으면 카메라가 너무 멀리 물러나 물건이 점처럼 찍힌다).
+            foreach (var r in model.GetComponentsInChildren<Renderer>())
+                if (!(r is ParticleSystemRenderer)) bounds.Encapsulate(r.bounds);
 
             var camera = new GameObject("DecorIconCamera").AddComponent<Camera>();
             camera.orthographic = true;
@@ -657,15 +712,33 @@ namespace CookieClicker.EditorTools
         private static void BuildStairs(Transform root)
         {
             // 정면(+z)에서 뒤(-z)로 올라가며, 한 칸(2m) 안에서 한 층(2.5m)을 올라간다. 단 높이 0.31m는 플레이어가 그냥 걸어 오를 수 있는 높이(stepOffset 0.45) 안쪽.
+            // 보이는 모양은 디딤판(밟는 판) + 챌판(세운 판) + 양옆 옆판(사선 보)이고, 걷는 판정은 보이지 않는 계단 상자가 맡는다.
             const int steps = 8;
+            const float width = 1.8f;
             float rise = DecorStorey / steps, run = DecorCell / steps;
-            var wood = DecorMat("Wood", DecorWood);
-            var dark = DecorMat("WoodDark", DecorWoodDark);
+            var tread = DecorMat("Wood", DecorWood);
+            var riser = DecorMat("WoodMid", Color.Lerp(DecorWood, DecorWoodDark, 0.3f));
+            var side = DecorMat("WoodDark", DecorWoodDark);
             for (int k = 0; k < steps; k++)
             {
-                float h = (k + 1) * rise;
-                Part(root, $"Step{k}", PrimitiveType.Cube, k % 2 == 0 ? wood : dark,
-                    new Vector3(0f, h * 0.5f, DecorCell * 0.5f - run * (k + 0.5f)), new Vector3(1.8f, h, run), true);
+                float top = (k + 1) * rise;
+                float z = DecorCell * 0.5f - run * (k + 0.5f);
+                Part(root, $"Tread{k}", PrimitiveType.Cube, tread, new Vector3(0f, top - 0.035f, z - 0.015f), new Vector3(width - 0.1f, 0.07f, run + 0.03f));
+                Part(root, $"Riser{k}", PrimitiveType.Cube, riser, new Vector3(0f, top - rise * 0.5f - 0.035f, z + run * 0.5f - 0.015f), new Vector3(width - 0.12f, rise - 0.07f, 0.03f));
+
+                var step = new GameObject($"StepCollider{k}").AddComponent<BoxCollider>();
+                step.transform.SetParent(root, false);
+                step.center = new Vector3(0f, top * 0.5f, z);
+                step.size = new Vector3(width, top, run);
+            }
+
+            // 옆판: 아래 앞에서 위 뒤로 비스듬히 이어지는 두꺼운 보
+            var slope = new Vector3(0f, DecorStorey, -DecorCell);
+            foreach (float x in new[] { -width * 0.5f + 0.04f, width * 0.5f - 0.04f })
+            {
+                var beam = Part(root, x < 0f ? "StringerL" : "StringerR", PrimitiveType.Cube, side,
+                    new Vector3(x, DecorStorey * 0.5f - 0.12f, 0f), new Vector3(0.08f, 0.32f, slope.magnitude + 0.1f));
+                beam.localRotation = Quaternion.LookRotation(slope);
             }
         }
 
@@ -758,16 +831,74 @@ namespace CookieClicker.EditorTools
             AddBoxCollider(root, new Vector3(0f, 0.24f, 0f), new Vector3(1.6f, 0.48f, 1.1f));
         }
 
+        /// <summary>
+        /// 휴대용 가스버너 위에 본진과 같은 낙곱새 냄비(가벼운 LOD2 모델)를 올리고, 김이 피어오르게 한다.
+        /// 김 파티클은 프리팹 안에 있어서 놓으면 바로 피어오르고, 미리보기(유령)에서는 꺼진다.
+        /// </summary>
         private static void BuildBurnerPot(Transform root)
         {
-            Part(root, "Burner", PrimitiveType.Cube, DecorMat("Burner", new Color(0.22f, 0.22f, 0.24f)), new Vector3(0f, 0.05f, 0f), new Vector3(0.4f, 0.1f, 0.4f));
-            Part(root, "Knob", PrimitiveType.Cube, DecorMat("PlasticRed", new Color(0.88f, 0.2f, 0.16f)), new Vector3(0.12f, 0.05f, 0.21f), new Vector3(0.06f, 0.05f, 0.03f));
-            var pot = DecorMat("PotBrown", new Color(0.55f, 0.3f, 0.18f));
-            Part(root, "Pot", PrimitiveType.Cylinder, pot, new Vector3(0f, 0.19f, 0f), new Vector3(0.38f, 0.09f, 0.38f));
-            Part(root, "Soup", PrimitiveType.Cylinder, DecorMat("Soup", new Color(0.85f, 0.25f, 0.12f)), new Vector3(0f, 0.27f, 0f), new Vector3(0.34f, 0.01f, 0.34f));
-            Part(root, "HandleL", PrimitiveType.Cube, pot, new Vector3(-0.22f, 0.24f, 0f), new Vector3(0.08f, 0.03f, 0.06f));
-            Part(root, "HandleR", PrimitiveType.Cube, pot, new Vector3(0.22f, 0.24f, 0f), new Vector3(0.08f, 0.03f, 0.06f));
-            AddBoxCollider(root, new Vector3(0f, 0.14f, 0f), new Vector3(0.42f, 0.28f, 0.42f));
+            // 버너: 진회색 몸통 + 은색 윗판 + 불꽃 고리 + 냄비 받침 4개 + 빨간 손잡이
+            var body = DecorMat("BurnerBody", new Color(0.24f, 0.25f, 0.28f));
+            var steel = DecorMat("Steel", new Color(0.78f, 0.8f, 0.83f));
+            var dark = DecorMat("Burner", new Color(0.22f, 0.22f, 0.24f));
+            Part(root, "Body", PrimitiveType.Cube, body, new Vector3(0f, 0.05f, 0f), new Vector3(0.46f, 0.1f, 0.36f));
+            Part(root, "TopPlate", PrimitiveType.Cube, steel, new Vector3(0f, 0.105f, -0.01f), new Vector3(0.44f, 0.012f, 0.32f));
+            Part(root, "Ring", PrimitiveType.Cylinder, dark, new Vector3(0f, 0.115f, -0.01f), new Vector3(0.16f, 0.008f, 0.16f));
+            for (int k = 0; k < 4; k++)
+            {
+                float angle = k * 90f + 45f;
+                var dir = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
+                var prong = Part(root, $"Prong{k}", PrimitiveType.Cube, dark, new Vector3(0f, 0.125f, -0.01f) + dir * 0.1f, new Vector3(0.02f, 0.02f, 0.08f));
+                prong.localRotation = Quaternion.Euler(0f, angle, 0f);
+            }
+            Part(root, "FrontPanel", PrimitiveType.Cube, DecorMat("TentOrange", new Color(0.96f, 0.55f, 0.24f)), new Vector3(0f, 0.05f, 0.181f), new Vector3(0.3f, 0.05f, 0.004f));
+            Part(root, "Knob", PrimitiveType.Cylinder, DecorMat("PlasticRed", new Color(0.88f, 0.2f, 0.16f)), new Vector3(0.17f, 0.05f, 0.19f), new Vector3(0.05f, 0.012f, 0.05f))
+                .localRotation = Quaternion.Euler(90f, 0f, 0f);
+
+            // 냄비: 본진 냄비와 같은 모델의 가벼운 버전
+            var potAsset = AssetDatabase.LoadAssetAtPath<GameObject>($"{LodFolder}/Nakgopsae_LOD2.glb");
+            if (potAsset != null)
+            {
+                var pot = (GameObject)PrefabUtility.InstantiatePrefab(potAsset, root);
+                pot.name = "Pot";
+                var bounds = RendererBounds(pot, root);
+                pot.transform.localScale *= 0.44f / Mathf.Max(bounds.size.x, bounds.size.z);
+                bounds = RendererBounds(pot, root);
+                pot.transform.localPosition += new Vector3(-bounds.center.x, 0.13f - bounds.min.y, -0.01f - bounds.center.z);
+            }
+
+            var steam = CreateParticleSystem("Steam", root, new Vector3(0f, 0.3f, -0.01f), 40);
+            var main = steam.main;
+            main.loop = true;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(1.4f, 2.2f);
+            main.startSpeed = 0f;
+            main.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.22f);
+            main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            main.startColor = new Color(1f, 1f, 1f, 0.35f);
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.prewarm = true;
+            var emission = steam.emission;
+            emission.rateOverTime = 4f;
+            var shape = steam.shape;
+            shape.shapeType = ParticleSystemShapeType.Circle;
+            shape.radius = 0.12f;
+            shape.rotation = new Vector3(-90f, 0f, 0f);
+            var velocity = steam.velocityOverLifetime;
+            velocity.enabled = true;
+            velocity.space = ParticleSystemSimulationSpace.World;
+            velocity.x = new ParticleSystem.MinMaxCurve(-0.03f, 0.03f);
+            velocity.y = new ParticleSystem.MinMaxCurve(0.25f, 0.4f);
+            velocity.z = new ParticleSystem.MinMaxCurve(-0.03f, 0.03f);
+            var size = steam.sizeOverLifetime;
+            size.enabled = true;
+            size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 0.5f, 1f, 1.8f));
+            var color = steam.colorOverLifetime;
+            color.enabled = true;
+            color.color = new ParticleSystem.MinMaxGradient(Fade(0.2f, 0.5f));
+            steam.GetComponent<ParticleSystemRenderer>().sharedMaterial =
+                ParticleMaterial("Steam", CookieArtFactory.SoftCircle.texture, ParticleBlend.Alpha);
+
+            AddBoxCollider(root, new Vector3(0f, 0.17f, 0f), new Vector3(0.46f, 0.34f, 0.44f));
         }
 
         private static void BuildParasol(Transform root)

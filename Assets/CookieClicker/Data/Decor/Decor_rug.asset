@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uB465\uADFC \uB7EC\uADF8"
   displayNameEn: Round Rug
   snap: 3
-  category: 1
+  category: 3
   slotGroup: 
   cost: 200
+  flat: 1
+  paintMaterial: carpet
   prefab: {fileID: 8755069812261953589, guid: 7849ac982078e6948997ad8c32959e28, type: 3}
   icon: {fileID: 21300000, guid: 9e496c05ebc6fd84e825bdeb25af5c91, type: 3}

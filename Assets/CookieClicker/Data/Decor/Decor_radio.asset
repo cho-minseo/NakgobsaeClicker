@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uB77C\uB514\uC624"
   displayNameEn: Radio
   snap: 3
-  category: 1
+  category: 2
   slotGroup: 
   cost: 300
+  flat: 0
+  paintMaterial: wood
   prefab: {fileID: 837709355176696802, guid: a2a19937595227647992905e6a5ead9b, type: 3}
   icon: {fileID: 21300000, guid: 3e9e5f6ce9f9d5c48a2c83d6150b42ea, type: 3}

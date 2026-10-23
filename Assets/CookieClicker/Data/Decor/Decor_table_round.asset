@@ -19,5 +19,7 @@ MonoBehaviour:
   category: 1
   slotGroup: 
   cost: 300
+  flat: 0
+  paintMaterial: Decor_Steel
   prefab: {fileID: 7134751462110834344, guid: 12969c79786d66f419d4c831f8964757, type: 3}
   icon: {fileID: 21300000, guid: f00241a020e06e443a4d1aa4788e1654, type: 3}

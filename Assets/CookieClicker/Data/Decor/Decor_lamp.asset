@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uC2A4\uD0E0\uB4DC \uC870\uBA85"
   displayNameEn: Floor Lamp
   snap: 3
-  category: 1
+  category: 2
   slotGroup: 
   cost: 350
+  flat: 0
+  paintMaterial: lamp
   prefab: {fileID: 272483122660427480, guid: 6def7db58da40034baccc4930c1be3d4, type: 3}
   icon: {fileID: 21300000, guid: 0cfa738a417c878409e8dc5d05898dad, type: 3}

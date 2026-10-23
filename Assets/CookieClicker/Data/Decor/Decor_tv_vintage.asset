@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uC61B\uB0A0 TV"
   displayNameEn: Retro TV
   snap: 3
-  category: 1
+  category: 2
   slotGroup: 
   cost: 800
+  flat: 0
+  paintMaterial: wood
   prefab: {fileID: 7561718434096878418, guid: 657040eae4915e745ad771a81549a4ee, type: 3}
   icon: {fileID: 21300000, guid: 30c8641f4cc70e9438d0bb5735a8685a, type: 3}

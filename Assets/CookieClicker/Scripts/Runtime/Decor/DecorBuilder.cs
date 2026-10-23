@@ -11,6 +11,7 @@ namespace CookieClicker.Decor
     /// <summary>
     /// 꾸미기 모드 조작. B로 켜고 끄고, 바라보는 곳에 반투명 미리보기를 띄워서 좌클릭으로 사서 놓고 우클릭으로 회수한다.
     /// 미리보기는 놓을 수 있으면 초록, 없으면 빨강. 계산(어디에 붙는지, 놓을 수 있는지)은 DecorArea가 한다.
+    /// C로 칠할 색을 고르면 그 색으로 놓이고, 놓인 물건을 보고 G를 누르면 그 색으로 다시 칠한다.
     /// </summary>
     // 건물 팝업(100)보다 늦게 돌아야 팝업을 Esc로 닫는 프레임에 꾸미기까지 같이 끝나지 않는다.
     [DefaultExecutionOrder(110)]
@@ -36,8 +37,12 @@ namespace CookieClicker.Decor
         [SerializeField] private InputAction removeAction = new InputAction("DecorRemove", InputActionType.Button, "<Mouse>/rightButton");
         [SerializeField] private InputAction rotateAction = new InputAction("DecorRotate", InputActionType.Button, "<Keyboard>/r");
         [SerializeField] private InputAction scrollAction = new InputAction("DecorScroll", InputActionType.Value, "<Mouse>/scroll/y");
-        [Tooltip("구조물 / 가구 탭 바꾸기")]
+        [Tooltip("다음 탭 (Shift와 함께 누르면 이전 탭)")]
         [SerializeField] private InputAction categoryAction = new InputAction("DecorCategory", InputActionType.Button, "<Keyboard>/tab");
+        [Tooltip("칠할 색 바꾸기 (원래 색 → 팔레트 순서)")]
+        [SerializeField] private InputAction colorAction = new InputAction("DecorColor", InputActionType.Button, "<Keyboard>/c");
+        [Tooltip("바라보는 물건을 지금 색으로 칠하기")]
+        [SerializeField] private InputAction paintAction = new InputAction("DecorPaint", InputActionType.Button, "<Keyboard>/g");
         [SerializeField] private InputActionReference cancelAction;
 
         public bool IsBuilding { get; private set; }
@@ -51,7 +56,9 @@ namespace CookieClicker.Decor
         private int selected;
         private DecorCategory category;
         /// <summary>탭마다 마지막으로 고른 물건 (탭을 왔다 갔다 해도 고른 게 유지되게)</summary>
-        private readonly int[] lastSelected = { -1, -1 };
+        private readonly int[] lastSelected = { -1, -1, -1, -1 };
+        /// <summary>칠할 색 번호 (-1 = 원래 색)</summary>
+        private int paintColor = -1;
         private int rotationSteps;
         private bool pausedLastFrame;
 
@@ -72,6 +79,8 @@ namespace CookieClicker.Decor
             rotateAction.Enable();
             scrollAction.Enable();
             categoryAction.Enable();
+            colorAction.Enable();
+            paintAction.Enable();
             selectAction.Enable();
             cancelAction.action.Enable();
         }
@@ -84,6 +93,8 @@ namespace CookieClicker.Decor
             rotateAction.Disable();
             scrollAction.Disable();
             categoryAction.Disable();
+            colorAction.Disable();
+            paintAction.Disable();
             selectAction.Disable();
             // 구경하기를 나가면서 꺼질 때
             if (IsBuilding) SetBuilding(false);
@@ -134,13 +145,25 @@ namespace CookieClicker.Decor
             area.SetGridVisible(building);
             hud.Show(building);
             hud.SetSelected(selected);
+            hud.SetPaintColor(paintColor);
             if (!building && activeGhost != null) activeGhost.SetActive(false);
         }
 
         private void HandleSelection()
         {
             if (categoryAction.WasPressedThisFrame())
-                SetCategory(category == DecorCategory.Structure ? DecorCategory.Furniture : DecorCategory.Structure);
+            {
+                int count = System.Enum.GetValues(typeof(DecorCategory)).Length;
+                bool back = Keyboard.current != null && Keyboard.current.shiftKey.isPressed;
+                SetCategory((DecorCategory)(((int)category + (back ? count - 1 : 1)) % count));
+            }
+            if (colorAction.WasPressedThisFrame())
+            {
+                // -1(원래 색) → 0 → 1 → ... → 마지막 → 다시 -1
+                int colors = area.Catalog.PaintColors.Count;
+                paintColor = paintColor + 1 >= colors ? -1 : paintColor + 1;
+                hud.SetPaintColor(paintColor);
+            }
 
             // 숫자키·휠은 지금 탭 안의 물건만 돈다.
             var inTab = new List<int>();
@@ -193,6 +216,12 @@ namespace CookieClicker.Decor
                 game.Refund(refund);
                 return;
             }
+            // 놓인 물건을 보고 G를 누르면 지금 고른 색으로 다시 칠한다 (무료).
+            if (looked != null && paintAction.WasPressedThisFrame())
+            {
+                area.Paint(looked, paintColor);
+                return;
+            }
 
             var placement = area.GetPlacement(piece, hit, rotationSteps);
             bool affordable = game.State.Cookies >= piece.Cost;
@@ -200,15 +229,15 @@ namespace CookieClicker.Decor
             ShowGhost(piece, placement, canPlace);
 
             string removeInfo = looked != null
-                ? Loc.T($"   ·   [우클릭] {looked.Piece.DisplayName} 회수 (+{NumberFormatter.Format(refund)})",
-                    $"   ·   [RMB] Remove {looked.Piece.DisplayName} (+{NumberFormatter.Format(refund)})")
+                ? Loc.T($"   ·   [우클릭] {looked.Piece.DisplayName} 회수 (+{NumberFormatter.Format(refund)})  [G] 칠하기",
+                    $"   ·   [RMB] Remove {looked.Piece.DisplayName} (+{NumberFormatter.Format(refund)})  [G] Paint")
                 : string.Empty;
             if (!placement.Valid) hud.SetStatus(placement.Reason + removeInfo, true);
             else if (!affordable) hud.SetStatus(Loc.T($"{game.Config.CurrencyName}가 모자라요", $"Not enough {game.Config.CurrencyName}") + removeInfo, true);
             else hud.SetStatus($"{piece.DisplayName}  {NumberFormatter.Format(piece.Cost)} {game.Config.CurrencyName}{removeInfo}", false);
 
             if (canPlace && placeAction.WasPressedThisFrame() && game.TrySpend(piece.Cost))
-                area.Place(piece, placement);
+                area.Place(piece, placement, paintColor);
         }
 
         // ------------------------------------------------------------------ 미리보기

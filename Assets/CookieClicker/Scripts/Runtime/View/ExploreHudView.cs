@@ -28,8 +28,8 @@ namespace CookieClicker.View
         [SerializeField, TextArea] private string swimHintEn = "Swim where you look · Space Up · C Dive · Shift Faster · Esc Back";
         [Header("꾸미기")]
         [SerializeField] private DecorBuilder decor;
-        [SerializeField, TextArea] private string decorHint = "좌클릭 놓기 · 우클릭 회수 · R 돌리기 · 휠/숫자 고르기 · Tab 구조물/가구 · B 끝내기";
-        [SerializeField, TextArea] private string decorHintEn = "LMB Place · RMB Remove · R Rotate · Wheel/1-9 Select · Tab Build/Furniture · B Done";
+        [SerializeField, TextArea] private string decorHint = "좌클릭 놓기 · 우클릭 회수 · R 돌리기 · 휠 고르기 · Tab 분류 · C 색 · G 칠하기 · B 끝내기";
+        [SerializeField, TextArea] private string decorHintEn = "LMB Place · RMB Remove · R Rotate · Wheel Select · Tab Category · C Color · G Paint · B Done";
         [SerializeField] private Color breathColor = new Color(0.55f, 0.85f, 1f);
         [SerializeField] private Color breathLowColor = new Color(1f, 0.4f, 0.35f);
 

@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Decor_fridge
   m_EditorClassIdentifier: CookieClicker::CookieClicker.Decor.DecorPiece
   id: fridge
-  displayName: "\uC791\uC740 \uB0C9\uC7A5\uACE0"
-  displayNameEn: Mini Fridge
+  displayName: "\uB0C9\uC7A5\uACE0"
+  displayNameEn: Fridge
   snap: 3
-  category: 1
+  category: 2
   slotGroup: 
   cost: 600
+  flat: 0
+  paintMaterial: 
   prefab: {fileID: 1493070249110887850, guid: 06e1face69fdddd45a63ca2153cc2925, type: 3}
   icon: {fileID: 21300000, guid: 80901465e33cdb34ca7d729905ec53d9, type: 3}

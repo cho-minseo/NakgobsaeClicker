@@ -19,5 +19,7 @@ MonoBehaviour:
   category: 0
   slotGroup: 
   cost: 60
+  flat: 0
+  paintMaterial: Decor_Jangpan
   prefab: {fileID: 3072098289777303143, guid: 33b0505af466c67459612cf2d9effc2b, type: 3}
   icon: {fileID: 21300000, guid: 43c8b034d0f7b284aa6a423834313a0c, type: 3}

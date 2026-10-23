@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uD654\uBD84"
   displayNameEn: Plant Pot
   snap: 3
-  category: 1
+  category: 3
   slotGroup: 
   cost: 100
+  flat: 0
+  paintMaterial: wood
   prefab: {fileID: 7415962026404893209, guid: 700e67999467b6b468b8c5f5a2466018, type: 3}
   icon: {fileID: 21300000, guid: 2c11f13194ebde140885351ed52da25b, type: 3}

@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: "\uC544\uC774\uC2A4\uBC15\uC2A4"
   displayNameEn: Ice Box
   snap: 3
-  category: 1
+  category: 3
   slotGroup: 
   cost: 200
+  flat: 0
+  paintMaterial: Decor_IceBlue
   prefab: {fileID: 7110474720741958073, guid: 796004b82e06b6a42bd4c6e8881b64a2, type: 3}
   icon: {fileID: 21300000, guid: 3de4dd14858692049beca715712a3195, type: 3}
