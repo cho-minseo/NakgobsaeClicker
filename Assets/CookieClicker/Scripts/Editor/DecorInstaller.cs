@@ -32,6 +32,8 @@ namespace CookieClicker.EditorTools
         private static readonly Vector2Int DecorLotCells = new Vector2Int(12, 10);
         private const float DecorCell = 2f;
         private const float DecorStorey = 2.5f;
+        /// <summary>가구 전체 크기 배율. 캐릭터가 머리 큰 2등신이라 실제 치수대로 만들면 가구가 작아 보여서 키운다.</summary>
+        private const float FurnitureScale = 1.3f;
 
         private static readonly Color DecorWood = new Color(0.78f, 0.58f, 0.38f);
         private static readonly Color DecorWoodDark = new Color(0.52f, 0.34f, 0.2f);
@@ -96,9 +98,12 @@ namespace CookieClicker.EditorTools
             if (!EditorUtility.DisplayDialog("Cookie Clicker",
                     "꾸미기 물건 프리팹과 아이콘을 처음 모양으로 다시 만듭니다.\n직접 고친 프리팹 모양은 사라집니다. (가격·이름 에셋은 유지)", "다시 만들기", "취소"))
                 return;
-            EnsureDecorAssets(true);
+            RebuildDecorPrefabsWithoutDialogs();
             EditorUtility.DisplayDialog("Cookie Clicker", "꾸미기 프리팹을 다시 만들었습니다.", "확인");
         }
+
+        /// <summary>확인 창 없이 프리팹·아이콘을 다시 만든다 (배치 모드 -executeMethod용). 같은 경로에 덮어써서 씬·데이터의 연결은 유지된다.</summary>
+        public static void RebuildDecorPrefabsWithoutDialogs() => EnsureDecorAssets(true);
 
         private static bool FindDecorTargets(out Transform world, out CookieGame game, out ExploreHudView hud,
             out FirstPersonController player, out ExploreModeController mode)
@@ -387,6 +392,7 @@ namespace CookieClicker.EditorTools
             var model = new GameObject("Model").transform;
             model.SetParent(root.transform, false);
             spec.Build(model);
+            if (spec.Category == DecorCategory.Furniture) model.localScale = Vector3.one * FurnitureScale;
             foreach (var part in model.GetComponentsInChildren<BoxCollider>())
             {
                 var t = part.transform;
