@@ -35,6 +35,18 @@ namespace CookieClicker.Data
         [Tooltip("럭키: 최대 몇 초 분량의 생산량까지 줄지")]
         [SerializeField] private float luckyMaxCpsSeconds = 900f;
 
+        [Header("상점 등급 색 (일반·고급·희귀·영웅·전설)")]
+        [SerializeField] private Color[] rarityColors =
+        {
+            new Color(0.80f, 0.70f, 0.56f), // 일반: 베이지
+            new Color(0.40f, 0.76f, 0.33f), // 고급: 초록
+            new Color(0.27f, 0.58f, 0.96f), // 희귀: 파랑
+            new Color(0.66f, 0.38f, 0.93f), // 영웅: 보라
+            new Color(1.00f, 0.74f, 0.16f), // 전설: 금
+        };
+        [Tooltip("건물을 이 개수 이상 가지면 그 등급 (일반·고급·희귀·영웅·전설 순)")]
+        [SerializeField] private int[] buildingRarityCounts = { 0, 10, 25, 50, 100 };
+
         [Header("저장")]
         [SerializeField] private string saveKey = "Nakgopsae.Save";
         [SerializeField] private float autosaveInterval = 30f;
@@ -54,6 +66,23 @@ namespace CookieClicker.Data
         public float AutosaveInterval => autosaveInterval;
 
         public int IndexOf(BuildingDefinition building) => Array.IndexOf(buildings, building);
+
+        public Color RarityColor(Rarity rarity)
+        {
+            int i = Mathf.Clamp((int)rarity, 0, rarityColors.Length - 1);
+            return rarityColors.Length > 0 ? rarityColors[i] : Color.white;
+        }
+
+        /// <summary>보유 개수로 정하는 건물 등급. 많이 가질수록 높아진다.</summary>
+        public Rarity BuildingRarity(int owned)
+        {
+            var rarity = Rarity.Common;
+            for (int i = 0; i < buildingRarityCounts.Length && i <= (int)Rarity.Legendary; i++)
+            {
+                if (owned >= buildingRarityCounts[i]) rarity = (Rarity)i;
+            }
+            return rarity;
+        }
 
 #if UNITY_EDITOR
         public void EditorSetContent(BuildingDefinition[] newBuildings, UpgradeDefinition[] newUpgrades)

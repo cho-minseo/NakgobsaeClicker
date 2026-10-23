@@ -91,6 +91,8 @@ namespace CookieClicker.EditorTools
             InstallDecor(world, game, hud.GetComponent<ExploreHudView>(), player, playerCamera, mode);
             // 3인칭 캐릭터(V로 시점 전환)와 의자에 앉기(F)
             InstallAvatar(player, playerCamera, hud.GetComponent<ExploreHudView>(), mode);
+            // 본진 냄비에서 1인분 낙곱새 들기(클릭)·던지기(클릭)·내려놓기(우클릭)
+            InstallCarry(player, playerCamera, hud.GetComponent<ExploreHudView>(), world.Find("Home/StewPot"));
         }
 
         // ------------------------------------------------------------------ 지형

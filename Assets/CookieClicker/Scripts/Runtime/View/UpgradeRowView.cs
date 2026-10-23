@@ -25,6 +25,12 @@ namespace CookieClicker.View
         [SerializeField] private Text iconLabel;
         [SerializeField] private Text costText;
 
+        [Header("등급 색")]
+        [Tooltip("그림 뒤 칸. 등급 색(일반·고급·희귀·영웅·전설)으로 칠한다")]
+        [SerializeField] private Image rarityTile;
+        [Tooltip("영웅·전설일 때만 켜지는 빛")]
+        [SerializeField] private RarityShine rarityGlow;
+
         [Header("색상")]
         [SerializeField] private Color cardColor = Color.white;
         [SerializeField] private Color flatCardColor = new Color(0.95f, 0.9f, 0.8f);
@@ -69,6 +75,15 @@ namespace CookieClicker.View
 
             costText.text = NumberFormatter.Format(upgrade.Cost);
             costText.color = canAfford ? affordableCostColor : expensiveCostColor;
+        }
+
+        /// <summary>그림 뒤 칸을 등급 색으로 칠하고, 높은 등급이면 뒤에서 빛나게 한다.</summary>
+        public void SetRarity(Color color, bool shine)
+        {
+            if (rarityTile != null) rarityTile.color = color;
+            if (rarityGlow == null) return;
+            rarityGlow.gameObject.SetActive(shine);
+            if (shine) rarityGlow.SetColor(color);
         }
 
         public void Hide()

@@ -1,3 +1,4 @@
+using CookieClicker.Data;
 using CookieClicker.Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -98,6 +99,9 @@ namespace CookieClicker.View
                 {
                     buildingRows[i].ShowBuilding(config.Buildings[i], state.BuildingCounts[i], game.BuyAmount, cost,
                         game.Production.UnitCps[i], game.Production.BuildingCps[i], state.Cookies >= cost);
+                    // 많이 가질수록 높은 등급 색 (기준 개수는 GameConfig)
+                    var rarity = config.BuildingRarity(state.BuildingCounts[i]);
+                    buildingRows[i].SetRarity(config.RarityColor(rarity), rarity >= Rarity.Epic);
                 }
                 else if (previousRevealed)
                 {
@@ -117,6 +121,8 @@ namespace CookieClicker.View
                 if (game.IsUpgradeAvailable(i))
                 {
                     upgradeRows[i].Show(config.Upgrades[i], state.Cookies >= config.Upgrades[i].Cost);
+                    var rarity = config.Upgrades[i].Rarity;
+                    upgradeRows[i].SetRarity(config.RarityColor(rarity), rarity >= Rarity.Epic);
                     anyUpgrade = true;
                 }
                 else
@@ -144,7 +150,9 @@ namespace CookieClicker.View
             if (!show) return;
 
             var upgrade = game.Config.Upgrades[hoveredUpgrade];
-            tooltipName.text = upgrade.DisplayName;
+            // 이름 옆에 등급을 등급 색으로 (예: "황금 통발  전설")
+            string rarityHex = ColorUtility.ToHtmlStringRGB(game.Config.RarityColor(upgrade.Rarity) * 0.8f);
+            tooltipName.text = $"{upgrade.DisplayName}  <size=18><color=#{rarityHex}>{RarityNames.Get(upgrade.Rarity)}</color></size>";
             tooltipDescription.text = upgrade.Description;
             tooltipCost.text = $"{NumberFormatter.Format(upgrade.Cost)} {game.Config.CurrencyName}";
             tooltipCost.color = game.State.Cookies >= upgrade.Cost ? affordableCostColor : expensiveCostColor;

@@ -29,6 +29,12 @@ namespace CookieClicker.View
         [SerializeField] private Text infoText;
         [SerializeField] private Text countText;
 
+        [Header("등급 색")]
+        [Tooltip("그림 뒤 칸. 등급 색(일반·고급·희귀·영웅·전설)으로 칠한다")]
+        [SerializeField] private Image rarityTile;
+        [Tooltip("영웅·전설일 때만 켜지는 빛")]
+        [SerializeField] private RarityShine rarityGlow;
+
         [Header("색상")]
         [SerializeField] private Color cardColor = Color.white;
         [SerializeField] private Color flatCardColor = new Color(0.95f, 0.9f, 0.8f);
@@ -40,6 +46,7 @@ namespace CookieClicker.View
         [SerializeField] private Color countColor = new Color(0.23f, 0.14f, 0.09f);
         [SerializeField] private Color dimCountColor = new Color(0.73f, 0.63f, 0.53f);
         [SerializeField] private Color mysteryIconColor = new Color(0f, 0f, 0f, 0.13f);
+        [SerializeField] private Color mysteryTileColor = new Color(0.92f, 0.86f, 0.75f);
 
         private int index;
         private Action<int> onClicked;
@@ -81,6 +88,7 @@ namespace CookieClicker.View
             SetCard(mysteryCardColor, false, false);
 
             SetIcon(building.Icon, building.IconColor, "?", true);
+            if (rarityTile != null) SetRarity(mysteryTileColor, false);
             nameText.text = "???";
             costText.text = NumberFormatter.Format(cost);
             costText.color = expensiveCostColor;
@@ -89,6 +97,15 @@ namespace CookieClicker.View
         }
 
         public void Hide() => gameObject.SetActive(false);
+
+        /// <summary>그림 뒤 칸을 등급 색으로 칠하고, 높은 등급이면 뒤에서 빛나게 한다.</summary>
+        public void SetRarity(Color color, bool shine)
+        {
+            if (rarityTile != null) rarityTile.color = color;
+            if (rarityGlow == null) return;
+            rarityGlow.gameObject.SetActive(shine);
+            if (shine) rarityGlow.SetColor(color);
+        }
 
         /// <summary>그림이 있으면 그림을, 없으면 색 칸에 이름 첫 글자를 보여 준다. silhouette이면 흐린 그림자로.</summary>
         private void SetIcon(Sprite sprite, Color tileColor, string label, bool silhouette)

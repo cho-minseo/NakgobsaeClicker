@@ -96,6 +96,7 @@ namespace CookieClicker.EditorTools
             // 불러와야 한다. 먼저 불러 두면 이미 내려간 객체를 참조하게 되어 Config 연결이 비어 버린다.
             var config = CookieContentFactory.CreateOrLoadContent();
             AssignShopIcons();
+            AssignUpgradeRarities();
             var prefabs = CreatePrefabs();
 
             var game = new GameObject("GameManager").AddComponent<CookieGame>();
@@ -745,6 +746,7 @@ namespace CookieClicker.EditorTools
             Wire(view, ("button", button), ("canvasGroup", group), ("background", background), ("highlight", highlight),
                 ("depth", background.GetComponent<Shadow>()), ("icon", iconImage), ("fallbackIcon", CookieArtFactory.RoundedRect),
                 ("iconLabel", iconLabel), ("nameText", nameText), ("costText", costText), ("infoText", infoText), ("countText", countText));
+            AddBuildingRowRarity(root.gameObject); // 등급 색 칸·빛
             return SavePrefab<BuildingRowView>(root.gameObject, "BuildingRow");
         }
 
@@ -768,6 +770,7 @@ namespace CookieClicker.EditorTools
             Wire(view, ("button", button), ("canvasGroup", group), ("background", background), ("highlight", highlight),
                 ("depth", background.GetComponent<Shadow>()), ("icon", iconImage), ("fallbackIcon", CookieArtFactory.RoundedRect),
                 ("iconLabel", iconLabel), ("costText", costText));
+            AddUpgradeRowRarity(root.gameObject); // 등급 색 칸·빛
             return SavePrefab<UpgradeRowView>(root.gameObject, "UpgradeRow");
         }
 

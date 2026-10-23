@@ -699,7 +699,8 @@ namespace CookieClicker.EditorTools
 
             var bounds = RendererBounds(instance, root);
             float scale = width > 0f ? width / Mathf.Max(bounds.size.x, bounds.size.z) : height / bounds.size.y;
-            instance.transform.localScale = Vector3.one * scale;
+            // 모델 자체에 크기가 들어 있는 것도 있어서(쓰레기통 0.47배, 화분 2배) 덮어쓰지 않고 곱한다.
+            instance.transform.localScale *= scale;
             bounds = RendererBounds(instance, root);
             instance.transform.localPosition -= new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
             bounds = RendererBounds(instance, root);

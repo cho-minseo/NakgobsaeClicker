@@ -57,6 +57,9 @@ namespace CookieClicker.Gameplay.Viewmodel
         private float strokePhase;
         private float swimWeight;
 
+        /// <summary>오른손에 무언가를 쥐고 있으면 true (주먹 쥔 모양, 클릭해도 주먹을 내밀지 않음). PotCarrier가 정한다.</summary>
+        public bool HoldingRight { get; set; }
+
         /// <summary>수영 중 팔로 물을 한 번 밀 때마다. 인자는 이동 세기(0 = 제자리 떠 있기, 1 = 헤엄쳐 나아감).</summary>
         public event Action<float> Stroked;
 
@@ -78,8 +81,8 @@ namespace CookieClicker.Gameplay.Viewmodel
             float moveRatio = player.MoveRatio;
             bool swimming = player.IsSwimming;
             bool running = !swimming && moveRatio > runFistThreshold;
-            if (attackAction.action.WasPressedThisFrame()) punch = 1f;
-            rightPose.SetPose(running || attackAction.action.IsPressed() ? HandPose.Fist : HandPose.Open);
+            if (attackAction.action.WasPressedThisFrame() && !HoldingRight) punch = 1f;
+            rightPose.SetPose(HoldingRight || running || attackAction.action.IsPressed() ? HandPose.Fist : HandPose.Open);
             leftPose.SetPose(running ? HandPose.Fist : HandPose.Open);
             punch = Mathf.Lerp(punch, 0f, punchRecover * dt);
 

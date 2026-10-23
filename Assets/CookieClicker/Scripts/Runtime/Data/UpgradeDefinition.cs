@@ -28,6 +28,8 @@ namespace CookieClicker.Data
         [SerializeField] private Color iconColor = Color.white;
         [Tooltip("상점 칸에 보이는 그림. 비워 두면 대상 건물의 그림을 쓴다.")]
         [SerializeField] private Sprite icon;
+        [Tooltip("상점 칸 색 등급 (일반 → 전설). Install Rarity 메뉴는 가격 순으로 채운다.")]
+        [SerializeField] private Rarity rarity;
 
         [Header("효과")]
         [SerializeField] private UpgradeEffectType effectType;
@@ -47,6 +49,7 @@ namespace CookieClicker.Data
         public double Cost => cost;
         public Color IconColor => iconColor;
         public Sprite Icon => icon != null ? icon : targetBuilding != null ? targetBuilding.Icon : null;
+        public Rarity Rarity => rarity;
         public UpgradeEffectType EffectType => effectType;
         public BuildingDefinition TargetBuilding => targetBuilding;
         public float Multiplier => multiplier;
@@ -58,6 +61,7 @@ namespace CookieClicker.Data
 
 #if UNITY_EDITOR
         public void EditorSetIcon(Sprite sprite) => icon = sprite;
+        public void EditorSetRarity(Rarity value) => rarity = value;
 
         public void EditorSetEnglish(string name, string newDescription)
         {
