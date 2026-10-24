@@ -100,7 +100,7 @@ namespace CookieClicker.EditorTools
             // 6) 바다 위치에 있던 건물은 땅으로, 원양어선은 배라서 물에 띄운다.
             MovePlot(world, "shrimp_farm", new Vector3(-14f, 0f, -25f));
             MovePlot(world, "franchise", new Vector3(48f, 0f, -20f));
-            MovePlot(world, "shrimp_trawler", new Vector3(14f, -0.7f, -55f));
+            MovePlot(world, "shrimp_trawler", new Vector3(14f, TrawlerPlotY, -55f));
 
             InstallSwimming(player, hud);
         }

@@ -10,8 +10,8 @@ namespace CookieClicker.Core
     public class DebugCheats : MonoBehaviour
     {
         [SerializeField] private CookieGame game;
-        [SerializeField] private double grantAmount = 10000;
-        [SerializeField] private InputAction grantAction = new InputAction("GrantCurrency", InputActionType.Button, "<Keyboard>/f1");
+        [SerializeField] private double grantAmount = 1000000000000;
+        [SerializeField] private InputAction grantAction = new InputAction("GrantCurrency", InputActionType.Button, "<Keyboard>/f12");
 
         private void Awake()
         {

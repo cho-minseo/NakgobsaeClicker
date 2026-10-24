@@ -547,8 +547,10 @@ namespace CookieClicker.EditorTools
             dot.anchoredPosition = new Vector2(34f, 0f);
             AddImage(dot, CookieArtFactory.Dot, Color.white);
             dot.gameObject.AddComponent<Blink>();
-            AddText(Stretch(CreateRect("Label", tag), Vector2.zero, Vector2.one, new Vector2(50f, 0f), new Vector2(-24f, 0f)),
+            var label = AddText(Stretch(CreateRect("Label", tag), Vector2.zero, Vector2.one, new Vector2(50f, 0f), new Vector2(-16f, 0f)),
                 "속보", 30, Color.white, TextAnchor.MiddleLeft);
+            // 영어 "BREAKING"처럼 긴 말은 두 줄로 꺾이지 않고 글자가 작아져서 한 줄에 들어간다.
+            FitOneLine(label, 16);
 
             AddText(Stretch(CreateRect("Section", news), Vector2.zero, new Vector2(0f, 1f), new Vector2(186f, 0f), new Vector2(316f, 0f)),
                 "동네 소식", 22, ChiliDeep, TextAnchor.MiddleCenter);
@@ -561,6 +563,16 @@ namespace CookieClicker.EditorTools
             newsText.horizontalOverflow = HorizontalWrapMode.Overflow;
             Wire(news.gameObject.AddComponent<NewsTickerView>(), ("game", game), ("newsText", newsText));
             return news;
+        }
+
+        /// <summary>칸보다 글이 길면 줄을 바꾸지 않고 글자 크기를 minSize까지 줄여 한 줄에 맞춘다.</summary>
+        private static void FitOneLine(Text text, int minSize)
+        {
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = minSize;
+            text.resizeTextMaxSize = text.fontSize;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
         }
 
         private static RectTransform CreateExploreButton(RectTransform root)

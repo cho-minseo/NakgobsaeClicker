@@ -73,6 +73,8 @@ namespace CookieClicker.EditorTools
             var hud = CreateExploreHud(ui.Canvas, game, playerCamera);
             // 바다(점점 깊어지는 해저 + 수면)와 수영·잠수 설치. 메뉴로 따로 실행할 수도 있다.
             InstallSea(world, player, hud.GetComponent<ExploreHudView>());
+            // 해안에서 원양어선까지 이어진 선착장 (배에 오르는 경사로는 배 단계마다 InstallTrawlerBoat가 만든다)
+            InstallDock(world);
             // 발소리·점프·수영·잠수 효과음
             InstallPlayerAudio(world, player);
 
@@ -233,6 +235,10 @@ namespace CookieClicker.EditorTools
             serialized.ApplyModifiedPropertiesWithoutUndo();
             // 보유 개수에 따라 건물 모습이 바뀌는 단계 (처음엔 박스를 단계마다 높인 임시 모습)
             InstallStages(view);
+            // 원양어선은 박스 대신 바다에 뜬 배 모델로
+            if (building.Id == "shrimp_trawler") InstallTrawlerBoat(view);
+            // 우주 소 방목장 하늘에는 소를 끌어 올리는 UFO
+            if (building.Id == "space_ranch") InstallUfo(view);
 
             // 목장은 울타리로 둘러 분위기를 낸다. 다른 건물은 Tools 메뉴로 따로 추가할 수 있다.
             if (building.Id == "cow_ranch") FenceTool.AddFence(view);
