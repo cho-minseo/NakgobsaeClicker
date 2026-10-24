@@ -160,7 +160,10 @@ namespace CookieClicker.EditorTools
             var velocity = ps.velocityOverLifetime;
             velocity.enabled = true;
             // 위로 올라가면서 빛줄기 가운데로 빨려 들고, 빙글 돈다.
+            // x·y·z는 같은 방식(두 값 사이 랜덤)이어야 해서 x·z도 0~0으로 맞춘다.
+            velocity.x = new ParticleSystem.MinMaxCurve(0f, 0f);
             velocity.y = new ParticleSystem.MinMaxCurve(2.5f, 4f);
+            velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
             velocity.radial = new ParticleSystem.MinMaxCurve(-0.35f);
             velocity.orbitalY = new ParticleSystem.MinMaxCurve(1.2f);
             var color = ps.colorOverLifetime;
