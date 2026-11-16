@@ -3,7 +3,9 @@
     "rootNamespace": "CookieClicker",
     "references": [
         "UnityEngine.UI",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.Timeline",
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

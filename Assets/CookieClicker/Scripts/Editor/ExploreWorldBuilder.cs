@@ -95,6 +95,8 @@ namespace CookieClicker.EditorTools
             InstallAvatar(player, playerCamera, hud.GetComponent<ExploreHudView>(), mode);
             // 본진 냄비에서 1인분 낙곱새 들기(클릭)·던지기(클릭)·내려놓기(우클릭)
             InstallCarry(player, playerCamera, hud.GetComponent<ExploreHudView>(), world.Find("Home/StewPot"));
+            // 건물을 처음 사거나 단계가 오르면 그 자리 공사 장면을 클리커 화면 "LIVE 공사 현장" 창으로 생중계
+            InstallConstruction(world, game, (RectTransform)ui.MainHud.transform);
         }
 
         // ------------------------------------------------------------------ 지형

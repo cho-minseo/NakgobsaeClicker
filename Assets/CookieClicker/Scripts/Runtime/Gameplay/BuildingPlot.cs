@@ -50,7 +50,12 @@ namespace CookieClicker.Gameplay
         [Tooltip("솟아오를 때 납작해졌다 늘어나는 정도")]
         [SerializeField, Range(0f, 0.6f)] private float popStrength = 0.3f;
 
+        /// <summary>단계가 올랐을 때 (이전 단계, 새 단계). 처음 불러올 때와 초기화로 내려갈 때는 알리지 않는다.</summary>
+        public event Action<BuildingPlot, int, int> StageReached;
+
         public BuildingDefinition Building => building;
+        /// <summary>공사 연출이 붙잡아 둔 동안 보여 주는 단계 (붙잡지 않았으면 null)</summary>
+        public int? HeldStage { get; private set; }
         public int Count { get; private set; }
         /// <summary>현재 단계 (0부터, 아직 안 샀으면 -1)</summary>
         public int StageIndex { get; private set; } = -1;
@@ -65,6 +70,7 @@ namespace CookieClicker.Gameplay
         private Transform popTarget;
         private Vector3 popBaseScale;
         private Renderer[] stageRenderers = Array.Empty<Renderer>();
+        private bool initialized;
 
         private void OnEnable()
         {
@@ -95,7 +101,6 @@ namespace CookieClicker.Gameplay
             int index = game.Config.IndexOf(building);
             Count = index >= 0 ? game.State.BuildingCounts[index] : 0;
 
-            builtRoot.SetActive(Count > 0);
             foreach (var tier in tiers)
             {
                 if (tier.visual != null) tier.visual.SetActive(Count >= tier.minCount);
@@ -107,7 +112,14 @@ namespace CookieClicker.Gameplay
             {
                 if (Count >= stages[i].minCount) stage = i;
             }
-            if (stage != StageIndex) ApplyStage(stage);
+            if (stage != StageIndex)
+            {
+                int from = StageIndex;
+                ApplyStage(stage);
+                if (initialized && stage > from) StageReached?.Invoke(this, from, stage);
+            }
+            initialized = true;
+            ShowVisuals();
 
             int seen = PlayerPrefs.GetInt(SeenKey, -1);
             if (stage > seen)
@@ -126,11 +138,6 @@ namespace CookieClicker.Gameplay
         {
             StopPop();
             StageIndex = stage;
-            for (int i = 0; i < stages.Length; i++)
-            {
-                if (stages[i].visual != null) stages[i].visual.SetActive(i == stage);
-            }
-
             stageRenderers = Array.Empty<Renderer>();
             if (stage < 0) return;
             var current = stages[stage];
@@ -143,10 +150,67 @@ namespace CookieClicker.Gameplay
             }
         }
 
+        /// <summary>건물 본체와 단계 모습을 켜고 끈다. 공사 중이면 붙잡아 둔 단계를, 아니면 지금 단계를 보여 준다.</summary>
+        private void ShowVisuals()
+        {
+            int shown = HeldStage ?? StageIndex;
+            builtRoot.SetActive(HeldStage.HasValue ? shown >= 0 : Count > 0);
+            for (int i = 0; i < stages.Length; i++)
+            {
+                if (stages[i].visual != null) stages[i].visual.SetActive(i == shown);
+            }
+        }
+
+        /// <summary>공사가 끝날 때까지 이 단계 모습으로 붙잡아 둔다 (-1이면 빈 땅).</summary>
+        public void Hold(int stage)
+        {
+            StopPop();
+            HeldStage = stage;
+            ShowVisuals();
+        }
+
+        /// <summary>붙잡은 것을 풀고 지금 단계 모습을 보여 준다. pop이면 솟아오르는 연출까지 바로 한다.</summary>
+        public void Release(bool pop)
+        {
+            HeldStage = null;
+            ShowVisuals();
+            if (pop) StartPop();
+        }
+
+        /// <summary>
+        /// 그 단계 건물 모습을 감싸는 상자 (이 건물 자리 기준 좌표). 꺼져 있는 단계도 잠깐 켜서 잰다.
+        /// 공사 연출이 비계 크기를 건물에 맞출 때 쓴다.
+        /// </summary>
+        public Bounds MeasureStage(int stage)
+        {
+            var visual = stage >= 0 && stage < stages.Length ? stages[stage].visual : null;
+            if (visual == null) return new Bounds(Vector3.up, Vector3.one * 2f);
+            bool rootActive = builtRoot.activeSelf, visualActive = visual.activeSelf;
+            builtRoot.SetActive(true);
+            visual.SetActive(true);
+            bool any = false;
+            var bounds = new Bounds();
+            foreach (var r in visual.GetComponentsInChildren<Renderer>())
+            {
+                if (r is ParticleSystemRenderer) continue;
+                var b = r.bounds;
+                for (int c = 0; c < 8; c++)
+                {
+                    var corner = transform.InverseTransformPoint(b.center + Vector3.Scale(b.extents,
+                        new Vector3((c & 1) == 0 ? -1 : 1, (c & 2) == 0 ? -1 : 1, (c & 4) == 0 ? -1 : 1)));
+                    if (!any) { bounds = new Bounds(corner, Vector3.zero); any = true; }
+                    else bounds.Encapsulate(corner);
+                }
+            }
+            visual.SetActive(visualActive);
+            builtRoot.SetActive(rootActive);
+            return any ? bounds : new Bounds(Vector3.up, Vector3.one * 2f);
+        }
+
         private void Update()
         {
-            // 구경하기 카메라에 실제로 그려질 때(= 플레이어가 볼 수 있을 때) 연출을 시작한다.
-            if (popPending && IsOnScreen()) StartPop();
+            // 구경하기 카메라에 실제로 그려질 때(= 플레이어가 볼 수 있을 때) 연출을 시작한다. 공사 중에는 공사 연출이 맡는다.
+            if (popPending && !HeldStage.HasValue && IsOnScreen()) StartPop();
             if (popTime >= 0f) AnimatePop();
         }
 
@@ -159,13 +223,17 @@ namespace CookieClicker.Gameplay
             return false;
         }
 
+        /// <summary>지금 보이는 건물 모습을 솟아오르게 한다 (공사 연출이 건물을 공개할 때 부른다).</summary>
+        public void Pop() => StartPop();
+
         private void StartPop()
         {
             popPending = false;
             PlayerPrefs.SetInt(SeenKey, StageIndex);
-            if (StageIndex < 0 || stages[StageIndex].visual == null) return;
+            int shown = HeldStage ?? StageIndex;
+            if (shown < 0 || stages[shown].visual == null) return;
 
-            popTarget = stages[StageIndex].visual.transform;
+            popTarget = stages[shown].visual.transform;
             popBaseScale = popTarget.localScale;
             popTime = 0f;
             if (stageUpEffect != null) stageUpEffect.Emit(stageUpParticles);

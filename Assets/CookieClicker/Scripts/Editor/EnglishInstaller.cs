@@ -67,6 +67,7 @@ namespace CookieClicker.EditorTools
         {
             ["야르! 낙곱새 맛집"] = "Yarr! Nakgopsae House",
             ["상점"] = "Store",
+            ["공사 현장"] = "Construction Site",
             ["통계"] = "Stats",
             ["업그레이드"] = "Upgrades",
             ["건물"] = "Buildings",
