@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d3e4e804b6b65245a6bb2c70fbf8574, type: 3}
+  m_Name: Decor_tv_modern
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Decor.DecorPiece
+  id: tv_modern
+  displayName: "\uD3C9\uBA74 TV"
+  displayNameEn: Flat TV
+  snap: 3
+  category: 2
+  slotGroup: 
+  cost: 1200
+  flat: 0
+  paintMaterial: 
+  prefab: {fileID: 4333126968679187589, guid: 7d1cd0a4eb30b6a439a7c60a2fc5483c, type: 3}
+  icon: {fileID: 21300000, guid: ff1c024826de1b049820c1303f6d4a71, type: 3}

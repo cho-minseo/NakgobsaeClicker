@@ -79,6 +79,22 @@ namespace CookieClicker.EditorTools
                 Paint = "carpet", Build = Kenney("stoolBar", 0.8f) },
             new DecorSpec { Id = "bench", Name = "나무 벤치", NameEn = "Bench", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 250, Seat = true,
                 Paint = "wood", Build = Kenney("bench", 0.9f) },
+            new DecorSpec { Id = "sofa", Name = "소파", NameEn = "Sofa", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 700, Seat = true,
+                Build = Kenney("loungeSofa", 0.65f) },
+            new DecorSpec { Id = "armchair", Name = "안락의자", NameEn = "Armchair", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 450, Seat = true,
+                Build = Kenney("loungeChair", 0.65f) },
+            new DecorSpec { Id = "table_square", Name = "네모 테이블", NameEn = "Square Table", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 300,
+                Build = Kenney("table", 0.6f) },
+            new DecorSpec { Id = "table_low", Name = "좌식 탁자", NameEn = "Low Table", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 250,
+                Build = Kenney("tableCoffee", 0.32f) },
+            new DecorSpec { Id = "desk", Name = "책상", NameEn = "Desk", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 400,
+                Build = Kenney("desk", 0.6f) },
+            new DecorSpec { Id = "bed", Name = "침대", NameEn = "Bed", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 900, Seat = true,
+                Build = Kenney("bedSingle", 0.5f) },
+            new DecorSpec { Id = "bookcase", Name = "책장", NameEn = "Bookcase", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 500,
+                Build = Kenney("bookcaseOpen", 1.4f) },
+            new DecorSpec { Id = "drawers", Name = "서랍장", NameEn = "Drawers", Snap = DecorSnap.Free, Category = DecorCategory.Furniture, Cost = 350,
+                Build = Kenney("sideTableDrawers", 0.5f) },
 
             // 가전
             new DecorSpec { Id = "burner_pot", Name = "버너와 냄비", NameEn = "Burner & Pot", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 1000,
@@ -91,6 +107,20 @@ namespace CookieClicker.EditorTools
                 Paint = "lamp", Build = Kenney("lampRoundFloor", 1.6f) },
             new DecorSpec { Id = "fridge", Name = "냉장고", NameEn = "Fridge", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 600,
                 Build = Kenney("kitchenFridgeLarge", 1.4f) },
+            new DecorSpec { Id = "stove", Name = "가스레인지", NameEn = "Stove", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 700,
+                Build = Kenney("kitchenStove", 0.9f) },
+            new DecorSpec { Id = "sink", Name = "싱크대", NameEn = "Sink", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 600,
+                Build = Kenney("kitchenSink", 0.9f) },
+            new DecorSpec { Id = "microwave", Name = "전자레인지", NameEn = "Microwave", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 300,
+                Build = Kenney("kitchenMicrowave", 0.3f) },
+            new DecorSpec { Id = "coffee_machine", Name = "커피 머신", NameEn = "Coffee Machine", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 350,
+                Build = Kenney("kitchenCoffeeMachine", 0.35f) },
+            new DecorSpec { Id = "washer", Name = "세탁기", NameEn = "Washer", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 650,
+                Build = Kenney("washer", 0.9f) },
+            new DecorSpec { Id = "tv_modern", Name = "평면 TV", NameEn = "Flat TV", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 1200,
+                Build = Kenney("televisionModern", 0.6f) },
+            new DecorSpec { Id = "speaker", Name = "스피커", NameEn = "Speaker", Snap = DecorSnap.Free, Category = DecorCategory.Appliance, Cost = 500,
+                Build = Kenney("speaker", 1f) },
 
             // 소품
             new DecorSpec { Id = "parasol", Name = "파라솔", NameEn = "Parasol", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 400,
@@ -105,6 +135,18 @@ namespace CookieClicker.EditorTools
                 Build = Kenney("cardboardBoxClosed", 0.45f) },
             new DecorSpec { Id = "trashcan", Name = "쓰레기통", NameEn = "Trash Can", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 80,
                 Paint = "metal", Build = Kenney("trashcan", 0.55f) },
+            new DecorSpec { Id = "rug_rect", Name = "네모 러그", NameEn = "Square Rug", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 250, Flat = true,
+                Paint = "carpet", Build = Kenney("rugRectangle", 0f, 2.4f) },
+            new DecorSpec { Id = "doormat", Name = "현관 매트", NameEn = "Doormat", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 60, Flat = true,
+                Build = Kenney("rugDoormat", 0f, 1f) },
+            new DecorSpec { Id = "plant_small", Name = "작은 화분", NameEn = "Small Plant", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 60,
+                Build = Kenney("plantSmall1", 0.4f) },
+            new DecorSpec { Id = "bear", Name = "곰 인형", NameEn = "Teddy Bear", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 150,
+                Build = Kenney("bear", 0.45f) },
+            new DecorSpec { Id = "books", Name = "책 더미", NameEn = "Books", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 40,
+                Build = Kenney("books", 0.25f) },
+            new DecorSpec { Id = "coat_rack", Name = "옷걸이", NameEn = "Coat Rack", Snap = DecorSnap.Free, Category = DecorCategory.Prop, Cost = 120,
+                Build = Kenney("coatRackStanding", 1.7f) },
         };
 
         [MenuItem("Tools/Cookie Clicker/Install Decor Mode (꾸미기 모드 설치)")]
@@ -640,8 +682,9 @@ namespace CookieClicker.EditorTools
             var light = DecorMat("Wood", DecorWood);
             var dark = DecorMat("WoodDark", DecorWoodDark);
             for (int k = 0; k < 4; k++)
+                // 널빤지를 칸 끝까지 꽉 채워서 옆 바닥과 이어 붙여도 틈이 생기지 않는다 (널빤지 구분은 색이 번갈아 맡는다).
                 Part(root, $"Plank{k}", PrimitiveType.Cube, k % 2 == 0 ? light : DecorMat("WoodMid", Color.Lerp(DecorWood, DecorWoodDark, 0.3f)),
-                    new Vector3(-0.75f + k * 0.5f, 0.1f, 0f), new Vector3(0.48f, 0.2f, 2f));
+                    new Vector3(-0.75f + k * 0.5f, 0.1f, 0f), new Vector3(0.5f, 0.2f, 2f));
             Part(root, "Joist", PrimitiveType.Cube, dark, new Vector3(0f, 0.04f, 0f), new Vector3(1.98f, 0.08f, 1.98f));
             AddBoxCollider(root, new Vector3(0f, 0.1f, 0f), new Vector3(2f, 0.2f, 2f));
         }
@@ -649,7 +692,8 @@ namespace CookieClicker.EditorTools
         private static void BuildJangpanFloor(Transform root)
         {
             Part(root, "Base", PrimitiveType.Cube, DecorMat("WoodDark", DecorWoodDark), new Vector3(0f, 0.075f, 0f), new Vector3(2f, 0.15f, 2f));
-            Part(root, "Jangpan", PrimitiveType.Cube, DecorMat("Jangpan", DecorJangpan), new Vector3(0f, 0.17f, 0f), new Vector3(1.94f, 0.06f, 1.94f));
+            // 장판을 칸 끝까지 깔아서 이어 붙였을 때 밑판 테두리가 줄처럼 보이지 않게 한다.
+            Part(root, "Jangpan", PrimitiveType.Cube, DecorMat("Jangpan", DecorJangpan), new Vector3(0f, 0.17f, 0f), new Vector3(2f, 0.06f, 2f));
             AddBoxCollider(root, new Vector3(0f, 0.1f, 0f), new Vector3(2f, 0.2f, 2f));
         }
 

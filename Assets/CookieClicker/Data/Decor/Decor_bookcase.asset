@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d3e4e804b6b65245a6bb2c70fbf8574, type: 3}
+  m_Name: Decor_bookcase
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Decor.DecorPiece
+  id: bookcase
+  displayName: "\uCC45\uC7A5"
+  displayNameEn: Bookcase
+  snap: 3
+  category: 1
+  slotGroup: 
+  cost: 500
+  flat: 0
+  paintMaterial: 
+  prefab: {fileID: 631091648537186982, guid: fc88d017a6547aa45a5075f4af6ce641, type: 3}
+  icon: {fileID: 21300000, guid: 8c3398ea0457b3a4ead56a0cfab6ba1f, type: 3}

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d3e4e804b6b65245a6bb2c70fbf8574, type: 3}
+  m_Name: Decor_table_low
+  m_EditorClassIdentifier: CookieClicker::CookieClicker.Decor.DecorPiece
+  id: table_low
+  displayName: "\uC88C\uC2DD \uD0C1\uC790"
+  displayNameEn: Low Table
+  snap: 3
+  category: 1
+  slotGroup: 
+  cost: 250
+  flat: 0
+  paintMaterial: 
+  prefab: {fileID: 6278778966522995808, guid: 8ba59be7ad4a66f4cabe1441763d4350, type: 3}
+  icon: {fileID: 21300000, guid: 894442de87a682a44a27bf224f542b3b, type: 3}
