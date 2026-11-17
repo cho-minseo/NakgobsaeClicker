@@ -41,3 +41,6 @@ Thumbs.db
 # Unity 충돌 복구 씬
 /[Aa]ssets/_Recovery/
 /[Aa]ssets/_Recovery.meta
+
+# 웹 빌드 결과물 (itch.io 등에 따로 올림)
+/Builds/
