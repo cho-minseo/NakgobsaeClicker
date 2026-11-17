@@ -121,6 +121,10 @@ namespace CookieClicker.EditorTools
             Wire(ui.Menu, ("settings", Object.FindAnyObjectByType<SettingsView>(FindObjectsInactive.Include)));
             // 영어판 문구 (건물·업그레이드 에셋, 씬의 고정 글자)
             InstallEnglish();
+            // 클릭 소리·구매 소리·버튼 소리·배경음악
+            InstallGameAudio(game);
+            // 웹에서 버벅이지 않게: 자주 바뀌는 UI는 따로 Canvas로, 탐험 맵의 안 움직이는 물체는 Static으로 묶기
+            OptimizeForWeb();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddSceneToBuildSettings();

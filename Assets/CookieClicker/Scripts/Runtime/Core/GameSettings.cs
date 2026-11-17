@@ -20,7 +20,8 @@ namespace CookieClicker.Core
         private const string LanguageKey = "settings.language";
         private const string ClickKeyKey = "settings.clickKey";
 
-        public const float DefaultVolume = 1f;
+        // 효과음 파일이 대부분 최대 음량이라 100%면 거슬린다. 처음 하는 사람은 60%에서 시작 (설정에서 올릴 수 있음).
+        public const float DefaultVolume = 0.6f;
         public const float DefaultLookSensitivity = 1f;
         public const string DefaultClickKey = "<Keyboard>/space";
         /// <summary>처음 켤 때는 기기 언어를 따른다 (한국어 기기 → 한국어, 그 밖 → 영어).</summary>
@@ -47,7 +48,7 @@ namespace CookieClicker.Core
         public static float LookSensitivity
         {
             get { EnsureLoaded(); return lookSensitivity; }
-            set { EnsureLoaded(); lookSensitivity = Mathf.Clamp(value, 0.2f, 3f); Apply(); }
+            set { EnsureLoaded(); lookSensitivity = Mathf.Clamp(value, 0.1f, 3f); Apply(); }
         }
 
         public static Language Language

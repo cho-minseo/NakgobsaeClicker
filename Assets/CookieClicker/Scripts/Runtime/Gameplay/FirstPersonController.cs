@@ -34,6 +34,10 @@ namespace CookieClicker.Gameplay
 
         [Header("시점")]
         [SerializeField] private float lookSensitivity = 0.1f;
+        [Tooltip("웹 브라우저는 마우스 이동량을 에디터보다 크게 보내서, 웹에서만 이 배율을 더 곱한다")]
+        [SerializeField] private float webLookScale = 0.45f;
+        [Tooltip("한 프레임에 이보다 크게 움직인 값은 브라우저가 잘못 보낸 튐으로 보고 버린다 (화면이 휙 도는 현상)")]
+        [SerializeField] private float maxLookDeltaPerFrame = 300f;
         [SerializeField, Range(10f, 89f)] private float maxPitch = 85f;
 
         [Header("수영")]
@@ -112,7 +116,14 @@ namespace CookieClicker.Gameplay
 
         private void Look()
         {
-            LookDelta = lookAction.action.ReadValue<Vector2>() * (lookSensitivity * GameSettings.LookSensitivity);
+            Vector2 raw = lookAction.action.ReadValue<Vector2>();
+            // 브라우저(특히 Chrome)는 마우스를 잠근 상태에서 가끔 수백 픽셀짜리 엉뚱한 값을 한 번씩 보낸다. 그런 프레임은 무시한다.
+            if (raw.sqrMagnitude > maxLookDeltaPerFrame * maxLookDeltaPerFrame) raw = Vector2.zero;
+            float scale = lookSensitivity * GameSettings.LookSensitivity;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            scale *= webLookScale;
+#endif
+            LookDelta = raw * scale;
             // 앉아 있으면 몸은 의자 방향 그대로 두고 카메라만 돈다.
             if (MovementLocked) seatedYaw += LookDelta.x;
             else transform.Rotate(0f, LookDelta.x, 0f);

@@ -281,7 +281,7 @@ namespace CookieClicker.EditorTools
                 var source = go.AddComponent<AudioSource>();
                 source.playOnAwake = false;
                 source.spatialBlend = 0f;
-                source.volume = 0.7f;
+                source.volume = 0.35f; // 소리 4줄이 겹쳐 울리므로 낮게 (웹에서 너무 시끄럽다는 의견)
                 return source;
             }
             return new ConstructionSounds
@@ -765,7 +765,7 @@ namespace CookieClicker.EditorTools
             var view = root.gameObject.AddComponent<LiveBroadcastView>();
             var audio = root.gameObject.AddComponent<AudioSource>();
             audio.playOnAwake = false;
-            audio.volume = 0.6f;
+            audio.volume = 0.35f;
             Wire(view, ("animator", animator), ("subtitle", subtitle), ("canvasGroup", group), ("audioSource", audio),
                 ("openSound", ConstructionSound("glitch_002")), ("closeSound", ConstructionSound("minimize_003")));
             return view;

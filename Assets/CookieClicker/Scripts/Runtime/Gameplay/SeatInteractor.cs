@@ -54,7 +54,7 @@ namespace CookieClicker.Gameplay
             {
                 exploreMode.ExitBlocked = true;
                 SetPrompt(Loc.T("[F] 일어나기", "[F] Stand up"));
-                if (interactAction.WasPressedThisFrame() || cancelAction.action.WasPressedThisFrame()) Stand();
+                if (interactAction.WasPressedThisFrame() || WebPointerLock.BackPressed(cancelAction.action)) Stand();
                 return;
             }
 

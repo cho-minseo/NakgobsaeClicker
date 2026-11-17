@@ -191,7 +191,7 @@ namespace CookieClicker.EditorTools
 
             var volume = CreateSettingRow(window, "Volume", "소리 크기", "Volume", 110f, 0f, 1f, out var volumeValue);
             var sensitivity = CreateSettingRow(window, "Sensitivity", "마우스 감도\n<size=20>(구경하기)</size>",
-                "Mouse speed\n<size=20>(explore)</size>", 200f, 0.2f, 3f, out var sensitivityValue);
+                "Mouse speed\n<size=20>(explore)</size>", 200f, 0.1f, 3f, out var sensitivityValue);
 
             // 언어: 고른 쪽이 밝은 금색으로 보인다 (SettingsView가 고른 버튼을 비활성 = 선택 표시로 둔다).
             var languageRow = CreateSettingLabelRow(window, "Language", "언어", "Language", 290f);

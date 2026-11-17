@@ -1,4 +1,5 @@
 using System;
+using CookieClicker.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -40,7 +41,27 @@ namespace CookieClicker.Gameplay
 
         private void Update()
         {
-            if (IsExploring && !ExitBlocked && exitAction.action.WasPressedThisFrame()) Exit();
+            // 매 프레임 물어봐서, 웹에서 Esc로 마우스 잠금이 풀린 일을 다음 프레임까지 남겨 두지 않는다.
+            bool back = WebPointerLock.BackPressed(exitAction.action);
+            if (IsExploring && !ExitBlocked && back) Exit();
+            KeepCursorLocked();
+        }
+
+        /// <summary>
+        /// 웹에서는 창 밖을 누르거나 Alt+Tab·Esc를 하면 브라우저가 마우스 잠금을 풀어 버리는데, Unity는 계속 잠긴 줄 안다.
+        /// 그러면 숨은 커서가 게임 밖으로 빠져나가 시점이 멈춘다. 잠금이 풀렸으면 커서를 보여 주고, 화면을 한 번 누르면 다시 잠근다.
+        /// 팝업·꾸미기처럼 일부러 커서를 풀어 둔 동안(Cursor.lockState가 None)에는 건드리지 않는다.
+        /// </summary>
+        private void KeepCursorLocked()
+        {
+            if (!IsExploring || Cursor.lockState != CursorLockMode.Locked || WebPointerLock.IsLocked) return;
+            Cursor.visible = true;
+            var mouse = Mouse.current;
+            if (mouse == null || !mouse.leftButton.wasPressedThisFrame) return;
+            // 한 번 풀었다가 다시 걸어야 Unity가 브라우저에 잠금을 새로 요청한다 (같은 값이면 무시함).
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         public void Enter()

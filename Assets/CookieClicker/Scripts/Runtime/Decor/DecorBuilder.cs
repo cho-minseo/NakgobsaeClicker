@@ -126,7 +126,7 @@ namespace CookieClicker.Decor
 
             // 꾸미기 중에는 Esc가 "꾸미기 끝내기"가 된다 (구경하기를 바로 나가지 않게).
             exploreMode.ExitBlocked = true;
-            if (cancelAction.action.WasPressedThisFrame())
+            if (WebPointerLock.BackPressed(cancelAction.action))
             {
                 SetBuilding(false);
                 return;

@@ -33,14 +33,32 @@ namespace CookieClicker.View
         [SerializeField] private Color breathColor = new Color(0.55f, 0.85f, 1f);
         [SerializeField] private Color breathLowColor = new Color(1f, 0.4f, 0.35f);
 
+        private float labelTimer;
+        private BuildingPlot lastLooked;
+        private int lastLookedCount = -1;
+
         private void Update()
         {
-            currencyText.text =
-                $"{NumberFormatter.Format(game.State.Cookies)} {game.Config.CurrencyName}   {Loc.T("초당", "per second:")} {NumberFormatter.Format(game.CookiesPerSecond, true)}";
+            // 글자는 0.1초마다만 새로 만든다 (매 프레임 문자열을 만들면 웹에서 메모리 정리 때문에 가끔 끊긴다).
+            labelTimer -= Time.unscaledDeltaTime;
+            if (labelTimer <= 0f)
+            {
+                labelTimer = 0.1f;
+                currencyText.text =
+                    $"{NumberFormatter.Format(game.State.Cookies)} {game.Config.CurrencyName}   {Loc.T("초당", "per second:")} {NumberFormatter.Format(game.CookiesPerSecond, true)}";
+            }
 
-            lookInfoText.text = !IsUnderwater() && TryGetLookedPlot(out var plot)
-                ? $"{plot.Building.DisplayName} x{plot.Count}\n<size=20>{plot.Building.Description}</size>"
-                : string.Empty;
+            BuildingPlot looked = null;
+            if (!IsUnderwater()) TryGetLookedPlot(out looked);
+            int lookedCount = looked != null ? looked.Count : -1;
+            if (looked != lastLooked || lookedCount != lastLookedCount)
+            {
+                lastLooked = looked;
+                lastLookedCount = lookedCount;
+                lookInfoText.text = looked != null
+                    ? $"{looked.Building.DisplayName} x{looked.Count}\n<size=20>{looked.Building.Description}</size>"
+                    : string.Empty;
+            }
 
             UpdateSwimUI();
         }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>보글보글 낙곱새</title>
+    <style>
+      /* 게임이 창(또는 itch.io 틀)을 꽉 채운다. 로딩 동안에는 썸네일 그림 위에 진행 막대를 띄운다. */
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #2b1a14; }
+      #unity-canvas { display: block; width: 100%; height: 100%; background: #2b1a14; outline: none; }
+      #loading {
+        position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+        background: #2b1a14 url("TemplateData/cover.jpg") center / cover no-repeat;
+        font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #fdf6e8;
+        transition: opacity 0.4s ease;
+      }
+      #loading::before {
+        content: ""; position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(30, 12, 8, 0.85) 0%, rgba(30, 12, 8, 0.0) 45%);
+      }
+      #loading.done { opacity: 0; pointer-events: none; }
+      #panel { position: relative; width: min(70%, 520px); margin-bottom: 7%; text-align: center; }
+      #message { font-size: clamp(14px, 2.6vw, 20px); font-weight: 700; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); }
+      #bar { height: 18px; border-radius: 9px; background: #fdf6e8; border: 3px solid #fdf6e8; overflow: hidden; box-shadow: 0 4px 0 #a8291a; }
+      #fill { height: 100%; width: 0%; border-radius: 6px; background: linear-gradient(90deg, #e2402a, #ff7a3d); transition: width 0.2s ease; }
+      #warning { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); max-width: 90%; display: none; }
+      #warning div { padding: 8px 14px; border-radius: 8px; font: 14px sans-serif; }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="loading">
+      <div id="panel">
+        <div id="message">낙곱새 끓이는 중… 0%</div>
+        <div id="bar"><div id="fill"></div></div>
+      </div>
+    </div>
+    <div id="warning"></div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+      var loading = document.querySelector("#loading");
+      var fill = document.querySelector("#fill");
+      var message = document.querySelector("#message");
+
+      function showBanner(msg, type) {
+        var banner = document.querySelector("#warning");
+        var div = document.createElement("div");
+        div.innerHTML = msg;
+        div.style.background = type == "error" ? "#e2402a" : "#ffe08a";
+        div.style.color = type == "error" ? "#fff" : "#3a2418";
+        banner.appendChild(div);
+        banner.style.display = "block";
+        if (type != "error") setTimeout(function () {
+          banner.removeChild(div);
+          if (!banner.children.length) banner.style.display = "none";
+        }, 5000);
+      }
+
+      // 구경하기에서 마우스를 잠글 때, 운영체제의 마우스 가속을 빼고 실제 움직인 만큼만 받는다.
+      // (가속이 붙으면 살짝만 움직여도 화면이 휙 돈다. 지원하지 않는 브라우저는 원래 방식으로 잠근다.)
+      // 한 번 실패하면 그 브라우저는 지원하지 않는 것으로 기억하고, 다음부터는 처음부터 원래 방식으로 잠근다.
+      // (실패를 알게 되는 건 클릭 처리가 끝난 뒤라 그때 다시 잠그려 하면 브라우저가 거절할 수 있다. 그래서 다음 클릭부터 바로 되게 한다.)
+      (function () {
+        var original = Element.prototype.requestPointerLock;
+        if (!original) return;
+        var useUnadjusted = true;
+        Element.prototype.requestPointerLock = function (options) {
+          var self = this;
+          if (!useUnadjusted) return original.call(self, options);
+          try {
+            var result = original.call(self, Object.assign({ unadjustedMovement: true }, options || {}));
+            if (result && typeof result.catch === "function") {
+              return result.catch(function (error) {
+                if (error && error.name === "NotSupportedError") useUnadjusted = false;
+                return original.call(self, options);
+              });
+            }
+            return result;
+          } catch (e) {
+            useUnadjusted = false;
+            return original.call(self, options);
+          }
+        };
+      })();
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement("meta");
+        meta.name = "viewport";
+        meta.content = "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+        document.head.appendChild(meta);
+      }
+
+      var script = document.createElement("script");
+      script.src = "Build/{{{ LOADER_FILENAME }}}";
+      script.onload = function () {
+        createUnityInstance(canvas, {
+          arguments: [],
+          dataUrl: "Build/{{{ DATA_FILENAME }}}",
+          frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_THREADS
+          workerUrl: "Build/{{{ WORKER_FILENAME }}}",
+#endif
+#if USE_WASM
+          codeUrl: "Build/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+          symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
+#endif
+          streamingAssetsUrl: "StreamingAssets",
+          companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+          productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+          productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+          showBanner: showBanner,
+          // 고해상도 화면(배율 150%·200%)에서 실제보다 2~4배 많은 점을 그리지 않게 1배로 그린다. 웹에서 렉을 크게 줄여 준다.
+          devicePixelRatio: 1,
+        }, function (progress) {
+          var percent = Math.round(progress * 100);
+          fill.style.width = percent + "%";
+          message.textContent = percent < 100 ? "낙곱새 끓이는 중… " + percent + "%" : "거의 다 끓었어요!";
+        }).then(function () {
+          loading.classList.add("done");
+          setTimeout(function () { loading.style.display = "none"; }, 450);
+          canvas.focus();
+        }).catch(function (error) {
+          alert(error);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>
